@@ -15,7 +15,7 @@ RUN go mod download
 COPY . ./
 
 # compile application
-RUN go build -o /ecowave/cmd
+RUN go build -o /ecowave
 
 # tells Docker that the container listens on specified network ports at runtime
 EXPOSE 8080
