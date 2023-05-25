@@ -1,10 +1,10 @@
-package main
+package app
 
 import (
 	"github.com/labstack/echo/v4"
 )
 
-func startApp() *echo.Echo {
+func StartApp() *echo.Echo {
 
 	return nil
 }
