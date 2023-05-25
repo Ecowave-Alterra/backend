@@ -2,7 +2,7 @@
 FROM golang:latest
 
 # create a working directory inside the image
-WORKDIR /application
+WORKDIR /app
 
 # copy Go modules and dependencies to image
 COPY go.mod ./
@@ -15,10 +15,10 @@ RUN go mod download
 COPY . ./
 
 # compile application
-RUN go build -o /ecowave
+RUN go build -o /compute-service-alterra
 
 # tells Docker that the container listens on specified network ports at runtime
 EXPOSE 8080
 
 # command to be used to execute when the image is used to start a container
-CMD [ "/ecowave" ]
+CMD [ "/compute-service-alterra" ]
