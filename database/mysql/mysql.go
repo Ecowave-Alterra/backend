@@ -2,11 +2,11 @@ package mysql
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/berrylradianh/ecowave-go/config"
 
-	"github.com/joho/godotenv"
+	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -15,14 +15,11 @@ var DB *gorm.DB
 
 func Init() {
 	InitDB()
-	// InitialMigration()
+	InitialMigration()
 }
 
 func InitDB() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	var err error
 
 	configurations := config.GetConfig()
 
@@ -40,10 +37,9 @@ func InitDB() {
 	}
 }
 
-// func InitialMigration() {
-// 	DB.AutoMigrate(
-// 		&eu.User{},
-// 		&eb.Book{},
-// 		&ebl.Blog{},
-// 	)
-// }
+func InitialMigration() {
+	DB.AutoMigrate(
+		ep.Product{},
+		ep.ProductCategory{},
+	)
+}
