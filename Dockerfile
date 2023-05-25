@@ -15,10 +15,10 @@ RUN go mod download
 COPY . ./
 
 # compile application
-RUN go build -o /compute-service-alterra
+RUN go build -o /ecowave/cmd
 
 # tells Docker that the container listens on specified network ports at runtime
 EXPOSE 8080
 
 # command to be used to execute when the image is used to start a container
-CMD [ "/compute-service-alterra" ]
+CMD [ "/ecowave" ]
