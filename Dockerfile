@@ -2,7 +2,7 @@
 FROM golang:latest
 
 # create a working directory inside the image
-WORKDIR /app
+WORKDIR /application
 
 # copy Go modules and dependencies to image
 COPY go.mod ./
