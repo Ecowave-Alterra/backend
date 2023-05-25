@@ -19,7 +19,7 @@ func (productHandler *ProductHandler) GetAllProducts() echo.HandlerFunc {
 		}
 
 		return e.JSON(http.StatusOK, map[string]interface{}{
-			"message":  "Success Get All Products",
+			"message":  "Success Get Products",
 			"products": products,
 		})
 	}
