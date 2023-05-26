@@ -1,10 +1,27 @@
-package main
+package app
 
 import (
+	"github.com/berrylradianh/ecowave-go/cmd/routes"
+	"github.com/berrylradianh/ecowave-go/common"
+
+	"github.com/berrylradianh/ecowave-go/database/mysql"
+	productHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/product"
+	productRepo "github.com/berrylradianh/ecowave-go/modules/repository/product"
+	productUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/product"
 	"github.com/labstack/echo/v4"
 )
 
-func startApp() *echo.Echo {
+func StartApp() *echo.Echo {
+	mysql.Init()
 
-	return nil
+	productRepo := productRepo.New(mysql.DB)
+	productUsecase := productUsecase.New(productRepo)
+	productHandler := productHandler.New(productUsecase)
+
+	handler := common.Handler{
+		ProductHandler: productHandler,
+	}
+
+	router := routes.StartRoute(handler)
+	return router
 }

@@ -3,12 +3,13 @@ module github.com/berrylradianh/ecowave-go
 go 1.18
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/validator v9.31.0+incompatible
-	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.10.2
 	golang.org/x/crypto v0.8.0
+	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.1
 )
 
