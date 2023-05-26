@@ -29,6 +29,10 @@ steps:
     - '--platform'
     - 'managed'
     - '--allow-unauthenticated'
+    - '--min-instances'
+    - '1'
+    - '--max-instances'
+    - '10'
     - '--set-env-vars'
     - 'DB_CONNECTION=mysql,DB_HOST=34.133.178.42,DB_PORT=3306,DB_NAME=ecowave_db,DB_USERNAME=root,DB_PASSWORD=secret-password'
   timeout: 900s
