@@ -1,10 +1,12 @@
 package productcategory
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
 	pct "github.com/berrylradianh/ecowave-go/modules/entity/product"
+	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 )
 
@@ -15,6 +17,21 @@ func (pch *ProductCategoryHandler) CreateProductCategory(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
 		})
+	}
+
+	if err := c.Validate(productCategory); err != nil {
+		if validationErr, ok := err.(validator.ValidationErrors); ok {
+			message := ""
+			for _, e := range validationErr {
+				if e.Tag() == "required" {
+					message = fmt.Sprintf("%s is required", e.Field())
+				}
+			}
+
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": message,
+			})
+		}
 	}
 
 	if err := pch.productCategoryUsecase.CreateProductCategory(&productCategory); err != nil {
@@ -35,6 +52,21 @@ func (pch *ProductCategoryHandler) UpdateProductCategory(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
 		})
+	}
+
+	if err := c.Validate(productCategory); err != nil {
+		if validationErr, ok := err.(validator.ValidationErrors); ok {
+			message := ""
+			for _, e := range validationErr {
+				if e.Tag() == "required" {
+					message = fmt.Sprintf("%s is required", e.Field())
+				}
+			}
+
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": message,
+			})
+		}
 	}
 
 	id, err := strconv.Atoi(c.Param("id"))
