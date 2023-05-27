@@ -11,7 +11,7 @@ type Information struct {
 	Content         string         `json:"Content,omitempty" form:"Content" validate:"required"`
 	ViewCount       uint           `json:"ViewCount,omitempty" form:"ViewCount"`
 	BookmarkCount   uint           `json:"BookmarkCount,omitempty" form:"BookmarkCount"`
-	StatusId        uint           `json:"StatusId,omitempty" form:"StatusId"`
+	StatusId        uint           `json:"StatusId,omitempty" form:"StatusId" validate:"required"`
 	Status          StatusResponse `gorm:"foreignKey:StatusId"`
 }
 

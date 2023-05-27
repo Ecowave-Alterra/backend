@@ -1,8 +1,6 @@
 package information
 
 import (
-	"errors"
-
 	ei "github.com/berrylradianh/ecowave-go/modules/entity/information"
 )
 
@@ -33,14 +31,15 @@ func (informationRepo *informationRepo) CreateInformation(information *ei.Inform
 }
 
 func (informationRepo *informationRepo) UpdateInformation(id int, information *ei.Information) error {
-	result := informationRepo.DB.Model(&information).Where("id = ?", id).Omit("UpdatedAt").Updates(&information)
+	query := "UPDATE information SET title = ?, photo_content_url = ?, content = ?, view_count = ?, bookmark_count = ?, status_id = ? WHERE ID = ?"
+	result := informationRepo.DB.Exec(query, information.Title, information.PhotoContentUrl, information.Content, information.ViewCount, information.BookmarkCount, information.StatusId, id)
 	if result.Error != nil {
 		return result.Error
 	}
-
-	if result.RowsAffected == 0 {
-		return errors.New("nothing updated")
-	}
+	// result := informationRepo.DB.Model(&information).Where("id = ?", id).Save(&information)
+	// if result.Error != nil {
+	// 	return result.Error
+	// }
 
 	return nil
 }

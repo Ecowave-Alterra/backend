@@ -11,7 +11,7 @@ type Status struct {
 }
 
 type StatusResponse struct {
-	*gorm.Model       `json:"-"`
+	ID                uint          `json:"-"`
 	StatusInformation string        `json:"StatusInformation" form:"StatusInformation"`
 	Informations      []Information `gorm:"foreignKey:StatusId" json:"-"`
 }

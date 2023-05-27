@@ -21,8 +21,13 @@ func (informationHandler *InformationHandler) GetAllInformations() echo.HandlerF
 			})
 		}
 
+		if informations == nil || len(*informations) == 0 {
+			return e.JSON(http.StatusOK, map[string]interface{}{
+				"Message": "Belum ada list informasi",
+			})
+		}
+
 		return e.JSON(http.StatusOK, map[string]interface{}{
-			"Message":      "Success Get Informations",
 			"Informations": informations,
 		})
 	}
@@ -47,7 +52,6 @@ func (informationHandler *InformationHandler) GetInformationById() echo.HandlerF
 		}
 
 		return e.JSON(http.StatusOK, map[string]interface{}{
-			"Message":     "Success Get Information",
 			"Information": information,
 		})
 	}
@@ -85,9 +89,15 @@ func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFu
 			})
 		}
 
-		return e.JSON(http.StatusOK, map[string]interface{}{
-			"Message": "Success Create Information",
-		})
+		if information.StatusId == 2 {
+			return e.JSON(http.StatusOK, map[string]interface{}{
+				"Message": "Anda berhasil menambahkan informasi ke dalam draft",
+			})
+		} else {
+			return e.JSON(http.StatusOK, map[string]interface{}{
+				"Message": "Anda berhasil menerbitkan informasi baru",
+			})
+		}
 	}
 }
 
@@ -98,6 +108,13 @@ func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFu
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
 				"Message": "input id is not a number",
+			})
+		}
+
+		informationBefore, err := informationHandler.informationUsecase.GetInformationById(id)
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, echo.Map{
+				"Message": "Record Not Found",
 			})
 		}
 
@@ -130,13 +147,26 @@ func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFu
 
 		err = informationHandler.informationUsecase.UpdateInformation(int(information.ID), information)
 		if err != nil {
-			return e.JSON(http.StatusOK, map[string]interface{}{
-				"Message": "Nothing Updated",
+			return e.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": err,
 			})
 		}
 
+		if information.StatusId == 2 {
+			if informationBefore.StatusId != information.StatusId {
+				return e.JSON(http.StatusOK, map[string]interface{}{
+					"Message": "Informasi berhasil dipindahkan ke dalam draft",
+				})
+			}
+		} else if information.StatusId == 1 {
+			if informationBefore.StatusId != information.StatusId {
+				return e.JSON(http.StatusOK, map[string]interface{}{
+					"Message": "Anda berhasil menerbitkan informasi baru",
+				})
+			}
+		}
 		return e.JSON(http.StatusOK, map[string]interface{}{
-			"Message": "Success Update Information",
+			"Message": "Anda berhasil mengubah informasi",
 		})
 	}
 }
@@ -166,7 +196,7 @@ func (informationHandler *InformationHandler) DeleteInformation() echo.HandlerFu
 		}
 
 		return e.JSON(http.StatusOK, map[string]interface{}{
-			"Message": "Success Delete Information",
+			"Message": "Anda berhasil menghapus informasi",
 		})
 	}
 }
