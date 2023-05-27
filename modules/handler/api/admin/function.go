@@ -1,9 +1,11 @@
 package admin
 
 import (
+	"fmt"
 	"net/http"
 
 	at "github.com/berrylradianh/ecowave-go/modules/entity/admin"
+	"github.com/go-playground/validator"
 
 	"github.com/labstack/echo/v4"
 )
@@ -15,6 +17,23 @@ func (ah *AdminHandler) LoginAdmin(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
 		})
+	}
+
+	if err := c.Validate(admin); err != nil {
+		if validationErr, ok := err.(validator.ValidationErrors); ok {
+			message := ""
+			for _, e := range validationErr {
+				if e.Tag() == "required" {
+					message = fmt.Sprintf("%s is required", e.Field())
+				} else if e.Tag() == "email" {
+					message = "invalid email address"
+				}
+			}
+
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": message,
+			})
+		}
 	}
 
 	token, err := ah.adminUsecase.LoginAdmin(&admin)
