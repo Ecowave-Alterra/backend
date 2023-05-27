@@ -6,8 +6,8 @@ import (
 )
 
 type ProductCategoryUsecase interface {
-	CreateProductCategory(productCategory *pct.ProductCategory) error
-	UpdateProductCategory(productCategory *pct.ProductCategory, id int) error
+	CreateProductCategory(productCategory *pct.ProductCategory) (bool, error)
+	UpdateProductCategory(productCategory *pct.ProductCategory, id int) (bool, error)
 	DeleteProductCategory(productCategory *pct.ProductCategory, id int) error
 	GetAllProductCategory(productCategory *[]pct.ProductCategory) error
 	SearchingProductCategoyByName(productCategory *pct.ProductCategory, name string) error

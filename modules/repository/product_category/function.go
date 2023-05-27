@@ -1,6 +1,8 @@
 package productcategory
 
-import pct "github.com/berrylradianh/ecowave-go/modules/entity/product"
+import (
+	pct "github.com/berrylradianh/ecowave-go/modules/entity/product"
+)
 
 func (pcr *productCategoryRepo) CreateProductCategory(productCategory *pct.ProductCategory) error {
 	if err := pcr.db.Save(&productCategory).Error; err != nil {
@@ -40,4 +42,17 @@ func (pcr *productCategoryRepo) SearchingProductCategoyByName(productCategory *p
 	}
 
 	return nil
+}
+
+func (pcr *productCategoryRepo) IsProductCategoryExist(productCategory *pct.ProductCategory, name string) (bool, error) {
+	result := pcr.db.Where("name = ?", name).Find(&productCategory)
+	if result.Error != nil {
+		return false, result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return false, nil
+	}
+
+	return true, nil
 }
