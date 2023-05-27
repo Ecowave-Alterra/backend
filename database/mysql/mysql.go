@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/berrylradianh/ecowave-go/config"
-
+	"github.com/berrylradianh/ecowave-go/database/seed"
+	at "github.com/berrylradianh/ecowave-go/modules/entity/admin"
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 
 	"gorm.io/driver/mysql"
@@ -16,6 +17,7 @@ var DB *gorm.DB
 func Init() {
 	InitDB()
 	InitialMigration()
+	seed.DBSeed(DB)
 }
 
 func InitDB() {
@@ -39,6 +41,7 @@ func InitDB() {
 
 func InitialMigration() {
 	DB.AutoMigrate(
+		at.Admin{},
 		ep.Product{},
 		ep.ProductCategory{},
 	)
