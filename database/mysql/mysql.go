@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/berrylradianh/ecowave-go/config"
-
+	"github.com/berrylradianh/ecowave-go/database/seed"
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 
 	"gorm.io/driver/mysql"
@@ -16,6 +16,7 @@ var DB *gorm.DB
 func Init() {
 	InitDB()
 	InitialMigration()
+	seed.DBSeed(DB)
 }
 
 func InitDB() {
