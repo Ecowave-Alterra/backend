@@ -68,6 +68,8 @@ func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFu
 				for _, e := range validationErrs {
 					if e.Tag() == "required" {
 						message = fmt.Sprintf("%s is required", e.Field())
+					} else if e.Tag() == "max" && e.Field() == "Title" {
+						message = "Mohon maaf, entri anda melebihi batas maksimum 65 karakter"
 					}
 				}
 				return e.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -112,6 +114,20 @@ func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFu
 			})
 		}
 
+		if err := e.Validate(information); err != nil {
+			if validationErrs, ok := err.(validator.ValidationErrors); ok {
+				message := ""
+				for _, e := range validationErrs {
+					if e.Tag() == "max" && e.Field() == "Title" {
+						message = "Mohon maaf, entri anda melebihi batas maksimum 65 karakter"
+					}
+				}
+				return e.JSON(http.StatusBadRequest, map[string]interface{}{
+					"Message": message,
+				})
+			}
+		}
+
 		err = informationHandler.informationUsecase.UpdateInformation(int(information.ID), information)
 		if err != nil {
 			return e.JSON(http.StatusOK, map[string]interface{}{
@@ -125,7 +141,7 @@ func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFu
 	}
 }
 
-func (informationHandler *InformationHandler) DeleteProduct() echo.HandlerFunc {
+func (informationHandler *InformationHandler) DeleteInformation() echo.HandlerFunc {
 	return func(e echo.Context) error {
 		var information *ei.Information
 		id, err := strconv.Atoi(e.Param("id"))

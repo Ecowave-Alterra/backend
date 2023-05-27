@@ -16,5 +16,5 @@ func (informationHandler *InformationHandler) RegisterRoutes(e *echo.Echo) {
 	informationGroup.GET("/:id", informationHandler.GetInformationById())
 	informationGroup.POST("", informationHandler.CreateInformation())
 	informationGroup.PUT("/:id", informationHandler.UpdateInformation())
-	informationGroup.DELETE("/:id", informationHandler.DeleteProduct())
+	informationGroup.DELETE("/:id", informationHandler.DeleteInformation())
 }

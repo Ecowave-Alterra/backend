@@ -20,12 +20,12 @@ func (informationUsecase *informationUsecase) CreateInformation(information *ei.
 	return err
 }
 
-func (informationUsecase *informationUsecase) UpdateProduct(id int, information *ei.Information) error {
+func (informationUsecase *informationUsecase) UpdateInformation(id int, information *ei.Information) error {
 	result := informationUsecase.informationRepository.UpdateInformation(id, information)
 	return result
 }
 
-func (informationUsecase *informationUsecase) DeleteProduct(id int) error {
+func (informationUsecase *informationUsecase) DeleteInformation(id int) error {
 	err := informationUsecase.informationRepository.DeleteInformation(id)
 	return err
 }
