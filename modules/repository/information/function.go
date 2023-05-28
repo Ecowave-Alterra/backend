@@ -56,3 +56,13 @@ func (informationRepo *informationRepo) DeleteInformation(id int) error {
 
 	return nil
 }
+
+func (informationRepo *informationRepo) SearchInformations(keyword string) (*[]ei.Information, error) {
+	var informations []ei.Information
+
+	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").Where("title LIKE ?", "%"+keyword+"%").Or(informationRepo.DB.Where("information_id LIKE ?", "%"+keyword+"%")).Find(&informations).Error; err != nil {
+		return nil, err
+	}
+
+	return &informations, nil
+}

@@ -200,3 +200,28 @@ func (informationHandler *InformationHandler) DeleteInformation() echo.HandlerFu
 		})
 	}
 }
+
+func (informationHandler *InformationHandler) SearchInformations() echo.HandlerFunc {
+	return func(e echo.Context) error {
+		var informations *[]ei.Information
+		var err error
+
+		keyword := e.QueryParam("keyword")
+		informations, err = informationHandler.informationUsecase.SearchInformations(keyword)
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, echo.Map{
+				"message": err.Error(),
+			})
+		}
+
+		if len(*informations) == 0 {
+			return e.JSON(http.StatusOK, echo.Map{
+				"message": "Product Not Found",
+			})
+		} else {
+			return e.JSON(http.StatusOK, map[string]interface{}{
+				"Informations": informations,
+			})
+		}
+	}
+}

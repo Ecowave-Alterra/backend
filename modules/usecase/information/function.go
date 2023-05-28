@@ -29,3 +29,11 @@ func (informationUsecase *informationUsecase) DeleteInformation(id int) error {
 	err := informationUsecase.informationRepository.DeleteInformation(id)
 	return err
 }
+
+func (informationUsecase *informationUsecase) SearchInformations(keyword string) (*[]ei.Information, error) {
+	informations, err := informationUsecase.informationRepository.SearchInformations(keyword)
+	if err != nil {
+		return nil, err
+	}
+	return informations, nil
+}
