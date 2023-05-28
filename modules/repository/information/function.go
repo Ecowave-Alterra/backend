@@ -4,13 +4,18 @@ import (
 	ei "github.com/berrylradianh/ecowave-go/modules/entity/information"
 )
 
-func (informationRepo *informationRepo) GetAllInformations() (*[]ei.Information, error) {
+func (informationRepo *informationRepo) GetAllInformations(offset, pageSize int) (*[]ei.Information, int64, error) {
 	var informations []ei.Information
-	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").Find(&informations).Error; err != nil {
-		return nil, err
+	var count int64
+	if err := informationRepo.DB.Model(&ei.Information{}).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return &informations, nil
+	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").Offset(offset).Limit(pageSize).Find(&informations).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return &informations, count, nil
 }
 
 func (informationRepo *informationRepo) GetInformationById(id int) (*ei.Information, error) {
@@ -57,22 +62,31 @@ func (informationRepo *informationRepo) DeleteInformation(id int) error {
 	return nil
 }
 
-func (informationRepo *informationRepo) SearchInformations(keyword string) (*[]ei.Information, error) {
+func (informationRepo *informationRepo) SearchInformations(keyword string, offset, pageSize int) (*[]ei.Information, int64, error) {
 	var informations []ei.Information
+	var count int64
+	if err := informationRepo.DB.Model(&ei.Information{}).Where("title LIKE ?", "%"+keyword+"%").Or(informationRepo.DB.Where("information_id LIKE ?", "%"+keyword+"%")).Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
 
 	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").Where("title LIKE ?", "%"+keyword+"%").Or(informationRepo.DB.Where("information_id LIKE ?", "%"+keyword+"%")).Find(&informations).Error; err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return &informations, nil
+	return &informations, count, nil
 }
 
-func (informationRepo *informationRepo) FilterInformations(keyword int) (*[]ei.Information, error) {
+func (informationRepo *informationRepo) FilterInformations(keyword, offset, pageSize int) (*[]ei.Information, int64, error) {
 	var informations []ei.Information
 
-	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").Where("status_id = ?", keyword).Find(&informations).Error; err != nil {
-		return nil, err
+	var count int64
+	if err := informationRepo.DB.Model(&ei.Information{}).Where("status_id = ?", keyword).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return &informations, nil
+	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").Where("status_id = ?", keyword).Find(&informations).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return &informations, count, nil
 }

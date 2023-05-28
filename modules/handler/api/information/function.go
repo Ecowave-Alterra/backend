@@ -2,6 +2,7 @@ package information
 
 import (
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -14,10 +15,25 @@ func (informationHandler *InformationHandler) GetAllInformations() echo.HandlerF
 	return func(e echo.Context) error {
 		var informations *[]ei.Information
 
-		informations, err := informationHandler.informationUsecase.GetAllInformations()
+		pageParam := e.QueryParam("page")
+		page, err := strconv.Atoi(pageParam)
+		if err != nil || page < 1 {
+			page = 1
+		}
+
+		pageSize := 10
+		offset := (page - 1) * pageSize
+
+		informations, total, err := informationHandler.informationUsecase.GetAllInformations(offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),
+			})
+		}
+
+		if page > int(math.Ceil(float64(total)/float64(pageSize))) {
+			return e.JSON(http.StatusNotFound, echo.Map{
+				"Message": "Not Found",
 			})
 		}
 
@@ -29,6 +45,8 @@ func (informationHandler *InformationHandler) GetAllInformations() echo.HandlerF
 
 		return e.JSON(http.StatusOK, map[string]interface{}{
 			"Informations": informations,
+			"Page":         page,
+			"ToalPage":     int(math.Ceil(float64(total) / float64(pageSize))),
 		})
 	}
 }
@@ -206,8 +224,17 @@ func (informationHandler *InformationHandler) SearchInformations() echo.HandlerF
 		var informations *[]ei.Information
 		var err error
 
+		pageParam := e.QueryParam("page")
+		page, err := strconv.Atoi(pageParam)
+		if err != nil || page < 1 {
+			page = 1
+		}
+
+		pageSize := 10
+		offset := (page - 1) * pageSize
+
 		keyword := e.QueryParam("keyword")
-		informations, err = informationHandler.informationUsecase.SearchInformations(keyword)
+		informations, total, err := informationHandler.informationUsecase.SearchInformations(keyword, offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),
@@ -216,11 +243,19 @@ func (informationHandler *InformationHandler) SearchInformations() echo.HandlerF
 
 		if len(*informations) == 0 {
 			return e.JSON(http.StatusOK, echo.Map{
-				"Message": "Product Not Found",
+				"Message": "Informasi yang anda cari tidak ditemukan",
 			})
 		} else {
+			if page > int(math.Ceil(float64(total)/float64(pageSize))) {
+				return e.JSON(http.StatusNotFound, echo.Map{
+					"Message": "Not Found",
+				})
+			}
+
 			return e.JSON(http.StatusOK, map[string]interface{}{
 				"Informations": informations,
+				"Page":         page,
+				"TotalPage":    int(math.Ceil(float64(total) / float64(pageSize))),
 			})
 		}
 	}
@@ -231,9 +266,18 @@ func (informationHandler *InformationHandler) FilterInformations() echo.HandlerF
 		var informations *[]ei.Information
 		var err error
 
+		pageParam := e.QueryParam("page")
+		page, err := strconv.Atoi(pageParam)
+		if err != nil || page < 1 {
+			page = 1
+		}
+
+		pageSize := 10
+		offset := (page - 1) * pageSize
+
 		keywordString := e.QueryParam("keyword")
 		keyword, _ := strconv.Atoi(keywordString)
-		informations, err = informationHandler.informationUsecase.FilterInformations(keyword)
+		informations, total, err := informationHandler.informationUsecase.FilterInformations(keyword, offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),
@@ -249,8 +293,16 @@ func (informationHandler *InformationHandler) FilterInformations() echo.HandlerF
 				"Message": "Belum ada informasi dalam draft",
 			})
 		} else if keyword == 1 || keyword == 2 {
+			if page > int(math.Ceil(float64(total)/float64(pageSize))) {
+				return e.JSON(http.StatusNotFound, echo.Map{
+					"Message": "Not Found",
+				})
+			}
+
 			return e.JSON(http.StatusOK, map[string]interface{}{
 				"Informations": informations,
+				"Page":         page,
+				"TotalPage":    int(math.Ceil(float64(total) / float64(pageSize))),
 			})
 		}
 

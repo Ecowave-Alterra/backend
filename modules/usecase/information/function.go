@@ -5,10 +5,9 @@ import (
 	ei "github.com/berrylradianh/ecowave-go/modules/entity/information"
 )
 
-func (informationUsecase *informationUsecase) GetAllInformations() (*[]ei.Information, error) {
-	informations, err := informationUsecase.informationRepository.GetAllInformations()
-
-	return informations, err
+func (informationUsecase *informationUsecase) GetAllInformations(offset, pageSize int) (*[]ei.Information, int64, error) {
+	informations, count, err := informationUsecase.informationRepository.GetAllInformations(offset, pageSize)
+	return informations, count, err
 }
 
 func (informationUsecase *informationUsecase) GetInformationById(id int) (*ei.Information, error) {
@@ -32,18 +31,18 @@ func (informationUsecase *informationUsecase) DeleteInformation(id int) error {
 	return err
 }
 
-func (informationUsecase *informationUsecase) SearchInformations(keyword string) (*[]ei.Information, error) {
-	informations, err := informationUsecase.informationRepository.SearchInformations(keyword)
+func (informationUsecase *informationUsecase) SearchInformations(keyword string, offset, pageSize int) (*[]ei.Information, int64, error) {
+	informations, count, err := informationUsecase.informationRepository.SearchInformations(keyword, offset, pageSize)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return informations, nil
+	return informations, count, nil
 }
 
-func (informationUsecase *informationUsecase) FilterInformations(keyword int) (*[]ei.Information, error) {
-	informations, err := informationUsecase.informationRepository.FilterInformations(keyword)
+func (informationUsecase *informationUsecase) FilterInformations(keyword, offset, pageSize int) (*[]ei.Information, int64, error) {
+	informations, count, err := informationUsecase.informationRepository.FilterInformations(keyword, offset, pageSize)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return informations, nil
+	return informations, count, nil
 }

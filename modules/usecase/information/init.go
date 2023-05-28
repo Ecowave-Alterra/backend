@@ -6,13 +6,13 @@ import (
 )
 
 type InformationUsecase interface {
-	GetAllInformations() (*[]ei.Information, error)
+	GetAllInformations(offset, pageSize int) (*[]ei.Information, int64, error)
 	GetInformationById(id int) (*ei.Information, error)
 	CreateInformation(information *ei.Information) error
 	UpdateInformation(id int, information *ei.Information) error
 	DeleteInformation(id int) error
-	SearchInformations(keyword string) (*[]ei.Information, error)
-	FilterInformations(keyword int) (*[]ei.Information, error)
+	SearchInformations(keyword string, offset, pageSize int) (*[]ei.Information, int64, error)
+	FilterInformations(keyword, offset, pageSize int) (*[]ei.Information, int64, error)
 }
 
 type informationUsecase struct {
