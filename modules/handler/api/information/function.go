@@ -188,7 +188,7 @@ func (informationHandler *InformationHandler) DeleteInformation() echo.HandlerFu
 			})
 		}
 
-		err = informationHandler.informationUsecase.DeleteInformation(int(information.ID))
+		err = informationHandler.informationUsecase.DeleteInformation(int(information.InformationId))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),

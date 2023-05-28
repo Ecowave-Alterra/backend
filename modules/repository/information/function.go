@@ -15,7 +15,7 @@ func (informationRepo *informationRepo) GetAllInformations() (*[]ei.Information,
 
 func (informationRepo *informationRepo) GetInformationById(id int) (*ei.Information, error) {
 	var information ei.Information
-	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").First(&information, id).Error; err != nil {
+	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").Where("information_id = ?", id).First(&information).Error; err != nil {
 		return nil, err
 	}
 
@@ -31,7 +31,7 @@ func (informationRepo *informationRepo) CreateInformation(information *ei.Inform
 }
 
 func (informationRepo *informationRepo) UpdateInformation(id int, information *ei.Information) error {
-	query := "UPDATE information SET title = ?, photo_content_url = ?, content = ?, view_count = ?, bookmark_count = ?, status_id = ? WHERE ID = ?"
+	query := "UPDATE information SET title = ?, photo_content_url = ?, content = ?, view_count = ?, bookmark_count = ?, status_id = ? WHERE information_id = ?"
 	result := informationRepo.DB.Exec(query, information.Title, information.PhotoContentUrl, information.Content, information.ViewCount, information.BookmarkCount, information.StatusId, id)
 	if result.Error != nil {
 		return result.Error
@@ -45,9 +45,14 @@ func (informationRepo *informationRepo) UpdateInformation(id int, information *e
 }
 
 func (informationRepo *informationRepo) DeleteInformation(id int) error {
-	if err := informationRepo.DB.Delete(&ei.Information{}, id).Error; err != nil {
-		return err
+	query := "DELETE FROM information WHERE information_id = ?"
+	result := informationRepo.DB.Exec(query, id)
+	if result.Error != nil {
+		return result.Error
 	}
+	// if err := informationRepo.DB.Where("information_id = ?", id).Delete(&ei.Information{}, id).Error; err != nil {
+	// 	return err
+	// }
 
 	return nil
 }

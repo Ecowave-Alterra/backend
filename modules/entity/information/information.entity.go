@@ -5,23 +5,24 @@ import "gorm.io/gorm"
 type Information struct {
 	*gorm.Model `json:"-"`
 
-	ID              uint           `json:"id,omitempty" gorm:"primary_key"`
-	Title           string         `json:"Title,omitempty" form:"Title" validate:"required,max=65"`
-	PhotoContentUrl string         `json:"PhotoContentUrl,omitempty" form:"PhotoContentUrl" validate:"required"`
-	Content         string         `json:"Content,omitempty" form:"Content" validate:"required"`
-	ViewCount       uint           `json:"ViewCount,omitempty" form:"ViewCount"`
-	BookmarkCount   uint           `json:"BookmarkCount,omitempty" form:"BookmarkCount"`
-	StatusId        uint           `json:"StatusId,omitempty" form:"StatusId" validate:"required"`
+	InformationId   uint           `json:"InformationiId,"`
+	Title           string         `json:"Title," form:"Title" validate:"required,max=65"`
+	PhotoContentUrl string         `json:"PhotoContentUrl," form:"PhotoContentUrl" validate:"required"`
+	Content         string         `json:"Content," form:"Content" validate:"required"`
+	ViewCount       uint           `json:"ViewCount," form:"ViewCount"`
+	BookmarkCount   uint           `json:"BookmarkCount," form:"BookmarkCount"`
+	StatusId        uint           `json:"StatusId," form:"StatusId" validate:"required"`
 	Status          StatusResponse `gorm:"foreignKey:StatusId"`
 }
 
 type InformationResponse struct {
 	*gorm.Model     `json:"-"`
-	Title           string `json:"Title,omitempty" form:"Title"`
-	PhotoContentUrl string `json:"PhotoContentUrl,omitempty" form:"PhotoContentUrl"`
-	Content         string `json:"Content,omitempty" form:"Content"`
-	ViewCount       uint   `json:"ViewCount,omitempty" form:"ViewCount"`
-	BookmarkCount   uint   `json:"BookmarkCount,omitempty" form:"BookmarkCount"`
+	InformationId   uint   `json:"InformationiId,"`
+	Title           string `json:"Title"`
+	PhotoContentUrl string `json:"PhotoContentUrl"`
+	Content         string `json:"Content,"`
+	ViewCount       uint   `json:"ViewCount,"`
+	BookmarkCount   uint   `json:"BookmarkCount,"`
 	StatusId        uint   `json:"-"`
 }
 
