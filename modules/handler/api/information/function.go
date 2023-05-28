@@ -70,10 +70,10 @@ func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFu
 			if validationErrs, ok := err.(validator.ValidationErrors); ok {
 				message := ""
 				for _, e := range validationErrs {
-					if e.Tag() == "required" {
-						message = fmt.Sprintf("%s is required", e.Field())
-					} else if e.Tag() == "max" && e.Field() == "Title" {
+					if e.Tag() == "max" && e.Field() == "Title" {
 						message = "Mohon maaf, entri anda melebihi batas maksimum 65 karakter"
+					} else if e.Tag() == "required" {
+						message = fmt.Sprintf("%s is required", e.Field())
 					}
 				}
 				return e.JSON(http.StatusBadRequest, map[string]interface{}{
