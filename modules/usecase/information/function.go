@@ -1,6 +1,7 @@
 package information
 
 import (
+	"github.com/berrylradianh/ecowave-go/helper/randomid"
 	ei "github.com/berrylradianh/ecowave-go/modules/entity/information"
 )
 
@@ -16,6 +17,7 @@ func (informationUsecase *informationUsecase) GetInformationById(id int) (*ei.In
 }
 
 func (informationUsecase *informationUsecase) CreateInformation(information *ei.Information) error {
+	information.InformationId = randomid.GenerateRandomNumber()
 	err := informationUsecase.informationRepository.CreateInformation(information)
 	return err
 }
