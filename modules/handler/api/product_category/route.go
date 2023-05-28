@@ -10,5 +10,5 @@ func (pch *ProductCategoryHandler) RegisterRoutes(e *echo.Echo) {
 	productCategoryGroup.PUT("/:id", pch.UpdateProductCategory)
 	productCategoryGroup.DELETE("/:id", pch.DeleteProductCategory)
 	productCategoryGroup.GET("", pch.GetAllProductCategory)
-	productCategoryGroup.GET("", pch.SearchingProductCategoyByName)
+	productCategoryGroup.GET("/", pch.SearchingProductCategoyByName)
 }
