@@ -210,18 +210,52 @@ func (informationHandler *InformationHandler) SearchInformations() echo.HandlerF
 		informations, err = informationHandler.informationUsecase.SearchInformations(keyword)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
-				"message": err.Error(),
+				"Message": err.Error(),
 			})
 		}
 
 		if len(*informations) == 0 {
 			return e.JSON(http.StatusOK, echo.Map{
-				"message": "Product Not Found",
+				"Message": "Product Not Found",
 			})
 		} else {
 			return e.JSON(http.StatusOK, map[string]interface{}{
 				"Informations": informations,
 			})
 		}
+	}
+}
+
+func (informationHandler *InformationHandler) FilterInformations() echo.HandlerFunc {
+	return func(e echo.Context) error {
+		var informations *[]ei.Information
+		var err error
+
+		keywordString := e.QueryParam("keyword")
+		keyword, _ := strconv.Atoi(keywordString)
+		informations, err = informationHandler.informationUsecase.FilterInformations(keyword)
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, echo.Map{
+				"Message": err.Error(),
+			})
+		}
+
+		if keyword == 1 && len(*informations) == 0 {
+			return e.JSON(http.StatusOK, echo.Map{
+				"Message": "Belum ada informasi yang terbit",
+			})
+		} else if keyword == 2 && len(*informations) == 0 {
+			return e.JSON(http.StatusOK, echo.Map{
+				"Message": "Belum ada informasi dalam draft",
+			})
+		} else if keyword == 1 || keyword == 2 {
+			return e.JSON(http.StatusOK, map[string]interface{}{
+				"Informations": informations,
+			})
+		}
+
+		return e.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Invalid parameters",
+		})
 	}
 }

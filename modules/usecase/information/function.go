@@ -39,3 +39,11 @@ func (informationUsecase *informationUsecase) SearchInformations(keyword string)
 	}
 	return informations, nil
 }
+
+func (informationUsecase *informationUsecase) FilterInformations(keyword int) (*[]ei.Information, error) {
+	informations, err := informationUsecase.informationRepository.FilterInformations(keyword)
+	if err != nil {
+		return nil, err
+	}
+	return informations, nil
+}

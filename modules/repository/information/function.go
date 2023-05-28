@@ -66,3 +66,13 @@ func (informationRepo *informationRepo) SearchInformations(keyword string) (*[]e
 
 	return &informations, nil
 }
+
+func (informationRepo *informationRepo) FilterInformations(keyword int) (*[]ei.Information, error) {
+	var informations []ei.Information
+
+	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").Where("status_id = ?", keyword).Find(&informations).Error; err != nil {
+		return nil, err
+	}
+
+	return &informations, nil
+}
