@@ -10,7 +10,7 @@ type ProductCategoryUsecase interface {
 	UpdateProductCategory(productCategory *pct.ProductCategory, id int) (bool, error)
 	DeleteProductCategory(productCategory *pct.ProductCategory, id int) error
 	GetAllProductCategory(productCategory *[]pct.ProductCategory) error
-	SearchingProductCategoyByName(productCategory *pct.ProductCategory, name string) error
+	SearchingProductCategoryByName(productCategory *[]pct.ProductCategory, name string) (bool, error)
 }
 
 type productCategoryUsecase struct {

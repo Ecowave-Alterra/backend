@@ -20,6 +20,6 @@ func (pcc *productCategoryUsecase) GetAllProductCategory(productCategory *[]pct.
 	return pcc.productCategoryRepo.GetAllProductCategory(productCategory)
 }
 
-func (pcc *productCategoryUsecase) SearchingProductCategoyByName(productCategory *pct.ProductCategory, name string) error {
-	return pcc.productCategoryRepo.SearchingProductCategoyByName(productCategory, name)
+func (pcc *productCategoryUsecase) SearchingProductCategoryByName(productCategory *[]pct.ProductCategory, name string) (bool, error) {
+	return pcc.productCategoryRepo.SearchingProductCategoryByName(productCategory, name)
 }

@@ -36,12 +36,17 @@ func (pcr *productCategoryRepo) GetAllProductCategory(productCategory *[]pct.Pro
 	return nil
 }
 
-func (pcr *productCategoryRepo) SearchingProductCategoyByName(productCategory *pct.ProductCategory, name string) error {
-	if err := pcr.db.Where("name LIKE ?", "%"+name+"%").Find(&productCategory).Error; err != nil {
-		return err
+func (pcr *productCategoryRepo) SearchingProductCategoryByName(productCategory *[]pct.ProductCategory, name string) (bool, error) {
+	result := pcr.db.Where("name LIKE ?", "%"+name+"%").Find(&productCategory)
+	if result.Error != nil {
+		return false, result.Error
 	}
 
-	return nil
+	if result.RowsAffected == 0 {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 func (pcr *productCategoryRepo) IsProductCategoryExist(productCategory *pct.ProductCategory, name string) (bool, error) {

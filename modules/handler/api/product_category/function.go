@@ -134,13 +134,20 @@ func (pch *ProductCategoryHandler) GetAllProductCategory(c echo.Context) error {
 }
 
 func (pch *ProductCategoryHandler) SearchingProductCategoyByName(c echo.Context) error {
-	var productCategory pct.ProductCategory
+	var productCategory []pct.ProductCategory
 
 	name := c.QueryParam("name")
 
-	if err := pch.productCategoryUsecase.SearchingProductCategoyByName(&productCategory, name); err != nil {
+	available, err := pch.productCategoryUsecase.SearchingProductCategoryByName(&productCategory, name)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
+		})
+	}
+
+	if !available {
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message": "product category not available",
 		})
 	}
 
