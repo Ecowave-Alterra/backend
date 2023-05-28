@@ -11,7 +11,7 @@ type ProductCategoryRepo interface {
 	DeleteProductCategory(productCategory *pct.ProductCategory, id int) error
 	GetAllProductCategory(productCategory *[]pct.ProductCategory) error
 	SearchingProductCategoryByName(productCategory *[]pct.ProductCategory, name string) (bool, error)
-	IsProductCategoryExist(productCategory *pct.ProductCategory, name string) (bool, error)
+	IsProductCategoryAvailable(productCategory *pct.ProductCategory, name string) (bool, error)
 }
 
 type productCategoryRepo struct {

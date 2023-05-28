@@ -49,7 +49,7 @@ func (pcr *productCategoryRepo) SearchingProductCategoryByName(productCategory *
 	return true, nil
 }
 
-func (pcr *productCategoryRepo) IsProductCategoryExist(productCategory *pct.ProductCategory, name string) (bool, error) {
+func (pcr *productCategoryRepo) IsProductCategoryAvailable(productCategory *pct.ProductCategory, name string) (bool, error) {
 	result := pcr.db.Where("name = ?", name).Find(&productCategory)
 	if result.Error != nil {
 		return false, result.Error

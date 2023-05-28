@@ -34,16 +34,16 @@ func (pch *ProductCategoryHandler) CreateProductCategory(c echo.Context) error {
 		}
 	}
 
-	exist, err := pch.productCategoryUsecase.CreateProductCategory(&productCategory)
+	available, err := pch.productCategoryUsecase.CreateProductCategory(&productCategory)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
 		})
 	}
 
-	if exist {
+	if available {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "product category already exists",
+			"message": "product category already available",
 		})
 	}
 
@@ -81,16 +81,16 @@ func (pch *ProductCategoryHandler) UpdateProductCategory(c echo.Context) error {
 		return err
 	}
 
-	exist, err := pch.productCategoryUsecase.UpdateProductCategory(&productCategory, id)
+	available, err := pch.productCategoryUsecase.UpdateProductCategory(&productCategory, id)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
 		})
 	}
 
-	if exist {
+	if available {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "product category already exists",
+			"message": "product category already available",
 		})
 	}
 
