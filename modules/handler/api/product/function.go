@@ -2,23 +2,54 @@ package product
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"path/filepath"
+	"strconv"
 
+	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	"github.com/labstack/echo/v4"
 )
 
 func (h *ProductHandler) CreateProduct(c echo.Context) error {
-	var req ep.ProductRequest
-	err := c.Bind(&req)
+	// err := c.Bind(&req)
+	// if err != nil {
+	// 	return c.JSON(http.StatusBadRequest, map[string]interface{}{
+	// 		"message": "Failed to bind data",
+	// 		"error":   err,
+	// 	})
+	// }
+
+	productCategoryIDstr := c.FormValue("Product_category_id")
+	productCategoryID, err := strconv.ParseUint(productCategoryIDstr, 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Failed to bind data",
+			"Message": "Invalid product category ID",
 			"error":   err,
 		})
 	}
+	name := c.FormValue("Name")
+	stockStr := c.FormValue("Stock")
+	stock, err := strconv.ParseUint(stockStr, 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Invalid stock",
+			"error":   err,
+		})
+	}
+	priceStr := c.FormValue("Price")
+	price, err := strconv.ParseFloat(priceStr, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Invalid price",
+			"error":   err,
+		})
+	}
+	description := c.FormValue("Description")
+
 	productDescription := ep.ProductDescription{
-		Description: req.Description,
+		Description: description,
 	}
 	err = h.productUseCase.CreateProductDescription(&productDescription)
 	if err != nil {
@@ -29,16 +60,16 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	}
 
 	status := "tersedia"
-	if req.Stock == 0 {
+	if stock == 0 {
 		status = "habis"
 	}
 
 	product := ep.Product{
-		Product_category_id:    req.Product_category_id,
+		Product_category_id:    uint(productCategoryID),
 		Product_description_id: productDescription.ID,
-		Name:                   req.Name,
-		Stock:                  req.Stock,
-		Price:                  req.Price,
+		Name:                   name,
+		Stock:                  uint(stock),
+		Price:                  price,
 		Status:                 status,
 		Rating:                 0.00,
 	}
@@ -50,17 +81,53 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 		})
 	}
 
-	for _, url := range req.Product_image_url {
-		productImage := ep.ProductImage{
-			Product_id:        product.ID,
-			Product_image_url: url,
-		}
-		err = h.productUseCase.CreateProductImage(&productImage)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"message": "Failed to create product image",
-				"error":   err,
-			})
+	for i := 1; i <= 10; i++ {
+		fileHeader, err := c.FormFile(fmt.Sprintf("PhotoContentUrl%d", i))
+		if fileHeader != nil {
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{
+					"Message": "Mohon maaf, Anda harus mengungga foto",
+				})
+			}
+			fileExtension := filepath.Ext(fileHeader.Filename)
+			allowedExtensions := map[string]bool{
+				".png":  true,
+				".jpeg": true,
+				".jpg":  true,
+			}
+			if !allowedExtensions[fileExtension] {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{
+					"Message": "Mohon maaf, format file yang Anda unggah tidak sesuai",
+				})
+			}
+			maxFileSize := 4 * 1024 * 1024
+			fileSize := fileHeader.Size
+			if fileSize > int64(maxFileSize) {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{
+					"Message": "Mohon maaf, ukuran file Anda melebihi batas maksimum 4MB",
+				})
+			}
+
+			PhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
+
+			log.Println(PhotoUrl)
+
+			productImage := ep.ProductImage{
+				Product_id:        product.ID,
+				Product_image_url: PhotoUrl,
+			}
+			err = h.productUseCase.CreateProductImage(&productImage)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"message": "Failed to create product image",
+					"error":   err,
+				})
+			}
+
+		} else {
+			if err != nil {
+				i = 1000
+			}
 		}
 	}
 
