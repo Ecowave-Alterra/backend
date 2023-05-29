@@ -1,13 +1,15 @@
 package product
 
-import pc "github.com/berrylradianh/ecowave-go/modules/usecase/product"
+import (
+	up "github.com/berrylradianh/ecowave-go/modules/usecase/product"
+)
 
 type ProductHandler struct {
-	productUC pc.ProductUseCase
+	productUseCase up.ProductUseCase
 }
 
-func New(productUC pc.ProductUseCase) *ProductHandler {
+func New(productUseCase up.ProductUseCase) *ProductHandler {
 	return &ProductHandler{
-		productUC,
+		productUseCase,
 	}
 }
