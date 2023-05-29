@@ -1,11 +1,12 @@
 package information
 
 import (
-	"fmt"
 	"math"
 	"net/http"
+	"path/filepath"
 	"strconv"
 
+	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
 	ei "github.com/berrylradianh/ecowave-go/modules/entity/information"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
@@ -13,8 +14,6 @@ import (
 
 func (informationHandler *InformationHandler) GetAllInformations() echo.HandlerFunc {
 	return func(e echo.Context) error {
-		var informations *[]ei.Information
-
 		pageParam := e.QueryParam("page")
 		page, err := strconv.Atoi(pageParam)
 		if err != nil || page < 1 {
@@ -54,7 +53,6 @@ func (informationHandler *InformationHandler) GetAllInformations() echo.HandlerF
 func (informationHandler *InformationHandler) GetInformationById() echo.HandlerFunc {
 	return func(e echo.Context) error {
 		var information *ei.Information
-
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -77,11 +75,48 @@ func (informationHandler *InformationHandler) GetInformationById() echo.HandlerF
 
 func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFunc {
 	return func(e echo.Context) error {
-		var information *ei.Information
-		if err := e.Bind(&information); err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Invalid Request Body",
+		statusIDStr := e.FormValue("StatusId")
+		statusID, err := strconv.ParseUint(statusIDStr, 10, 64)
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": "Invalid StatusId",
 			})
+		}
+
+		fileHeader, err := e.FormFile("PhotoContentUrl")
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": "Mohon maaf, Anda harus mengungga foto",
+			})
+		}
+
+		fileExtension := filepath.Ext(fileHeader.Filename)
+		allowedExtensions := map[string]bool{
+			".png":  true,
+			".jpeg": true,
+			".jpg":  true,
+		}
+		if !allowedExtensions[fileExtension] {
+			return e.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": "Mohon maaf, format file yang Anda unggah tidak sesuai",
+			})
+		}
+
+		maxFileSize := 4 * 1024 * 1024
+		fileSize := fileHeader.Size
+		if fileSize > int64(maxFileSize) {
+			return e.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": "Mohon maaf, ukuran file Anda melebihi batas maksimum 4MB",
+			})
+		}
+
+		PhotoUrl, _ := cloudstorage.UploadToBucket(e.Request().Context(), fileHeader)
+
+		information := &ei.Information{
+			Title:           e.FormValue("Title"),
+			Content:         e.FormValue("Content"),
+			PhotoContentUrl: PhotoUrl,
+			StatusId:        uint(statusID),
 		}
 
 		if err := e.Validate(information); err != nil {
@@ -90,8 +125,6 @@ func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFu
 				for _, e := range validationErrs {
 					if e.Tag() == "max" && e.Field() == "Title" {
 						message = "Mohon maaf, entri anda melebihi batas maksimum 65 karakter"
-					} else if e.Tag() == "required" {
-						message = fmt.Sprintf("%s is required", e.Field())
 					}
 				}
 				return e.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -100,7 +133,7 @@ func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFu
 			}
 		}
 
-		err := informationHandler.informationUsecase.CreateInformation(information)
+		err = informationHandler.informationUsecase.CreateInformation(information)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),
@@ -263,9 +296,6 @@ func (informationHandler *InformationHandler) SearchInformations() echo.HandlerF
 
 func (informationHandler *InformationHandler) FilterInformations() echo.HandlerFunc {
 	return func(e echo.Context) error {
-		var informations *[]ei.Information
-		var err error
-
 		pageParam := e.QueryParam("page")
 		page, err := strconv.Atoi(pageParam)
 		if err != nil || page < 1 {
