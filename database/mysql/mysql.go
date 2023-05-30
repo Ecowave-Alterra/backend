@@ -42,7 +42,6 @@ func InitialMigration() {
 	DB.AutoMigrate(
 		ep.Product{},
 		ep.ProductCategory{},
-		ep.ProductDescription{},
 		ep.ProductImage{},
 	)
 }

@@ -8,10 +8,6 @@ func (pc *productUseCase) CreateProduct(product *ep.Product) error {
 	return pc.productRepo.CreateProduct(product)
 }
 
-func (pc *productUseCase) CreateProductDescription(productDescription *ep.ProductDescription) error {
-	return pc.productRepo.CreateProductDescription(productDescription)
-}
-
 func (pc *productUseCase) CreateProductImage(productImage *ep.ProductImage) error {
 	return pc.productRepo.CreateProductImage(productImage)
 }
@@ -32,20 +28,12 @@ func (pc *productUseCase) UpdateProduct(productId string, productRequest *ep.Pro
 	return pc.productRepo.UpdateProduct(productId, productRequest)
 }
 
-func (pc *productUseCase) UpdateProductDescription(productDescriptionID string, description string) error {
-	return pc.productRepo.UpdateProductDescription(productDescriptionID, description)
-}
-
 func (pc *productUseCase) UpdateProductImage(productID string, productImage *ep.ProductImage) error {
 	return pc.productRepo.UpdateProductImage(productID, productImage)
 }
 
 func (pc *productUseCase) DeleteProduct(productId string, product *ep.Product) error {
 	return pc.productRepo.DeleteProduct(productId, product)
-}
-
-func (pc *productUseCase) DeleteProductDescription(productDescriptionID string, productDescription *ep.ProductDescription) error {
-	return pc.productRepo.DeleteProductDescription(productDescriptionID, productDescription)
 }
 
 func (pc *productUseCase) DeleteProductImage(productID string, productImages *[]ep.ProductImage) error {

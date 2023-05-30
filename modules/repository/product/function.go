@@ -12,14 +12,6 @@ func (r *productRepo) CreateProduct(product *ep.Product) error {
 	return nil
 }
 
-func (r *productRepo) CreateProductDescription(productDescription *ep.ProductDescription) error {
-	if err := r.db.Save(&productDescription).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (r *productRepo) CreateProductImage(productImage *ep.ProductImage) error {
 	if err := r.db.Save(&productImage).Error; err != nil {
 		return err
@@ -30,7 +22,7 @@ func (r *productRepo) CreateProductImage(productImage *ep.ProductImage) error {
 
 func (r *productRepo) GetAllProduct(products *[]ep.Product) ([]ep.Product, error) {
 	if err := r.db.
-		Preload("Product_Category").Preload("Product_Description").
+		Preload("Product_Category").
 		Find(&products).Error; err != nil {
 		return nil, err
 	}
@@ -41,7 +33,6 @@ func (r *productRepo) GetAllProduct(products *[]ep.Product) ([]ep.Product, error
 func (r *productRepo) GetProductByID(productId string, product *ep.Product) (ep.Product, error) {
 	if err := r.db.
 		Preload("Product_Category").
-		Preload("Product_Description").
 		First(&product, productId).Error; err != nil {
 		return *product, err
 	}
@@ -58,15 +49,7 @@ func (r *productRepo) GetProductImageURLById(productId string, productImage *ep.
 }
 
 func (r *productRepo) UpdateProduct(productId string, req *ep.ProductRequest) error {
-	if err := r.db.Model(&ep.Product{}).Where("id = ?", productId).Updates(ep.Product{Product_category_id: req.Product_category_id, Name: req.Name, Stock: req.Stock, Price: req.Price, Status: req.Status}).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *productRepo) UpdateProductDescription(productDescriptionID string, description string) error {
-	if err := r.db.Model(&ep.ProductDescription{}).Where("id = ?", productDescriptionID).Updates(ep.ProductDescription{Description: description}).Error; err != nil {
+	if err := r.db.Model(&ep.Product{}).Where("id = ?", productId).Updates(ep.Product{Product_category_id: req.Product_category_id, Name: req.Name, Stock: req.Stock, Price: req.Price, Status: req.Status, Description: req.Description}).Error; err != nil {
 		return err
 	}
 
@@ -79,14 +62,6 @@ func (r *productRepo) UpdateProductImage(productID string, productImage *ep.Prod
 
 func (r *productRepo) DeleteProduct(productId string, product *ep.Product) error {
 	if err := r.db.Delete(&product, productId).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *productRepo) DeleteProductDescription(productDescriptionID string, productDescription *ep.ProductDescription) error {
-	if err := r.db.Delete(&productDescription, productDescriptionID).Error; err != nil {
 		return err
 	}
 

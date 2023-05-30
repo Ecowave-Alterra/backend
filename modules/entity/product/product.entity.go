@@ -3,16 +3,17 @@ package product
 import "gorm.io/gorm"
 
 type Product struct {
-	*gorm.Model            `json:"-"`
-	Name                   string             `json:"name,omitempty" form:"name"`
-	Stock                  uint               `json:"stock,omitempty" form:"stock"`
-	Price                  float64            `json:"price,omitempty" form:"price"`
-	Status                 string             `json:"status" form:"status"`
-	Rating                 float64            `json:"rating" form:"rating"`
-	Product_category_id    uint               `json:"product_category_id,omitempty" form:"product_category_id"`
-	Product_description_id uint               `json:"product_description_id,omitempty" form:"product_description_id"`
-	Product_Category       ProductCategory    `gorm:"foreignKey:Product_category_id"`
-	Product_Description    ProductDescription `gorm:"foreignKey:Product_description_id"`
+	*gorm.Model         `json:"-"`
+	Name                string  `json:"name,omitempty" form:"name" validate:"required,max=10"`
+	Stock               uint    `json:"stock,omitempty" form:"stock"`
+	Price               float64 `json:"price,omitempty" form:"price"`
+	Status              string  `json:"status" form:"status"`
+	Rating              float64 `json:"rating" form:"rating"`
+	Description         string  `json:"description,omitempty" form:"description"`
+	Product_category_id uint    `json:"product_category_id,omitempty" form:"product_category_id"`
+	// Product_description_id uint               `json:"product_description_id,omitempty" form:"product_description_id"`
+	Product_Category ProductCategory `gorm:"foreignKey:Product_category_id"`
+	// Product_Description    ProductDescription `gorm:"foreignKey:Product_description_id"`
 }
 
 type ProductRequest struct {

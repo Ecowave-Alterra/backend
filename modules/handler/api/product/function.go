@@ -13,14 +13,6 @@ import (
 )
 
 func (h *ProductHandler) CreateProduct(c echo.Context) error {
-	// err := c.Bind(&req)
-	// if err != nil {
-	// 	return c.JSON(http.StatusBadRequest, map[string]interface{}{
-	// 		"message": "Failed to bind data",
-	// 		"error":   err,
-	// 	})
-	// }
-
 	productCategoryIDstr := c.FormValue("Product_category_id")
 	productCategoryID, err := strconv.ParseUint(productCategoryIDstr, 10, 64)
 	if err != nil {
@@ -48,30 +40,19 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	}
 	description := c.FormValue("Description")
 
-	productDescription := ep.ProductDescription{
-		Description: description,
-	}
-	err = h.productUseCase.CreateProductDescription(&productDescription)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Failed to create product description",
-			"error":   err,
-		})
-	}
-
 	status := "tersedia"
 	if stock == 0 {
 		status = "habis"
 	}
 
 	product := ep.Product{
-		Product_category_id:    uint(productCategoryID),
-		Product_description_id: productDescription.ID,
-		Name:                   name,
-		Stock:                  uint(stock),
-		Price:                  price,
-		Status:                 status,
-		Rating:                 0.00,
+		Product_category_id: uint(productCategoryID),
+		Name:                name,
+		Stock:               uint(stock),
+		Price:               price,
+		Status:              status,
+		Rating:              0.00,
+		Description:         description,
 	}
 	err = h.productUseCase.CreateProduct(&product)
 	if err != nil {
@@ -86,7 +67,7 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 		if fileHeader != nil {
 			if err != nil {
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{
-					"Message": "Mohon maaf, Anda harus mengungga foto",
+					"Message": "Mohon maaf, Anda harus mengunggah foto",
 				})
 			}
 			fileExtension := filepath.Ext(fileHeader.Filename)
@@ -171,7 +152,7 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 			Price:             product.Price,
 			Status:            product.Status,
 			Rating:            product.Rating,
-			Description:       product.Product_Description.Description,
+			Description:       product.Description,
 			Product_image_url: imageURLs,
 		}
 
@@ -218,7 +199,7 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 		Price:             product.Price,
 		Status:            product.Status,
 		Rating:            product.Rating,
-		Description:       product.Product_Description.Description,
+		Description:       product.Description,
 		Product_image_url: imageURLs,
 	}
 
@@ -271,14 +252,6 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		})
 	}
 
-	err = h.productUseCase.UpdateProductDescription(fmt.Sprint(product.Product_description_id), req.Description)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "Failed to update product description",
-			"error":   err,
-		})
-	}
-
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "Successfully update product",
 	})
@@ -292,15 +265,6 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to get product",
-			"error":   err,
-		})
-	}
-
-	var productDescription ep.ProductDescription
-	err = h.productUseCase.DeleteProductDescription(fmt.Sprint(product.Product_description_id), &productDescription)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "Failed to delete product description",
 			"error":   err,
 		})
 	}
@@ -364,7 +328,7 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 			Price:             product.Price,
 			Status:            product.Status,
 			Rating:            product.Rating,
-			Description:       product.Product_Description.Description,
+			Description:       product.Description,
 			Product_image_url: imageURLs,
 		}
 
@@ -407,7 +371,7 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 				Price:             product.Price,
 				Status:            product.Status,
 				Rating:            product.Rating,
-				Description:       product.Product_Description.Description,
+				Description:       product.Description,
 				Product_image_url: imageURLs,
 			}
 
@@ -460,7 +424,7 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 				Price:             product.Price,
 				Status:            product.Status,
 				Rating:            product.Rating,
-				Description:       product.Product_Description.Description,
+				Description:       product.Description,
 				Product_image_url: imageURLs,
 			}
 
@@ -521,7 +485,7 @@ func (h *ProductHandler) FilterProductByStatus(c echo.Context) error {
 			Price:             product.Price,
 			Status:            product.Status,
 			Rating:            product.Rating,
-			Description:       product.Product_Description.Description,
+			Description:       product.Description,
 			Product_image_url: imageURLs,
 		}
 
