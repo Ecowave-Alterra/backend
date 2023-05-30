@@ -10,8 +10,8 @@ func (informationUsecase *informationUsecase) GetAllInformations(offset, pageSiz
 	return informations, count, err
 }
 
-func (informationUsecase *informationUsecase) GetInformationById(id int) (*ei.Information, error) {
-	information, err := informationUsecase.informationRepository.GetInformationById(id)
+func (informationUsecase *informationUsecase) GetInformationById(informationId int) (*ei.Information, error) {
+	information, err := informationUsecase.informationRepository.GetInformationById(informationId)
 	return information, err
 }
 
@@ -32,13 +32,13 @@ func (informationUsecase *informationUsecase) CreateInformation(information *ei.
 	return err
 }
 
-func (informationUsecase *informationUsecase) UpdateInformation(id int, information *ei.Information) error {
-	result := informationUsecase.informationRepository.UpdateInformation(id, information)
+func (informationUsecase *informationUsecase) UpdateInformation(informationId int, information *ei.Information) error {
+	result := informationUsecase.informationRepository.UpdateInformation(informationId, information)
 	return result
 }
 
-func (informationUsecase *informationUsecase) DeleteInformation(id int) error {
-	err := informationUsecase.informationRepository.DeleteInformation(id)
+func (informationUsecase *informationUsecase) DeleteInformation(informationId int) error {
+	err := informationUsecase.informationRepository.DeleteInformation(informationId)
 	return err
 }
 

@@ -18,9 +18,9 @@ func (informationRepo *informationRepo) GetAllInformations(offset, pageSize int)
 	return &informations, count, nil
 }
 
-func (informationRepo *informationRepo) GetInformationById(id int) (*ei.Information, error) {
+func (informationRepo *informationRepo) GetInformationById(informationId int) (*ei.Information, error) {
 	var information ei.Information
-	if err := informationRepo.DB.Where("information_id = ?", id).First(&information).Error; err != nil {
+	if err := informationRepo.DB.Where("information_id = ?", informationId).First(&information).Error; err != nil {
 		return nil, err
 	}
 
@@ -46,9 +46,8 @@ func (informationRepo *informationRepo) CheckInformationExists(informationId uin
 	return exists, nil
 }
 
-func (informationRepo *informationRepo) UpdateInformation(id int, information *ei.Information) error {
-	query := "UPDATE information SET title = ?, photo_content_url = ?, content = ?, view_count = ?, bookmark_count = ?, status = ? WHERE information_id = ?"
-	result := informationRepo.DB.Exec(query, information.Title, information.PhotoContentUrl, information.Content, information.ViewCount, information.BookmarkCount, information.Status, id)
+func (informationRepo *informationRepo) UpdateInformation(informationId int, information *ei.Information) error {
+	result := informationRepo.DB.Model(&information).Where("information_id = ?", informationId).Updates(&information)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -56,11 +55,10 @@ func (informationRepo *informationRepo) UpdateInformation(id int, information *e
 	return nil
 }
 
-func (informationRepo *informationRepo) DeleteInformation(id int) error {
-	query := "DELETE FROM information WHERE information_id = ?"
-	result := informationRepo.DB.Exec(query, id)
-	if result.Error != nil {
-		return result.Error
+func (informationRepo *informationRepo) DeleteInformation(informationId int) error {
+	var information *ei.Information
+	if err := informationRepo.DB.Delete(&information, "information_id = ?", informationId).Error; err != nil {
+		return err
 	}
 
 	return nil

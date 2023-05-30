@@ -1,7 +1,6 @@
 package information
 
 import (
-	"fmt"
 	"math"
 	"net/http"
 	"path/filepath"
@@ -147,7 +146,6 @@ func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFu
 
 func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFunc {
 	return func(e echo.Context) error {
-		var information *ei.Information
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -162,17 +160,45 @@ func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFu
 			})
 		}
 
-		information, err = informationHandler.informationUsecase.GetInformationById(id)
+		information, err := informationHandler.informationUsecase.GetInformationById(id)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": "Record Not Found",
 			})
 		}
 
-		if err := e.Bind(&information); err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Invalid Request Body",
-			})
+		title := e.FormValue("Title")
+		content := e.FormValue("Content")
+		status := e.FormValue("Status")
+		fileHeader, err := e.FormFile("PhotoContentUrl")
+
+		if title != "" {
+			information.Title = title
+		}
+		if content != "" {
+			information.Content = content
+		}
+		if status != "" {
+			information.Status = status
+		}
+		if fileHeader != nil {
+			if informationBefore.PhotoContentUrl != "" {
+				fileName, _ := cloudstorage.GetFileName(informationBefore.PhotoContentUrl)
+				if err != nil {
+					return e.JSON(http.StatusInternalServerError, echo.Map{
+						"Message": "Gagal mendapatkan nama file",
+					})
+				}
+				err = cloudstorage.DeleteImage(fileName)
+				if err != nil {
+					return e.JSON(http.StatusInternalServerError, echo.Map{
+						"Message": "Gagal menghapus file pada cloud storage",
+					})
+				}
+			}
+
+			PhotoUrl, _ := cloudstorage.UploadToBucket(e.Request().Context(), fileHeader)
+			information.PhotoContentUrl = PhotoUrl
 		}
 
 		if err := e.Validate(information); err != nil {
@@ -189,7 +215,7 @@ func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFu
 			}
 		}
 
-		err = informationHandler.informationUsecase.UpdateInformation(int(information.ID), information)
+		err = informationHandler.informationUsecase.UpdateInformation(int(information.InformationId), information)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
 				"Message": err,
@@ -240,7 +266,6 @@ func (informationHandler *InformationHandler) DeleteInformation() echo.HandlerFu
 					"Message": "Gagal mendapatkan nama file",
 				})
 			}
-			fmt.Println(fileName)
 			err = cloudstorage.DeleteImage(fileName)
 			if err != nil {
 				return e.JSON(http.StatusInternalServerError, echo.Map{
