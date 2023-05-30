@@ -1,11 +1,14 @@
 package product
 
 import (
+	"encoding/csv"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
@@ -495,5 +498,76 @@ func (h *ProductHandler) FilterProductByStatus(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message":  "Successfully get product based on stock status",
 		"products": productResponses,
+	})
+}
+
+func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
+	var products []ep.Product
+
+	products, err := h.productUseCase.GetAllProduct(&products)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "Failed to get product datas",
+			"error":   err,
+		})
+	}
+
+	file, err := os.Create("product-data.csv")
+	defer file.Close()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to get product images",
+			"error":   err,
+		})
+	}
+
+	w := csv.NewWriter(file)
+	defer w.Flush()
+
+	csvHeader := []string{"Product_id", "Name", "Category", "Stock", "Price", "Status", "Rating", "Description", "Product_image_url"}
+	var csvData [][]string
+	csvData = append(csvData, csvHeader)
+
+	var productImage ep.ProductImage
+	for _, product := range products {
+		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"message": "Failed to get product images",
+				"error":   err,
+			})
+		}
+
+		var imageURLs []string
+		for _, image := range productImages {
+			imageURLs = append(imageURLs, image.Product_image_url)
+		}
+
+		record := []string{
+			strconv.Itoa(int(product.ID)),
+			product.Name,
+			product.Product_Category.Category,
+			strconv.Itoa(int(product.Stock)),
+			strconv.FormatFloat(product.Price, 'f', -1, 64),
+			product.Status,
+			strconv.FormatFloat(product.Rating, 'f', -1, 64),
+			product.Description,
+			strings.Join(imageURLs, ", "),
+		}
+
+		csvData = append(csvData, record)
+	}
+
+	w.WriteAll(csvData)
+
+	if err := w.Error(); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "Failed to write CSV file",
+			"error":   err,
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "Successfully generate CSV file",
 	})
 }
