@@ -16,6 +16,18 @@ func (informationUsecase *informationUsecase) GetInformationById(id int) (*ei.In
 }
 
 func (informationUsecase *informationUsecase) CreateInformation(information *ei.Information) error {
+	for {
+		informationId := randomid.GenerateRandomNumber()
+
+		exists, err := informationUsecase.informationRepository.CheckInformationExists(informationId)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			information.InformationId = informationId
+			break
+		}
+	}
 	information.InformationId = randomid.GenerateRandomNumber()
 	err := informationUsecase.informationRepository.CreateInformation(information)
 	return err

@@ -35,16 +35,24 @@ func (informationRepo *informationRepo) CreateInformation(information *ei.Inform
 	return nil
 }
 
+func (informationRepo *informationRepo) CheckInformationExists(informationId uint) (bool, error) {
+	query := "SELECT COUNT(*) FROM information WHERE information_id = ?"
+	var count int
+	err := informationRepo.DB.Exec(query, informationId).Scan(&count)
+	if err != nil {
+		return false, err.Error
+	}
+
+	exists := count > 0
+	return exists, nil
+}
+
 func (informationRepo *informationRepo) UpdateInformation(id int, information *ei.Information) error {
 	query := "UPDATE information SET title = ?, photo_content_url = ?, content = ?, view_count = ?, bookmark_count = ?, status_id = ? WHERE information_id = ?"
 	result := informationRepo.DB.Exec(query, information.Title, information.PhotoContentUrl, information.Content, information.ViewCount, information.BookmarkCount, information.StatusId, id)
 	if result.Error != nil {
 		return result.Error
 	}
-	// result := informationRepo.DB.Model(&information).Where("id = ?", id).Save(&information)
-	// if result.Error != nil {
-	// 	return result.Error
-	// }
 
 	return nil
 }
@@ -55,9 +63,6 @@ func (informationRepo *informationRepo) DeleteInformation(id int) error {
 	if result.Error != nil {
 		return result.Error
 	}
-	// if err := informationRepo.DB.Where("information_id = ?", id).Delete(&ei.Information{}, id).Error; err != nil {
-	// 	return err
-	// }
 
 	return nil
 }

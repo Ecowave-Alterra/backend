@@ -9,6 +9,7 @@ type InformationRepository interface {
 	GetAllInformations(offset, pageSize int) (*[]ei.Information, int64, error)
 	GetInformationById(id int) (*ei.Information, error)
 	CreateInformation(information *ei.Information) error
+	CheckInformationExists(informationId uint) (bool, error)
 	UpdateInformation(id int, information *ei.Information) error
 	DeleteInformation(id int) error
 	SearchInformations(keyword string, offset, pageSize int) (*[]ei.Information, int64, error)
