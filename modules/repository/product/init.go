@@ -19,7 +19,6 @@ type ProductRepo interface {
 	SearchProductByName(name string, product *[]ep.Product) ([]ep.Product, error)
 	SearchProductByCategory(category string, product *[]ep.Product) ([]ep.Product, error)
 	FilterProductByStatus(status string, product *[]ep.Product) ([]ep.Product, error)
-	// ImportProductFromCSV(product *pe.Product) error
 }
 
 type productRepo struct {

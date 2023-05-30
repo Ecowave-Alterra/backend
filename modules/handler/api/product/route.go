@@ -14,7 +14,6 @@ func (productHandler *ProductHandler) RegisterRoutes(e *echo.Echo) {
 	productGroup.GET("/:id", productHandler.GetProductByID)
 	productGroup.PUT("/:id", productHandler.UpdateProduct)
 	productGroup.DELETE("/:id", productHandler.DeleteProduct)
-	// productGroup.POST("/import-csv", productHandler.ImportProductFromCSV)
 	productGroup.GET("/search", productHandler.SearchProduct)
 	productGroup.GET("/filter", productHandler.FilterProductByStatus)
 

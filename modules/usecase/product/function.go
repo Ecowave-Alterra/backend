@@ -55,7 +55,3 @@ func (pc *productUseCase) SearchProductByCategory(category string, product *[]ep
 func (pc *productUseCase) FilterProductByStatus(status string, product *[]ep.Product) ([]ep.Product, error) {
 	return pc.productRepo.FilterProductByStatus(status, product)
 }
-
-// func (pc *productUseCase) ImportProductFromCSV(product *pe.Product) error {
-// 	return pc.productRepo.ImportProductFromCSV(product)
-// }

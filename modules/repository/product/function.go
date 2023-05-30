@@ -113,11 +113,3 @@ func (r *productRepo) FilterProductByStatus(status string, product *[]ep.Product
 
 	return *product, nil
 }
-
-// func (r *productRepo) ImportProductFromCSV(product *pe.Product) error {
-// 	if err := r.db.Save(&product).Error; err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
