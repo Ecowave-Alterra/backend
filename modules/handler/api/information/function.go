@@ -76,14 +76,6 @@ func (informationHandler *InformationHandler) GetInformationById() echo.HandlerF
 
 func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFunc {
 	return func(e echo.Context) error {
-		statusIDStr := e.FormValue("StatusId")
-		statusID, err := strconv.ParseUint(statusIDStr, 10, 64)
-		if err != nil {
-			return e.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Invalid StatusId",
-			})
-		}
-
 		fileHeader, err := e.FormFile("PhotoContentUrl")
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -117,7 +109,7 @@ func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFu
 			Title:           e.FormValue("Title"),
 			Content:         e.FormValue("Content"),
 			PhotoContentUrl: PhotoUrl,
-			StatusId:        uint(statusID),
+			Status:          e.FormValue("Status"),
 		}
 
 		if err := e.Validate(information); err != nil {
@@ -141,7 +133,7 @@ func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFu
 			})
 		}
 
-		if information.StatusId == 2 {
+		if information.Status == "Draft" {
 			return e.JSON(http.StatusOK, map[string]interface{}{
 				"Message": "Anda berhasil menambahkan informasi ke dalam draft",
 			})
@@ -204,14 +196,14 @@ func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFu
 			})
 		}
 
-		if information.StatusId == 2 {
-			if informationBefore.StatusId != information.StatusId {
+		if information.Status == "Draft" {
+			if informationBefore.Status != information.Status {
 				return e.JSON(http.StatusOK, map[string]interface{}{
 					"Message": "Informasi berhasil dipindahkan ke dalam draft",
 				})
 			}
-		} else if information.StatusId == 1 {
-			if informationBefore.StatusId != information.StatusId {
+		} else if information.Status == "Terbit" {
+			if informationBefore.Status != information.Status {
 				return e.JSON(http.StatusOK, map[string]interface{}{
 					"Message": "Anda berhasil menerbitkan informasi baru",
 				})

@@ -45,6 +45,5 @@ func InitialMigration() {
 		ep.Product{},
 		ep.ProductCategory{},
 		ei.Information{},
-		ei.Status{},
 	)
 }

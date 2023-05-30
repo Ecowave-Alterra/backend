@@ -11,7 +11,7 @@ func (informationRepo *informationRepo) GetAllInformations(offset, pageSize int)
 		return nil, 0, err
 	}
 
-	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").Offset(offset).Limit(pageSize).Find(&informations).Error; err != nil {
+	if err := informationRepo.DB.Offset(offset).Limit(pageSize).Find(&informations).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -20,7 +20,7 @@ func (informationRepo *informationRepo) GetAllInformations(offset, pageSize int)
 
 func (informationRepo *informationRepo) GetInformationById(id int) (*ei.Information, error) {
 	var information ei.Information
-	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").Where("information_id = ?", id).First(&information).Error; err != nil {
+	if err := informationRepo.DB.Where("information_id = ?", id).First(&information).Error; err != nil {
 		return nil, err
 	}
 
@@ -47,8 +47,8 @@ func (informationRepo *informationRepo) CheckInformationExists(informationId uin
 }
 
 func (informationRepo *informationRepo) UpdateInformation(id int, information *ei.Information) error {
-	query := "UPDATE information SET title = ?, photo_content_url = ?, content = ?, view_count = ?, bookmark_count = ?, status_id = ? WHERE information_id = ?"
-	result := informationRepo.DB.Exec(query, information.Title, information.PhotoContentUrl, information.Content, information.ViewCount, information.BookmarkCount, information.StatusId, id)
+	query := "UPDATE information SET title = ?, photo_content_url = ?, content = ?, view_count = ?, bookmark_count = ?, status = ? WHERE information_id = ?"
+	result := informationRepo.DB.Exec(query, information.Title, information.PhotoContentUrl, information.Content, information.ViewCount, information.BookmarkCount, information.Status, id)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -73,7 +73,7 @@ func (informationRepo *informationRepo) SearchInformations(keyword string, offse
 		return nil, 0, err
 	}
 
-	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").Where("title LIKE ?", "%"+keyword+"%").Or(informationRepo.DB.Where("information_id LIKE ?", "%"+keyword+"%")).Find(&informations).Error; err != nil {
+	if err := informationRepo.DB.Where("title LIKE ?", "%"+keyword+"%").Or(informationRepo.DB.Where("information_id LIKE ?", "%"+keyword+"%")).Find(&informations).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -84,11 +84,11 @@ func (informationRepo *informationRepo) FilterInformations(keyword, offset, page
 	var informations []ei.Information
 
 	var count int64
-	if err := informationRepo.DB.Model(&ei.Information{}).Where("status_id = ?", keyword).Count(&count).Error; err != nil {
+	if err := informationRepo.DB.Model(&ei.Information{}).Where("status = ?", keyword).Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
 
-	if err := informationRepo.DB.Preload("Status", "deleted_at IS NULL").Where("status_id = ?", keyword).Find(&informations).Error; err != nil {
+	if err := informationRepo.DB.Where("status = ?", keyword).Find(&informations).Error; err != nil {
 		return nil, 0, err
 	}
 
