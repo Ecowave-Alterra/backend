@@ -5,6 +5,11 @@ import (
 	ei "github.com/berrylradianh/ecowave-go/modules/entity/information"
 )
 
+func (informationUsecase *informationUsecase) GetAllInformationsNoPagination() (*[]ei.Information, error) {
+	informations, err := informationUsecase.informationRepository.GetAllInformationsNoPagination()
+	return informations, err
+}
+
 func (informationUsecase *informationUsecase) GetAllInformations(offset, pageSize int) (*[]ei.Information, int64, error) {
 	informations, count, err := informationUsecase.informationRepository.GetAllInformations(offset, pageSize)
 	return informations, count, err

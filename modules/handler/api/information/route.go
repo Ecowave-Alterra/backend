@@ -19,4 +19,5 @@ func (informationHandler *InformationHandler) RegisterRoutes(e *echo.Echo) {
 	informationGroup.DELETE("/:id", informationHandler.DeleteInformation())
 	informationGroup.GET("/search", informationHandler.SearchInformations())
 	informationGroup.GET("/filter", informationHandler.FilterInformations())
+	informationGroup.GET("/download-csv", informationHandler.DownloadCSVFile())
 }

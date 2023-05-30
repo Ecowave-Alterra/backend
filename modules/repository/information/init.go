@@ -6,6 +6,7 @@ import (
 )
 
 type InformationRepository interface {
+	GetAllInformationsNoPagination() (*[]ei.Information, error)
 	GetAllInformations(offset, pageSize int) (*[]ei.Information, int64, error)
 	GetInformationById(informationId int) (*ei.Information, error)
 	CreateInformation(information *ei.Information) error

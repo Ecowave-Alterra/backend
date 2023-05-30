@@ -4,6 +4,15 @@ import (
 	ei "github.com/berrylradianh/ecowave-go/modules/entity/information"
 )
 
+func (informationRepo *informationRepo) GetAllInformationsNoPagination() (*[]ei.Information, error) {
+	var informations []ei.Information
+	if err := informationRepo.DB.Find(&informations).Error; err != nil {
+		return nil, err
+	}
+
+	return &informations, nil
+}
+
 func (informationRepo *informationRepo) GetAllInformations(offset, pageSize int) (*[]ei.Information, int64, error) {
 	var informations []ei.Information
 	var count int64

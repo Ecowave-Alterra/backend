@@ -1,8 +1,10 @@
 package information
 
 import (
+	"encoding/csv"
 	"math"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -374,5 +376,67 @@ func (informationHandler *InformationHandler) FilterInformations() echo.HandlerF
 		return e.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Invalid parameters",
 		})
+	}
+}
+
+func (informationHandler *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
+	return func(e echo.Context) error {
+		informations, err := informationHandler.informationUsecase.GetAllInformationsNoPagination()
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, echo.Map{
+				"Message": err.Error(),
+			})
+		}
+
+		file, err := os.Create("information-data.csv")
+		defer file.Close()
+		if err != nil {
+			return e.JSON(http.StatusInternalServerError, echo.Map{
+				"message": "Failed to create CSV file",
+				"error":   err,
+			})
+		}
+
+		writer := csv.NewWriter(file)
+		defer writer.Flush()
+
+		csvHeader := []string{"InformationId", "Title", "Content", "Status", "ViewCount", "BookmarkCount", "PhotoContentUrl"}
+		err = writer.Write(csvHeader)
+		if err != nil {
+			return e.JSON(http.StatusInternalServerError, echo.Map{
+				"message": "Failed to write CSV header",
+				"error":   err,
+			})
+		}
+
+		for _, info := range *informations {
+			record := []string{
+				strconv.Itoa(int(info.InformationId)),
+				info.Title,
+				info.Content,
+				info.Status,
+				strconv.Itoa(int(info.ViewCount)),
+				strconv.Itoa(int(info.BookmarkCount)),
+				info.PhotoContentUrl,
+			}
+
+			err = writer.Write(record)
+			if err != nil {
+				return e.JSON(http.StatusInternalServerError, echo.Map{
+					"message": "Failed to write CSV record",
+					"error":   err,
+				})
+			}
+		}
+
+		writer.Flush()
+		if err := writer.Error(); err != nil {
+			return e.JSON(http.StatusInternalServerError, echo.Map{
+				"message": "Failed to flush CSV writer",
+				"error":   err,
+			})
+		}
+
+		return e.Attachment("information-data.csv", "information-data.csv")
 	}
 }
