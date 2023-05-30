@@ -28,7 +28,6 @@ func (informationUsecase *informationUsecase) CreateInformation(information *ei.
 			break
 		}
 	}
-	information.InformationId = randomid.GenerateRandomNumber()
 	err := informationUsecase.informationRepository.CreateInformation(information)
 	return err
 }

@@ -6,6 +6,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/url"
+	"path"
 
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/option"
@@ -43,4 +44,34 @@ func UploadToBucket(ctx context.Context, fileHeader *multipart.FileHeader) (stri
 
 	PhotoUrl := fmt.Sprintf("https://storage.cloud.google.com%s", u.EscapedPath())
 	return PhotoUrl, nil
+}
+
+func GetFileName(filePath string) (string, error) {
+	decodeFilePath, err := url.PathUnescape(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	fileName := path.Base(decodeFilePath)
+	return fileName, nil
+}
+
+func DeleteImage(fileName string) error {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx, option.WithCredentialsFile("storage.json"))
+	if err != nil {
+		return err
+	}
+
+	bucketName := "ecowave_storage"
+	objectPath := "img/" + fileName
+
+	obj := client.Bucket(bucketName).Object(objectPath)
+
+	err = obj.Delete(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

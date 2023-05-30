@@ -36,11 +36,10 @@ func (informationRepo *informationRepo) CreateInformation(information *ei.Inform
 }
 
 func (informationRepo *informationRepo) CheckInformationExists(informationId uint) (bool, error) {
-	query := "SELECT COUNT(*) FROM information WHERE information_id = ?"
-	var count int
-	err := informationRepo.DB.Exec(query, informationId).Scan(&count)
-	if err != nil {
-		return false, err.Error
+	var count int64
+	result := informationRepo.DB.Model(&ei.Information{}).Where("information_id = ?", informationId).Count(&count)
+	if result.Error != nil {
+		return false, result.Error
 	}
 
 	exists := count > 0

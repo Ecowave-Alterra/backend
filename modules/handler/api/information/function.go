@@ -1,6 +1,7 @@
 package information
 
 import (
+	"fmt"
 	"math"
 	"net/http"
 	"path/filepath"
@@ -237,6 +238,23 @@ func (informationHandler *InformationHandler) DeleteInformation() echo.HandlerFu
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": "Record Not Found",
 			})
+		}
+
+		photoContentUrl := information.PhotoContentUrl
+		if photoContentUrl != "" {
+			fileName, err := cloudstorage.GetFileName(photoContentUrl)
+			if err != nil {
+				return e.JSON(http.StatusInternalServerError, echo.Map{
+					"Message": "Gagal mendapatkan nama file",
+				})
+			}
+			fmt.Println(fileName)
+			err = cloudstorage.DeleteImage(fileName)
+			if err != nil {
+				return e.JSON(http.StatusInternalServerError, echo.Map{
+					"Message": "Gagal menghapus file pada cloud storage",
+				})
+			}
 		}
 
 		err = informationHandler.informationUsecase.DeleteInformation(int(information.InformationId))
