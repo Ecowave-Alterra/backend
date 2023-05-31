@@ -2,6 +2,7 @@ package information
 
 import (
 	"encoding/csv"
+	"log"
 	"math"
 	"net/http"
 	"os"
@@ -389,13 +390,18 @@ func (informationHandler *InformationHandler) DownloadCSVFile() echo.HandlerFunc
 		}
 
 		file, err := os.Create("information-data.csv")
-		defer file.Close()
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "Failed to create CSV file",
 				"error":   err,
 			})
 		}
+
+		defer func() {
+			if closeErr := file.Close(); closeErr != nil {
+				log.Println("Error closing file:", closeErr)
+			}
+		}()
 
 		writer := csv.NewWriter(file)
 		defer writer.Flush()
@@ -437,6 +443,8 @@ func (informationHandler *InformationHandler) DownloadCSVFile() echo.HandlerFunc
 			})
 		}
 
-		return e.Attachment("information-data.csv", "information-data.csv")
+		return e.JSON(http.StatusOK, map[string]interface{}{
+			"message": "Successfully generate CSV file",
+		})
 	}
 }
