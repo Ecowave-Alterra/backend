@@ -392,8 +392,8 @@ func (informationHandler *InformationHandler) DownloadCSVFile() echo.HandlerFunc
 		file, err := os.Create("information-data.csv")
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"message": "Failed to create CSV file",
-				"error":   err,
+				"Message": "Failed to create CSV file",
+				"Error":   err,
 			})
 		}
 
@@ -410,8 +410,8 @@ func (informationHandler *InformationHandler) DownloadCSVFile() echo.HandlerFunc
 		err = writer.Write(csvHeader)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"message": "Failed to write CSV header",
-				"error":   err,
+				"Message": "Failed to write CSV header",
+				"Error":   err,
 			})
 		}
 
@@ -429,8 +429,8 @@ func (informationHandler *InformationHandler) DownloadCSVFile() echo.HandlerFunc
 			err = writer.Write(record)
 			if err != nil {
 				return e.JSON(http.StatusInternalServerError, echo.Map{
-					"message": "Failed to write CSV record",
-					"error":   err,
+					"Message": "Failed to write CSV record",
+					"Error":   err,
 				})
 			}
 		}
@@ -438,13 +438,13 @@ func (informationHandler *InformationHandler) DownloadCSVFile() echo.HandlerFunc
 		writer.Flush()
 		if err := writer.Error(); err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"message": "Failed to flush CSV writer",
-				"error":   err,
+				"Message": "Failed to flush CSV writer",
+				"Error":   err,
 			})
 		}
 
 		return e.JSON(http.StatusOK, map[string]interface{}{
-			"message": "Successfully generate CSV file",
+			"Message": "Successfully generate CSV file",
 		})
 	}
 }
