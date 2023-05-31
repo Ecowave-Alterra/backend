@@ -16,7 +16,7 @@ import (
 )
 
 func (h *ProductHandler) CreateProduct(c echo.Context) error {
-	productCategoryIDstr := c.FormValue("Product_category_id")
+	productCategoryIDstr := c.FormValue("ProductCategoryId")
 	productCategoryID, err := strconv.ParseUint(productCategoryIDstr, 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -49,13 +49,13 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	}
 
 	product := ep.Product{
-		Product_category_id: uint(productCategoryID),
-		Name:                name,
-		Stock:               uint(stock),
-		Price:               price,
-		Status:              status,
-		Rating:              0.00,
-		Description:         description,
+		ProductCategoryId: uint(productCategoryID),
+		Name:              name,
+		Stock:             uint(stock),
+		Price:             price,
+		Status:            status,
+		Rating:            0.00,
+		Description:       description,
 	}
 	err = h.productUseCase.CreateProduct(&product)
 	if err != nil {
@@ -97,8 +97,8 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 			log.Println(PhotoUrl)
 
 			productImage := ep.ProductImage{
-				Product_id:        product.ID,
-				Product_image_url: PhotoUrl,
+				ProductId:       product.ID,
+				ProductImageUrl: PhotoUrl,
 			}
 			err = h.productUseCase.CreateProductImage(&productImage)
 			if err != nil {
@@ -144,19 +144,19 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 
 		var imageURLs []string
 		for _, image := range productImages {
-			imageURLs = append(imageURLs, image.Product_image_url)
+			imageURLs = append(imageURLs, image.ProductImageUrl)
 		}
 
 		productResponse := ep.ProductResponse{
-			Product_id:        product.ID,
-			Name:              product.Name,
-			Category:          product.Product_Category.Category,
-			Stock:             product.Stock,
-			Price:             product.Price,
-			Status:            product.Status,
-			Rating:            product.Rating,
-			Description:       product.Description,
-			Product_image_url: imageURLs,
+			ProductId:       product.ID,
+			Name:            product.Name,
+			Category:        product.ProductCategory.Category,
+			Stock:           product.Stock,
+			Price:           product.Price,
+			Status:          product.Status,
+			Rating:          product.Rating,
+			Description:     product.Description,
+			ProductImageUrl: imageURLs,
 		}
 
 		productResponses = append(productResponses, productResponse)
@@ -191,19 +191,19 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 
 	var imageURLs []string
 	for _, image := range productImages {
-		imageURLs = append(imageURLs, image.Product_image_url)
+		imageURLs = append(imageURLs, image.ProductImageUrl)
 	}
 
 	productResponse := ep.ProductResponse{
-		Product_id:        product.ID,
-		Name:              product.Name,
-		Category:          product.Product_Category.Category,
-		Stock:             product.Stock,
-		Price:             product.Price,
-		Status:            product.Status,
-		Rating:            product.Rating,
-		Description:       product.Description,
-		Product_image_url: imageURLs,
+		ProductId:       product.ID,
+		Name:            product.Name,
+		Category:        product.ProductCategory.Category,
+		Stock:           product.Stock,
+		Price:           product.Price,
+		Status:          product.Status,
+		Rating:          product.Rating,
+		Description:     product.Description,
+		ProductImageUrl: imageURLs,
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
@@ -229,13 +229,13 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	}
 
 	req = ep.ProductRequest{
-		Product_category_id: req.Product_category_id,
-		Name:                req.Name,
-		Stock:               req.Stock,
-		Price:               req.Price,
-		Description:         req.Description,
-		Status:              status,
-		Product_image_url:   req.Product_image_url,
+		ProductCategoryId: req.ProductCategoryId,
+		Name:              req.Name,
+		Stock:             req.Stock,
+		Price:             req.Price,
+		Description:       req.Description,
+		Status:            status,
+		ProductImageUrl:   req.ProductImageUrl,
 	}
 
 	var product ep.Product
@@ -320,19 +320,19 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 
 		var imageURLs []string
 		for _, image := range productImages {
-			imageURLs = append(imageURLs, image.Product_image_url)
+			imageURLs = append(imageURLs, image.ProductImageUrl)
 		}
 
 		productResponse := ep.ProductResponse{
-			Product_id:        product.ID,
-			Name:              product.Name,
-			Category:          product.Product_Category.Category,
-			Stock:             product.Stock,
-			Price:             product.Price,
-			Status:            product.Status,
-			Rating:            product.Rating,
-			Description:       product.Description,
-			Product_image_url: imageURLs,
+			ProductId:       product.ID,
+			Name:            product.Name,
+			Category:        product.ProductCategory.Category,
+			Stock:           product.Stock,
+			Price:           product.Price,
+			Status:          product.Status,
+			Rating:          product.Rating,
+			Description:     product.Description,
+			ProductImageUrl: imageURLs,
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
@@ -363,19 +363,19 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 
 			var imageURLs []string
 			for _, image := range productImages {
-				imageURLs = append(imageURLs, image.Product_image_url)
+				imageURLs = append(imageURLs, image.ProductImageUrl)
 			}
 
 			productResponse := ep.ProductResponse{
-				Product_id:        product.ID,
-				Name:              product.Name,
-				Category:          product.Product_Category.Category,
-				Stock:             product.Stock,
-				Price:             product.Price,
-				Status:            product.Status,
-				Rating:            product.Rating,
-				Description:       product.Description,
-				Product_image_url: imageURLs,
+				ProductId:       product.ID,
+				Name:            product.Name,
+				Category:        product.ProductCategory.Category,
+				Stock:           product.Stock,
+				Price:           product.Price,
+				Status:          product.Status,
+				Rating:          product.Rating,
+				Description:     product.Description,
+				ProductImageUrl: imageURLs,
 			}
 
 			productResponses = append(productResponses, productResponse)
@@ -416,19 +416,19 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 
 			var imageURLs []string
 			for _, image := range productImages {
-				imageURLs = append(imageURLs, image.Product_image_url)
+				imageURLs = append(imageURLs, image.ProductImageUrl)
 			}
 
 			productResponse := ep.ProductResponse{
-				Product_id:        product.ID,
-				Name:              product.Name,
-				Category:          product.Product_Category.Category,
-				Stock:             product.Stock,
-				Price:             product.Price,
-				Status:            product.Status,
-				Rating:            product.Rating,
-				Description:       product.Description,
-				Product_image_url: imageURLs,
+				ProductId:       product.ID,
+				Name:            product.Name,
+				Category:        product.ProductCategory.Category,
+				Stock:           product.Stock,
+				Price:           product.Price,
+				Status:          product.Status,
+				Rating:          product.Rating,
+				Description:     product.Description,
+				ProductImageUrl: imageURLs,
 			}
 
 			productResponses = append(productResponses, productResponse)
@@ -477,19 +477,19 @@ func (h *ProductHandler) FilterProductByStatus(c echo.Context) error {
 
 		var imageURLs []string
 		for _, image := range productImages {
-			imageURLs = append(imageURLs, image.Product_image_url)
+			imageURLs = append(imageURLs, image.ProductImageUrl)
 		}
 
 		productResponse := ep.ProductResponse{
-			Product_id:        product.ID,
-			Name:              product.Name,
-			Category:          product.Product_Category.Category,
-			Stock:             product.Stock,
-			Price:             product.Price,
-			Status:            product.Status,
-			Rating:            product.Rating,
-			Description:       product.Description,
-			Product_image_url: imageURLs,
+			ProductId:       product.ID,
+			Name:            product.Name,
+			Category:        product.ProductCategory.Category,
+			Stock:           product.Stock,
+			Price:           product.Price,
+			Status:          product.Status,
+			Rating:          product.Rating,
+			Description:     product.Description,
+			ProductImageUrl: imageURLs,
 		}
 
 		productResponses = append(productResponses, productResponse)
@@ -516,7 +516,7 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 	defer file.Close()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "Failed to get product images",
+			"message": "Failed to create csv file",
 			"error":   err,
 		})
 	}
@@ -524,7 +524,7 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 	w := csv.NewWriter(file)
 	defer w.Flush()
 
-	csvHeader := []string{"Product_id", "Name", "Category", "Stock", "Price", "Status", "Rating", "Description", "Product_image_url"}
+	csvHeader := []string{"Product_id", "Name", "Category", "Stock", "Price", "Status", "Rating", "Description", "ProductImageUrl"}
 	var csvData [][]string
 	csvData = append(csvData, csvHeader)
 
@@ -540,13 +540,13 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 
 		var imageURLs []string
 		for _, image := range productImages {
-			imageURLs = append(imageURLs, image.Product_image_url)
+			imageURLs = append(imageURLs, image.ProductImageUrl)
 		}
 
 		record := []string{
 			strconv.Itoa(int(product.ID)),
 			product.Name,
-			product.Product_Category.Category,
+			product.ProductCategory.Category,
 			strconv.Itoa(int(product.Stock)),
 			strconv.FormatFloat(product.Price, 'f', -1, 64),
 			product.Status,

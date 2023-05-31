@@ -22,7 +22,7 @@ func (r *productRepo) CreateProductImage(productImage *ep.ProductImage) error {
 
 func (r *productRepo) GetAllProduct(products *[]ep.Product) ([]ep.Product, error) {
 	if err := r.db.
-		Preload("Product_Category").
+		Preload("ProductCategory").
 		Find(&products).Error; err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (r *productRepo) GetAllProduct(products *[]ep.Product) ([]ep.Product, error
 
 func (r *productRepo) GetProductByID(productId string, product *ep.Product) (ep.Product, error) {
 	if err := r.db.
-		Preload("Product_Category").
+		Preload("ProductCategory").
 		First(&product, productId).Error; err != nil {
 		return *product, err
 	}
@@ -49,7 +49,7 @@ func (r *productRepo) GetProductImageURLById(productId string, productImage *ep.
 }
 
 func (r *productRepo) UpdateProduct(productId string, req *ep.ProductRequest) error {
-	if err := r.db.Model(&ep.Product{}).Where("id = ?", productId).Updates(ep.Product{Product_category_id: req.Product_category_id, Name: req.Name, Stock: req.Stock, Price: req.Price, Status: req.Status, Description: req.Description}).Error; err != nil {
+	if err := r.db.Model(&ep.Product{}).Where("id = ?", productId).Updates(ep.Product{ProductCategoryId: req.ProductCategoryId, Name: req.Name, Stock: req.Stock, Price: req.Price, Status: req.Status, Description: req.Description}).Error; err != nil {
 		return err
 	}
 
@@ -78,7 +78,7 @@ func (r *productRepo) DeleteProductImage(productID string, productImages *[]ep.P
 
 func (r *productRepo) SearchProductByID(productID string, product *ep.Product) (ep.Product, error) {
 	if err := r.db.
-		Preload("Product_Category").
+		Preload("ProductCategory").
 		Where("id = ?", productID).
 		First(&product).Error; err != nil {
 		return *product, err
@@ -88,7 +88,7 @@ func (r *productRepo) SearchProductByID(productID string, product *ep.Product) (
 }
 
 func (r *productRepo) SearchProductByName(name string, product *[]ep.Product) ([]ep.Product, error) {
-	if err := r.db.Where("name LIKE ?", "%"+name+"%").Preload("Product_Category").
+	if err := r.db.Where("name LIKE ?", "%"+name+"%").Preload("ProductCategory").
 		Find(&product).Error; err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (r *productRepo) SearchProductByName(name string, product *[]ep.Product) ([
 }
 
 func (r *productRepo) SearchProductByCategory(category string, product *[]ep.Product) ([]ep.Product, error) {
-	if err := r.db.Preload("Product_Category").
+	if err := r.db.Preload("ProductCategory").
 		Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&product).Error; err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (r *productRepo) SearchProductByCategory(category string, product *[]ep.Pro
 }
 
 func (r *productRepo) FilterProductByStatus(status string, product *[]ep.Product) ([]ep.Product, error) {
-	if err := r.db.Where("status = ?", status).Preload("Product_Category").
+	if err := r.db.Where("status = ?", status).Preload("ProductCategory").
 		Find(&product).Error; err != nil {
 		return nil, err
 	}

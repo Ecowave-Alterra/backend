@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type ProductImage struct {
 	gorm.Model
-	Product_id        uint    `json:"product_id" form:"product_id"`
-	Product_image_url string  `json:"product_image_url" form:"product_image_url"`
-	Product           Product `gorm:"foreignKey:Product_id"`
+	ProductId       uint    `json:"productId" form:"productId"`
+	ProductImageUrl string  `json:"productImageUrl" form:"productImageUrl"`
+	Product         Product `gorm:"foreignKey:ProductId"`
 }
