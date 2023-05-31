@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ecowave",
+  "private_key_id": "6db9034f1cdacf258bd98fb56451b54858aa95e2",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC4n9m9sxcy6j2E\nPUiAf5ZR4uwMUXEIsyp9ipv7il5TsYQjssLcjg/jUfr8U+cwbUg57yKpDUN46ClX\nzISMxgS756pWaX5ItdZsBU/3/+QghH3dkCyscha7hhldn7hHFwgwV1ri6S4ICVIN\nZDtT5HcRWPhI/H6xVaSE+QvF2BPdEN2aE2QOgtd8Sv2O/uUx8mlI4uX0/SHD1M/r\n49sVTC8EIuCStHT02ZCs62FztI26HC4dElcNbszMxJj1IDERJoXVfcpov8vTaTYM\naJVf7uIWj1mCyWIRbLSJ70FvVAePqirqxB1tDvp59TvDtoshaSaePyRLKVV+c+3d\nMKYfe8dVAgMBAAECggEABU6zF7z6QcByHEcWunrwe1ImrwP4V+OuqQU/DrAfnhBQ\nWCZfa6+5zTMiH/bZgo7hsKirOmjjM6qY5ak/djyLDkvOncVSmAyCKYDNl7eHe1fT\ntnbakeqFtMZaHFLnHUQQPDOGrVc+t4RtE216NyMuORVxrcd0bOylWh0+tWVMzOIO\nm3FaF2/ZeB6u/CoxfdIQht0R0Kmk0DS25XfUbBx5mqOUD2b2iv03/o3dBNfYi+4X\n68l7PCaOiSc6YK4lG+jRpreGeH1MjaEVA7XojsKgclE2bFzVo8by0233amnmMUmE\nkIKUm/BIMpA6NqQYDDppfsufQOwxJ7+db+E3xcq10QKBgQD7MkJw0iKszR3XX5MP\ncxCVHUGVXkWym7DQEo2HM1LYKK2dMLCXlogP4CkK+UPl5L5m1PPRfVY7+7J1kN51\nlvS04e78hjTH8bnHtVIhqb9CfQn68qUN5QQMrDXGQd8q2GjqJQkTYeUSaKVfR8Ma\nBkt+CzJmTMzblcO6agnAtKTdPwKBgQC8J6+WL5xf9C7mv9avJ0yVifyI4UC+zbU+\nDsaUkfQ26OKwOe1Q37WmVXmQRIN9eBCeQwl1CQ71853jRKlNZ/8ObscrXn91n7JV\nOviFjp6cNdSfkmq3AwVhbaadXjHtIdM1oFf3OLLbLg+erRkfiJLTWUjLgfgvdET3\nL/AMJGMyawKBgDdX2GmQ8pDN1EBKT1U9Da88teFZ1tNGGAuPutzJwvva4n1aZ93O\nDYYp5gED8CCraAOx8VH7Yk9u4d+jHlAcBSgBCy1ZyDExIbRNT54ZDwlwEQ3X/eN0\nzJKaMnLOuoNvEJZduIUrsVN/+MdoQSTvtBw+DUmarBvJAEmG6UUqx5PzAoGAIDZb\nJUc5amQPs4mcY5hC0EczaOvHfeMR6HH3JXBncw8j4C/KpVHnc3amvUA9krl/ftjT\nQaovWYQ/v6z9nzbyv7HPf2lKQQT6LwVNju//z5aXtEoI4xQtU6TGJaL+wS5NTp0I\n8lZOqJ+WJQBVkMR8/poGkHDL4LPzKq6WVj3UjckCgYEAogWczL6QaO4qowskJ6MS\ngzJPPk2+/UiTby2PfSEkUexhj0v/EBTBdSS6Qe5vsn+YdCtWONfLYqu4CS1XP9+D\nlr0A7w270HHQg8XMpmJnenltgw/05SxyGj5dJWaSjKOl9j0Ssea8H2RHT5WP5lo5\nMuF46wJDV8lY0Q3CNQDLO1c=\n-----END PRIVATE KEY-----\n",
+  "client_email": "storage-service@ecowave.iam.gserviceaccount.com",
+  "client_id": "115206654776438814122",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/storage-service%40ecowave.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
