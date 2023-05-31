@@ -14,7 +14,7 @@ type InformationRepository interface {
 	UpdateInformation(informationId int, information *ei.Information) error
 	DeleteInformation(informationId int) error
 	SearchInformations(keyword string, offset, pageSize int) (*[]ei.Information, int64, error)
-	FilterInformations(keyword, offset, pageSize int) (*[]ei.Information, int64, error)
+	FilterInformations(keyword string, offset, pageSize int) (*[]ei.Information, int64, error)
 }
 
 type informationRepo struct {

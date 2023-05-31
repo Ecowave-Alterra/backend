@@ -55,7 +55,7 @@ func (informationUsecase *informationUsecase) SearchInformations(keyword string,
 	return informations, count, nil
 }
 
-func (informationUsecase *informationUsecase) FilterInformations(keyword, offset, pageSize int) (*[]ei.Information, int64, error) {
+func (informationUsecase *informationUsecase) FilterInformations(keyword string, offset, pageSize int) (*[]ei.Information, int64, error) {
 	informations, count, err := informationUsecase.informationRepository.FilterInformations(keyword, offset, pageSize)
 	if err != nil {
 		return nil, 0, err

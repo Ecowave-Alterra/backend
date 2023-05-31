@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
 	ei "github.com/berrylradianh/ecowave-go/modules/entity/information"
@@ -135,7 +136,7 @@ func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFu
 			})
 		}
 
-		if information.Status == "Draft" {
+		if strings.EqualFold(information.Status, "Draft") {
 			return e.JSON(http.StatusOK, map[string]interface{}{
 				"Message": "Anda berhasil menambahkan informasi ke dalam draft",
 			})
@@ -225,13 +226,13 @@ func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFu
 			})
 		}
 
-		if information.Status == "Draft" {
+		if strings.EqualFold(information.Status, "Draft") {
 			if informationBefore.Status != information.Status {
 				return e.JSON(http.StatusOK, map[string]interface{}{
 					"Message": "Informasi berhasil dipindahkan ke dalam draft",
 				})
 			}
-		} else if information.Status == "Terbit" {
+		} else if strings.EqualFold(information.Status, "Terbit") {
 			if informationBefore.Status != information.Status {
 				return e.JSON(http.StatusOK, map[string]interface{}{
 					"Message": "Anda berhasil menerbitkan informasi baru",
@@ -343,8 +344,7 @@ func (informationHandler *InformationHandler) FilterInformations() echo.HandlerF
 		pageSize := 10
 		offset := (page - 1) * pageSize
 
-		keywordString := e.QueryParam("keyword")
-		keyword, _ := strconv.Atoi(keywordString)
+		keyword := e.QueryParam("keyword")
 		informations, total, err := informationHandler.informationUsecase.FilterInformations(keyword, offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
@@ -352,15 +352,15 @@ func (informationHandler *InformationHandler) FilterInformations() echo.HandlerF
 			})
 		}
 
-		if keyword == 1 && len(*informations) == 0 {
+		if strings.EqualFold(keyword, "Terbit") && len(*informations) == 0 {
 			return e.JSON(http.StatusOK, echo.Map{
 				"Message": "Belum ada informasi yang terbit",
 			})
-		} else if keyword == 2 && len(*informations) == 0 {
+		} else if strings.EqualFold(keyword, "Draft") && len(*informations) == 0 {
 			return e.JSON(http.StatusOK, echo.Map{
 				"Message": "Belum ada informasi dalam draft",
 			})
-		} else if keyword == 1 || keyword == 2 {
+		} else if strings.EqualFold(keyword, "Terbit") || strings.EqualFold(keyword, "Draft") {
 			if page > int(math.Ceil(float64(total)/float64(pageSize))) {
 				return e.JSON(http.StatusNotFound, echo.Map{
 					"Message": "Not Found",

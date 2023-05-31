@@ -87,7 +87,7 @@ func (informationRepo *informationRepo) SearchInformations(keyword string, offse
 	return &informations, count, nil
 }
 
-func (informationRepo *informationRepo) FilterInformations(keyword, offset, pageSize int) (*[]ei.Information, int64, error) {
+func (informationRepo *informationRepo) FilterInformations(keyword string, offset, pageSize int) (*[]ei.Information, int64, error) {
 	var informations []ei.Information
 
 	var count int64
