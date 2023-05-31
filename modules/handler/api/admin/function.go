@@ -11,12 +11,9 @@ import (
 )
 
 func (ah *AdminHandler) LoginAdmin(c echo.Context) error {
-	var admin at.Admin
-
-	if err := c.Bind(&admin); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "fail",
-		})
+	admin := &at.Admin{
+		Email:    c.FormValue("email"),
+		Password: c.FormValue("password"),
 	}
 
 	if err := c.Validate(admin); err != nil {
@@ -36,7 +33,7 @@ func (ah *AdminHandler) LoginAdmin(c echo.Context) error {
 		}
 	}
 
-	token, err := ah.adminUsecase.LoginAdmin(&admin)
+	token, err := ah.adminUsecase.LoginAdmin(admin)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "invalid email or password",
