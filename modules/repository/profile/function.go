@@ -41,3 +41,35 @@ func (pr *profileRepo) UpdateUserDetailProfile(userDetail *ut.UserDetail, id int
 
 	return nil
 }
+
+func (pr *profileRepo) CreateAddressProfile(address *ut.UserAddress) error {
+	if err := pr.db.Save(&address).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (pr *profileRepo) GetAllAddressProfile(address *[]ut.UserAddress, idUser int) error {
+	if err := pr.db.Where("user_id = ?", idUser).Find(&address).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (pr *profileRepo) GetAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error {
+	if err := pr.db.Where("user_id = ? AND id = ?", idUser, idAddress).First(&address).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (pr *profileRepo) UpdateAddressProfile(address *ut.UserAddress, idUser int, idAddress int) error {
+	if err := pr.db.Where("user_id = ? AND id = ?", idUser, idAddress).Updates(&address).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

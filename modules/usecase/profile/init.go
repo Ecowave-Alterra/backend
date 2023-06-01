@@ -10,7 +10,10 @@ type ProfileUsecase interface {
 	GetUser2Profile(id int) (*ut.User2Response, *ut.User, *ut.UserDetail, error)
 	UpdateUserProfile(user *ut.User, id int) error
 	UpdateUserDetailProfile(userDetail *ut.UserDetail, id int) error
-	// GetUserDetailProfile(userDetail *ut.UserDetail, id int) error
+	CreateAddressProfile(address *ut.UserAddress) error
+	GetAllAddressProfile(address *[]ut.UserAddress, idUser int) error
+	GetAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error
+	UpdateAddressProfile(address *ut.UserAddress, idUser int, idAddress int) error
 }
 
 type profileUsecase struct {

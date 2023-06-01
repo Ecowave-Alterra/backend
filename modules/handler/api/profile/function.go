@@ -1,8 +1,8 @@
 package profile
 
 import (
-	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
 	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
@@ -99,11 +99,8 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 			}
 		}
 
-		log.Println("aha")
 		profilePhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
-		log.Println(profilePhotoUrl)
 		userDetail.ProfilePhotoUrl = profilePhotoUrl
-		log.Println("aha")
 	}
 
 	if err := ph.profileUsecase.UpdateUserProfile(user, idUserSementara); err != nil {
@@ -123,17 +120,94 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	})
 }
 
-// func (ph *ProfileHandler) GetUserDetailProfile(c echo.Context) error {
-// 	var userDetail ut.UserDetail
+func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
+	var address ut.UserAddress
+	address.UserId = 1
 
-// 	if err := ph.profileUsecase.GetUserDetailProfile(&userDetail, 1); err != nil {
-// 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-// 			"message": "fail",
-// 		})
-// 	}
+	if err := c.Bind(&address); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "fail",
+		})
+	}
 
-// 	return c.JSON(http.StatusOK, map[string]interface{}{
-// 		"message": "success",
-// 		"data":    userDetail,
-// 	})
-// }
+	if err := ph.profileUsecase.CreateAddressProfile(&address); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "fail",
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "success create new address",
+	})
+}
+
+func (ph *ProfileHandler) GetAllAddressProfile(c echo.Context) error {
+	var address []ut.UserAddress
+	idUserSementara := 1
+
+	if err := ph.profileUsecase.GetAllAddressProfile(&address, idUserSementara); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "fail",
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "success get all address",
+		"data":    address,
+	})
+}
+
+func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
+	var address ut.UserAddress
+	address.UserId = 1
+
+	idAddress, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return err
+	}
+
+	if err := ph.profileUsecase.GetAddressByIdProfile(&address, int(address.UserId), idAddress); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "fail",
+		})
+	}
+
+	recipient := c.FormValue("Recipient")
+	phoneNumber := c.FormValue("PhoneNumber")
+	addressFV := c.FormValue("Address")
+	note := c.FormValue("Note")
+	mark := c.FormValue("Mark")
+	isPrimary, err := strconv.ParseBool(c.FormValue("IsPrimary"))
+	if err != nil {
+		return err
+	}
+
+	if recipient != "" {
+		address.Recipient = recipient
+	}
+	if phoneNumber != "" {
+		address.PhoneNumber = phoneNumber
+	}
+	if addressFV != "" {
+		address.Address = addressFV
+	}
+	if note != "" {
+		address.Note = note
+	}
+	if mark != "" {
+		address.Mark = mark
+	}
+	if isPrimary != address.IsPrimary {
+		address.IsPrimary = isPrimary
+	}
+
+	if err := ph.profileUsecase.UpdateAddressProfile(&address, int(address.UserId), idAddress); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "fail",
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "success update address by id",
+	})
+}

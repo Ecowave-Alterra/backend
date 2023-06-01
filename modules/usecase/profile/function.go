@@ -60,6 +60,18 @@ func (pc *profileUsecase) UpdateUserDetailProfile(userDetail *ut.UserDetail, id 
 	return pc.profileRepo.UpdateUserDetailProfile(userDetail, id)
 }
 
-// func (pc *profileUsecase) GetUserDetailProfile(userDetail *ut.UserDetail, id int) error {
-// 	return pc.profileRepo.GetUserDetailProfile(userDetail, id)
-// }
+func (pc *profileUsecase) CreateAddressProfile(address *ut.UserAddress) error {
+	return pc.profileRepo.CreateAddressProfile(address)
+}
+
+func (pc *profileUsecase) GetAllAddressProfile(address *[]ut.UserAddress, idUser int) error {
+	return pc.profileRepo.GetAllAddressProfile(address, idUser)
+}
+
+func (pc *profileUsecase) GetAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error {
+	return pc.profileRepo.GetAddressByIdProfile(address, idUser, idAddress)
+}
+
+func (pc *profileUsecase) UpdateAddressProfile(address *ut.UserAddress, idUser int, idAddress int) error {
+	return pc.profileRepo.UpdateAddressProfile(address, idUser, idAddress)
+}
