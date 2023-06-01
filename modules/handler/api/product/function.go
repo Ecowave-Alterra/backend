@@ -215,27 +215,46 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	productID := c.Param("id")
 	var req ep.ProductRequest
-	err := c.Bind(&req)
+
+	productCategoryIDstr := c.FormValue("ProductCategoryId")
+	productCategoryID, err := strconv.ParseUint(productCategoryIDstr, 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Failed to bind data",
+			"Message": "Invalid product category ID",
 			"error":   err,
 		})
 	}
+	name := c.FormValue("Name")
+	stockStr := c.FormValue("Stock")
+	stock, err := strconv.ParseUint(stockStr, 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Invalid stock",
+			"error":   err,
+		})
+	}
+	priceStr := c.FormValue("Price")
+	price, err := strconv.ParseFloat(priceStr, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Invalid price",
+			"error":   err,
+		})
+	}
+	description := c.FormValue("Description")
 
 	status := "tersedia"
-	if req.Stock == 0 {
+	if stock == 0 {
 		status = "habis"
 	}
 
 	req = ep.ProductRequest{
-		ProductCategoryId: req.ProductCategoryId,
-		Name:              req.Name,
-		Stock:             req.Stock,
-		Price:             req.Price,
-		Description:       req.Description,
+		ProductCategoryId: uint(productCategoryID),
+		Name:              name,
+		Stock:             uint(stock),
+		Price:             price,
+		Description:       description,
 		Status:            status,
-		ProductImageUrl:   req.ProductImageUrl,
 	}
 
 	var product ep.Product
@@ -251,6 +270,51 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "Failed to update data",
+			"error":   err,
+		})
+	}
+
+	for i := 1; i <= 5; i++ {
+		fileHeader, err := c.FormFile(fmt.Sprintf("PhotoContentUrl%d", i))
+		if fileHeader != nil {
+			filename, _ := cloudstorage.GetFileName(fileHeader.Filename)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, echo.Map{
+					"Message": "Gagal mendapatkan nama file",
+				})
+			}
+			err = cloudstorage.DeleteImage(filename)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, echo.Map{
+					"Message": "Gagal menghapus file pada cloud storage",
+				})
+			}
+			PhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
+
+			productImage := ep.ProductImage{
+				ProductId:       product.ID,
+				ProductImageUrl: PhotoUrl,
+			}
+			err = h.productUseCase.CreateProductImage(&productImage)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"message": "Failed to create product image",
+					"error":   err,
+				})
+			}
+
+		} else {
+			if err != nil {
+				i = 1000
+			}
+		}
+	}
+
+	var productImages []ep.ProductImage
+	err = h.productUseCase.DeleteProductImage(productID, &productImages)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "Failed to delete product images",
 			"error":   err,
 		})
 	}
