@@ -21,7 +21,7 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Invalid product category ID",
-			"error":   err,
+			"Error":   err,
 		})
 	}
 	name := c.FormValue("Name")
@@ -30,7 +30,7 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Invalid stock",
-			"error":   err,
+			"Error":   err,
 		})
 	}
 	priceStr := c.FormValue("Price")
@@ -38,7 +38,7 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Invalid price",
-			"error":   err,
+			"Error":   err,
 		})
 	}
 	description := c.FormValue("Description")
@@ -61,7 +61,7 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "Failed to create product",
-			"error":   err,
+			"Error":   err,
 		})
 	}
 
@@ -104,8 +104,8 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 			err = h.productUseCase.CreateProductImage(&productImage)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-					"message": "Failed to create product image",
-					"error":   err,
+					"Message": "Failed to create product image",
+					"Error":   err,
 				})
 			}
 
@@ -117,7 +117,7 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Successfully create new product",
+		"Message": "Anda berhasil menambahkan produk",
 	})
 }
 
@@ -127,8 +127,8 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 	products, err := h.productUseCase.GetAllProduct(&products)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Failed to get product datas",
-			"error":   err,
+			"Message": "Failed to get product datas",
+			"Error":   err,
 		})
 	}
 
@@ -138,8 +138,8 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"message": "Failed to get product images",
-				"error":   err,
+				"Message": "Failed to get product images",
+				"Error":   err,
 			})
 		}
 
@@ -164,8 +164,8 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message":  "Successfully get all product datas",
-		"products": productResponses,
+		"Message":  "Successfully get all product datas",
+		"Products": productResponses,
 	})
 }
 
@@ -176,8 +176,8 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 	product, err := h.productUseCase.GetProductByID(productID, &product)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "Failed to get product",
-			"error":   err,
+			"Message": "Failed to get product",
+			"Error":   err,
 		})
 	}
 
@@ -185,8 +185,8 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 	productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "Failed to get product images",
-			"error":   err,
+			"Message": "Failed to get product images",
+			"Error":   err,
 		})
 	}
 
@@ -208,8 +208,8 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message":  "Successfully get product data by id",
-		"products": productResponse,
+		"Message":  "Successfully get product data by id",
+		"Products": productResponse,
 	})
 }
 
@@ -222,7 +222,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Invalid product category ID",
-			"error":   err,
+			"Error":   err,
 		})
 	}
 	name := c.FormValue("Name")
@@ -231,7 +231,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Invalid stock",
-			"error":   err,
+			"Error":   err,
 		})
 	}
 	priceStr := c.FormValue("Price")
@@ -239,7 +239,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Invalid price",
-			"error":   err,
+			"Error":   err,
 		})
 	}
 	description := c.FormValue("Description")
@@ -261,24 +261,24 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	product, err = h.productUseCase.GetProductByID(productId, &product)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "Failed to get product",
-			"error":   err,
+			"Message": "Failed to get product",
+			"Error":   err,
 		})
 	}
 
 	err = h.productUseCase.UpdateProduct(productId, &req)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Failed to update data",
-			"error":   err,
+			"Message": "Failed to update data",
+			"Error":   err,
 		})
 	}
 
 	err = h.productUseCase.UpdateProductStock(productId, req.Stock)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Failed to update product stock",
-			"error":   err,
+			"Message": "Failed to update product stock",
+			"Error":   err,
 		})
 	}
 
@@ -286,8 +286,8 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	err = h.productUseCase.DeleteProductImage(fmt.Sprint(product.ID), &productImages)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Failed to delete product images",
-			"error":   err,
+			"Message": "Failed to delete product images",
+			"Error":   err,
 		})
 	}
 
@@ -316,8 +316,8 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 			err = h.productUseCase.CreateProductImage(&productImage)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-					"message": "Failed to create product image",
-					"error":   err,
+					"Message": "Failed to create product image",
+					"Error":   err,
 				})
 			}
 
@@ -329,7 +329,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Successfully update product",
+		"Message": "Anda berhasil mengubah produk",
 	})
 }
 
@@ -340,8 +340,8 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 	product, err := h.productUseCase.GetProductByID(productId, &product)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "Failed to get product",
-			"error":   err,
+			"Message": "Failed to get product",
+			"Error":   err,
 		})
 	}
 
@@ -373,13 +373,13 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 	err = h.productUseCase.DeleteProduct(productId, &product)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "Failed to delete product",
-			"error":   err,
+			"Message": "Failed to delete product",
+			"Error":   err,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Successfully delete product",
+		"Message": "Anda berhasil menghapus produk",
 	})
 }
 
@@ -393,8 +393,8 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 		product, err := h.productUseCase.SearchProductByID(itemId, &product)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"message": "Failed to get product",
-				"error":   err,
+				"Message": "Failed to get product",
+				"Error":   err,
 			})
 		}
 
@@ -402,8 +402,8 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"message": "Failed to get product images",
-				"error":   err,
+				"Message": "Failed to get product images",
+				"Error":   err,
 			})
 		}
 
@@ -425,8 +425,8 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"message":  "Successfully get product data by id",
-			"products": productResponse,
+			"Message":  "Successfully get product data by id",
+			"Products": productResponse,
 		})
 	case "name":
 		var products []ep.Product
@@ -434,8 +434,8 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 		products, err := h.productUseCase.SearchProductByName(name, &products)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"message": "Failed to get product",
-				"error":   err,
+				"Message": "Failed to get product",
+				"Error":   err,
 			})
 		}
 
@@ -445,8 +445,8 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 			productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"message": "Failed to get product images",
-					"error":   err,
+					"Message": "Failed to get product images",
+					"Error":   err,
 				})
 			}
 
@@ -472,14 +472,14 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 
 		if len(productResponses) == 0 {
 			return c.JSON(http.StatusOK, map[string]interface{}{
-				"message": "Product not found",
-				"product": productResponses,
+				"Message": "Product not found",
+				"Product": productResponses,
 			})
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"message":  "Successfully get product by name",
-			"products": productResponses,
+			"Message":  "Successfully get product by name",
+			"Products": productResponses,
 		})
 	case "category":
 		var products []ep.Product
@@ -487,8 +487,8 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 		products, err := h.productUseCase.SearchProductByCategory(category, &products)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"message": "Failed to get product by category",
-				"error":   err,
+				"Message": "Failed to get product by category",
+				"Error":   err,
 			})
 		}
 
@@ -498,8 +498,8 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 			productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"message": "Failed to get product images",
-					"error":   err,
+					"Message": "Failed to get product images",
+					"Error":   err,
 				})
 			}
 
@@ -525,19 +525,19 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 
 		if len(productResponses) == 0 {
 			return c.JSON(http.StatusOK, map[string]interface{}{
-				"message": "Product not found",
-				"product": productResponses,
+				"Message": "Product not found",
+				"Product": productResponses,
 			})
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"message":  "Successfully get product data by category",
-			"products": productResponses,
+			"Message":  "Successfully get product data by category",
+			"Products": productResponses,
 		})
 	}
 
 	return c.JSON(http.StatusBadRequest, map[string]interface{}{
-		"message": "Invalid search parameter",
+		"Message": "Invalid search parameter",
 	})
 }
 
@@ -548,8 +548,8 @@ func (h *ProductHandler) FilterProductByStatus(c echo.Context) error {
 	products, err := h.productUseCase.FilterProductByStatus(status, &product)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "Failed to filter product",
-			"error":   err,
+			"Message": "Failed to filter product",
+			"Error":   err,
 		})
 	}
 
@@ -559,8 +559,8 @@ func (h *ProductHandler) FilterProductByStatus(c echo.Context) error {
 		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"message": "Failed to get product images",
-				"error":   err,
+				"Message": "Failed to get product images",
+				"Error":   err,
 			})
 		}
 
@@ -585,8 +585,8 @@ func (h *ProductHandler) FilterProductByStatus(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message":  "Successfully get product based on stock status",
-		"products": productResponses,
+		"Message":  "Successfully get product based on stock status",
+		"Products": productResponses,
 	})
 }
 
@@ -596,8 +596,8 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 	products, err := h.productUseCase.GetAllProduct(&products)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Failed to get product datas",
-			"error":   err,
+			"Message": "Failed to get product datas",
+			"Error":   err,
 		})
 	}
 
@@ -605,8 +605,8 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 	defer file.Close()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "Failed to create csv file",
-			"error":   err,
+			"Message": "Failed to create csv file",
+			"Error":   err,
 		})
 	}
 
@@ -622,8 +622,8 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"message": "Failed to get product images",
-				"error":   err,
+				"Message": "Failed to get product images",
+				"Error":   err,
 			})
 		}
 
@@ -651,8 +651,8 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 
 	if err := w.Error(); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Failed to write CSV file",
-			"error":   err,
+			"Message": "Failed to write CSV file",
+			"Error":   err,
 		})
 	}
 
