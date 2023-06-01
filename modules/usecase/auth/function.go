@@ -2,10 +2,10 @@ package auth
 
 import (
 	pw "github.com/berrylradianh/ecowave-go/helper/password"
-	eu "github.com/berrylradianh/ecowave-go/modules/entity/user"
+	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
-func (ac *authUsecase) LoginAdmin(email, password string) (*eu.User, error) {
+func (ac *authUsecase) LoginAdmin(email, password string) (*ue.User, error) {
 	user, err := ac.authRepo.GetUserByEmail(email)
 	if err != nil {
 		return nil, err
