@@ -1,0 +1,21 @@
+package auth
+
+import (
+	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
+	ar "github.com/berrylradianh/ecowave-go/modules/repository/auth"
+)
+
+type AuthUsecase interface {
+	// LoginAdmin(admin *ut.User) (string, error)
+	LoginAdmin(email, password string) (*ut.User, error)
+}
+
+type authUsecase struct {
+	authRepo ar.AuthRepo
+}
+
+func New(adminRepo ar.AuthRepo) *authUsecase {
+	return &authUsecase{
+		adminRepo,
+	}
+}

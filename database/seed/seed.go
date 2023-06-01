@@ -10,7 +10,8 @@ type Seed struct {
 
 func RegisterSeed(db *gorm.DB) []Seed {
 	return []Seed{
-		{Seed: CreateAdmin(db)},
+		{Seed: CreateRoles()},
+		{Seed: CreateAdmin()},
 	}
 }
 
