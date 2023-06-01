@@ -12,6 +12,7 @@ func RegisterSeed(db *gorm.DB) []Seed {
 	return []Seed{
 		{Seed: CreateRoles()},
 		{Seed: CreateAdmin()},
+		{Seed: CreateInformation()},
 	}
 }
 
@@ -23,11 +24,11 @@ func DBSeed(db *gorm.DB) error {
 		}
 
 		if count == 0 {
-			if err := db.Debug().Create(seed.Seed).Error; err != nil {
+			err := db.Debug().Create(seed.Seed).Error
+			if err != nil {
 				return err
 			}
 		}
 	}
-
 	return nil
 }
