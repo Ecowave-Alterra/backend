@@ -5,6 +5,8 @@ import (
 
 	"github.com/berrylradianh/ecowave-go/config"
 	"github.com/berrylradianh/ecowave-go/database/seed"
+	re "github.com/berrylradianh/ecowave-go/modules/entity/role"
+	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 
@@ -41,6 +43,11 @@ func InitDB() {
 
 func InitialMigration() {
 	DB.AutoMigrate(
+		re.Role{},
+		ue.User{},
+		ue.UserDetail{},
 		ie.Information{},
 	)
+	DB.Migrator().HasConstraint(&ue.User{}, "UserDetail")
+	DB.Migrator().HasConstraint(&re.Role{}, "Users")
 }
