@@ -17,11 +17,11 @@ type InformationUsecase interface {
 }
 
 type informationUsecase struct {
-	informationRepository ri.InformationRepository
+	informationRepo ri.InformationRepo
 }
 
-func New(informationRepository ri.InformationRepository) *informationUsecase {
+func New(informationRepo ri.InformationRepo) *informationUsecase {
 	return &informationUsecase{
-		informationRepository,
+		informationRepo,
 	}
 }

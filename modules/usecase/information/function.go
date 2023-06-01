@@ -6,17 +6,17 @@ import (
 )
 
 func (informationUsecase *informationUsecase) GetAllInformationsNoPagination() (*[]ei.Information, error) {
-	informations, err := informationUsecase.informationRepository.GetAllInformationsNoPagination()
+	informations, err := informationUsecase.informationRepo.GetAllInformationsNoPagination()
 	return informations, err
 }
 
 func (informationUsecase *informationUsecase) GetAllInformations(offset, pageSize int) (*[]ei.Information, int64, error) {
-	informations, count, err := informationUsecase.informationRepository.GetAllInformations(offset, pageSize)
+	informations, count, err := informationUsecase.informationRepo.GetAllInformations(offset, pageSize)
 	return informations, count, err
 }
 
 func (informationUsecase *informationUsecase) GetInformationById(informationId int) (*ei.Information, error) {
-	information, err := informationUsecase.informationRepository.GetInformationById(informationId)
+	information, err := informationUsecase.informationRepo.GetInformationById(informationId)
 	return information, err
 }
 
@@ -24,7 +24,7 @@ func (informationUsecase *informationUsecase) CreateInformation(information *ei.
 	for {
 		informationId := randomid.GenerateRandomNumber()
 
-		exists, err := informationUsecase.informationRepository.CheckInformationExists(informationId)
+		exists, err := informationUsecase.informationRepo.CheckInformationExists(informationId)
 		if err != nil {
 			return err
 		}
@@ -33,22 +33,22 @@ func (informationUsecase *informationUsecase) CreateInformation(information *ei.
 			break
 		}
 	}
-	err := informationUsecase.informationRepository.CreateInformation(information)
+	err := informationUsecase.informationRepo.CreateInformation(information)
 	return err
 }
 
 func (informationUsecase *informationUsecase) UpdateInformation(informationId int, information *ei.Information) error {
-	result := informationUsecase.informationRepository.UpdateInformation(informationId, information)
+	result := informationUsecase.informationRepo.UpdateInformation(informationId, information)
 	return result
 }
 
 func (informationUsecase *informationUsecase) DeleteInformation(informationId int) error {
-	err := informationUsecase.informationRepository.DeleteInformation(informationId)
+	err := informationUsecase.informationRepo.DeleteInformation(informationId)
 	return err
 }
 
 func (informationUsecase *informationUsecase) SearchInformations(keyword string, offset, pageSize int) (*[]ei.Information, int64, error) {
-	informations, count, err := informationUsecase.informationRepository.SearchInformations(keyword, offset, pageSize)
+	informations, count, err := informationUsecase.informationRepo.SearchInformations(keyword, offset, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -56,7 +56,7 @@ func (informationUsecase *informationUsecase) SearchInformations(keyword string,
 }
 
 func (informationUsecase *informationUsecase) FilterInformations(keyword string, offset, pageSize int) (*[]ei.Information, int64, error) {
-	informations, count, err := informationUsecase.informationRepository.FilterInformations(keyword, offset, pageSize)
+	informations, count, err := informationUsecase.informationRepo.FilterInformations(keyword, offset, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}

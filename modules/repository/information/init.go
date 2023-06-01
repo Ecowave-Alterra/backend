@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type InformationRepository interface {
+type InformationRepo interface {
 	GetAllInformationsNoPagination() (*[]ei.Information, error)
 	GetAllInformations(offset, pageSize int) (*[]ei.Information, int64, error)
 	GetInformationById(informationId int) (*ei.Information, error)
@@ -18,11 +18,11 @@ type InformationRepository interface {
 }
 
 type informationRepo struct {
-	DB *gorm.DB
+	db *gorm.DB
 }
 
-func New(DB *gorm.DB) InformationRepository {
+func New(db *gorm.DB) InformationRepo {
 	return &informationRepo{
-		DB,
+		db,
 	}
 }
