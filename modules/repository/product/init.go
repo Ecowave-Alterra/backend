@@ -7,12 +7,12 @@ import (
 
 type ProductRepo interface {
 	CreateProduct(product *ep.Product) error
+	CheckProductExist(productId uint) (bool, error)
 	CreateProductImage(productImage *ep.ProductImage) error
 	GetAllProduct(products *[]ep.Product) ([]ep.Product, error)
 	GetProductByID(productId string, product *ep.Product) (ep.Product, error)
 	GetProductImageURLById(productId string, productImage *ep.ProductImage) ([]ep.ProductImage, error)
 	UpdateProduct(productId string, productRequest *ep.ProductRequest) error
-	UpdateProductImage(productID string, productImage *ep.ProductImage) error
 	DeleteProduct(productId string, product *ep.Product) error
 	DeleteProductImage(productID string, productImages *[]ep.ProductImage) error
 	DeleteProductImageByID(ProductImageID string, productImage *ep.ProductImage) error

@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type Product struct {
 	*gorm.Model       `json:"-"`
+	ProductID         uint            `json:"ProductId"`
 	Name              string          `json:"name" form:"name" validate:"required,max=10"`
 	Stock             uint            `json:"stock" form:"stock"`
 	Price             float64         `json:"price" form:"price"`
@@ -25,13 +26,13 @@ type ProductRequest struct {
 }
 
 type ProductResponse struct {
-	ProductId       uint     `json:"product_id"`
-	Name            string   `json:"name" form:"name"`
-	Category        string   `json:"category" form:"category"`
-	Stock           uint     `json:"stock" form:"stock"`
-	Price           float64  `json:"price" form:"price"`
-	Status          string   `json:"status" form:"status"`
-	Rating          float64  `json:"rating" form:"rating"`
-	Description     string   `json:"description" form:"description"`
-	ProductImageUrl []string `json:"productImageUrl" form:"productImageUrl"`
+	ProductID       uint     `json:"ProductId"`
+	Name            string   `json:"Name" form:"name"`
+	Category        string   `json:"Category" form:"category"`
+	Stock           uint     `json:"Stock" form:"stock"`
+	Price           float64  `json:"Price" form:"price"`
+	Status          string   `json:"Status" form:"status"`
+	Rating          float64  `json:"Rating" form:"rating"`
+	Description     string   `json:"Description" form:"description"`
+	ProductImageUrl []string `json:"ProductImageUrl" form:"productImageUrl"`
 }

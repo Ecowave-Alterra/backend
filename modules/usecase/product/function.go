@@ -1,10 +1,23 @@
 package product
 
 import (
+	"github.com/berrylradianh/ecowave-go/helper/randomid"
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 )
 
 func (pc *productUseCase) CreateProduct(product *ep.Product) error {
+	for {
+		productId := randomid.GenerateRandomNumber()
+
+		exists, err := pc.productRepo.CheckProductExist(productId)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			product.ProductID = productId
+			break
+		}
+	}
 	return pc.productRepo.CreateProduct(product)
 }
 
@@ -26,10 +39,6 @@ func (pc *productUseCase) GetProductImageURLById(productId string, productImage 
 
 func (pc *productUseCase) UpdateProduct(productId string, productRequest *ep.ProductRequest) error {
 	return pc.productRepo.UpdateProduct(productId, productRequest)
-}
-
-func (pc *productUseCase) UpdateProductImage(productID string, productImage *ep.ProductImage) error {
-	return pc.productRepo.UpdateProductImage(productID, productImage)
 }
 
 func (pc *productUseCase) DeleteProduct(productId string, product *ep.Product) error {

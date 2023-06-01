@@ -148,7 +148,7 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 		}
 
 		productResponse := ep.ProductResponse{
-			ProductId:       product.ID,
+			ProductID:       product.ProductID,
 			Name:            product.Name,
 			Category:        product.ProductCategory.Category,
 			Stock:           product.Stock,
@@ -181,7 +181,7 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 	}
 
 	var productImage ep.ProductImage
-	productImages, err := h.productUseCase.GetProductImageURLById(productID, &productImage)
+	productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to get product images",
@@ -195,7 +195,7 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 	}
 
 	productResponse := ep.ProductResponse{
-		ProductId:       product.ID,
+		ProductID:       product.ProductID,
 		Name:            product.Name,
 		Category:        product.ProductCategory.Category,
 		Stock:           product.Stock,
@@ -213,7 +213,7 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 }
 
 func (h *ProductHandler) UpdateProduct(c echo.Context) error {
-	productID := c.Param("id")
+	productId := c.Param("id")
 	var req ep.ProductRequest
 
 	productCategoryIDstr := c.FormValue("ProductCategoryId")
@@ -258,7 +258,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	}
 
 	var product ep.Product
-	product, err = h.productUseCase.GetProductByID(productID, &product)
+	product, err = h.productUseCase.GetProductByID(productId, &product)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to get product",
@@ -266,7 +266,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		})
 	}
 
-	err = h.productUseCase.UpdateProduct(productID, &req)
+	err = h.productUseCase.UpdateProduct(productId, &req)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "Failed to update data",
@@ -275,7 +275,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	}
 
 	var productImages []ep.ProductImage
-	err = h.productUseCase.DeleteProductImage(productID, &productImages)
+	err = h.productUseCase.DeleteProductImage(fmt.Sprint(product.ID), &productImages)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "Failed to delete product images",
@@ -325,10 +325,10 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 }
 
 func (h *ProductHandler) DeleteProduct(c echo.Context) error {
-	productID := c.Param("id")
+	productId := c.Param("id")
 
 	var product ep.Product
-	product, err := h.productUseCase.GetProductByID(productID, &product)
+	product, err := h.productUseCase.GetProductByID(productId, &product)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to get product",
@@ -337,7 +337,7 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 	}
 
 	var productImage ep.ProductImage
-	productImages, _ := h.productUseCase.GetProductImageURLById(productID, &productImage)
+	productImages, _ := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 
 	for _, image := range productImages {
 		filename, err := cloudstorage.GetFileName(image.ProductImageUrl)
@@ -361,7 +361,7 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 		}
 	}
 
-	err = h.productUseCase.DeleteProduct(productID, &product)
+	err = h.productUseCase.DeleteProduct(productId, &product)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to delete product",
@@ -380,8 +380,8 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 	switch param {
 	case "id":
 		var product ep.Product
-		productID := c.QueryParam("id")
-		product, err := h.productUseCase.SearchProductByID(productID, &product)
+		itemId := c.QueryParam("id")
+		product, err := h.productUseCase.SearchProductByID(itemId, &product)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "Failed to get product",
@@ -390,7 +390,7 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 		}
 
 		var productImage ep.ProductImage
-		productImages, err := h.productUseCase.GetProductImageURLById(productID, &productImage)
+		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "Failed to get product images",
@@ -404,7 +404,7 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 		}
 
 		productResponse := ep.ProductResponse{
-			ProductId:       product.ID,
+			ProductID:       product.ProductID,
 			Name:            product.Name,
 			Category:        product.ProductCategory.Category,
 			Stock:           product.Stock,
@@ -447,7 +447,7 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 			}
 
 			productResponse := ep.ProductResponse{
-				ProductId:       product.ID,
+				ProductID:       product.ProductID,
 				Name:            product.Name,
 				Category:        product.ProductCategory.Category,
 				Stock:           product.Stock,
@@ -500,7 +500,7 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 			}
 
 			productResponse := ep.ProductResponse{
-				ProductId:       product.ID,
+				ProductID:       product.ProductID,
 				Name:            product.Name,
 				Category:        product.ProductCategory.Category,
 				Stock:           product.Stock,
@@ -561,7 +561,7 @@ func (h *ProductHandler) FilterProductByStatus(c echo.Context) error {
 		}
 
 		productResponse := ep.ProductResponse{
-			ProductId:       product.ID,
+			ProductID:       product.ProductID,
 			Name:            product.Name,
 			Category:        product.ProductCategory.Category,
 			Stock:           product.Stock,
@@ -624,7 +624,7 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 		}
 
 		record := []string{
-			strconv.Itoa(int(product.ID)),
+			strconv.Itoa(int(product.ProductID)),
 			product.Name,
 			product.ProductCategory.Category,
 			strconv.Itoa(int(product.Stock)),
