@@ -12,6 +12,7 @@ type ProductUseCase interface {
 	GetProductByID(productId string, product *ep.Product) (ep.Product, error)
 	GetProductImageURLById(productId string, productImage *ep.ProductImage) ([]ep.ProductImage, error)
 	UpdateProduct(productId string, productRequest *ep.ProductRequest) error
+	UpdateProductStock(productId string, stock uint) error
 	DeleteProduct(productId string, product *ep.Product) error
 	DeleteProductImage(productID string, productImage *[]ep.ProductImage) error
 	DeleteProductImageByID(ProductImageID string, productImage *ep.ProductImage) error

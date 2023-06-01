@@ -41,6 +41,10 @@ func (pc *productUseCase) UpdateProduct(productId string, productRequest *ep.Pro
 	return pc.productRepo.UpdateProduct(productId, productRequest)
 }
 
+func (pc *productUseCase) UpdateProductStock(productId string, stock uint) error {
+	return pc.productRepo.UpdateProductStock(productId, stock)
+}
+
 func (pc *productUseCase) DeleteProduct(productId string, product *ep.Product) error {
 	return pc.productRepo.DeleteProduct(productId, product)
 }

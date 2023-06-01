@@ -252,7 +252,6 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	req = ep.ProductRequest{
 		ProductCategoryId: uint(productCategoryID),
 		Name:              name,
-		Stock:             uint(stock),
 		Price:             price,
 		Description:       description,
 		Status:            status,
@@ -271,6 +270,14 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "Failed to update data",
+			"error":   err,
+		})
+	}
+
+	err = h.productUseCase.UpdateProductStock(productId, req.Stock)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "Failed to update product stock",
 			"error":   err,
 		})
 	}

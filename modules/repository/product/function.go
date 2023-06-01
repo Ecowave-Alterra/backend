@@ -61,7 +61,15 @@ func (r *productRepo) GetProductImageURLById(productId string, productImage *ep.
 }
 
 func (r *productRepo) UpdateProduct(productId string, req *ep.ProductRequest) error {
-	if err := r.db.Model(&ep.Product{}).Where("product_id = ?", productId).Updates(ep.Product{ProductCategoryId: req.ProductCategoryId, Name: req.Name, Stock: req.Stock, Price: req.Price, Status: req.Status, Description: req.Description}).Error; err != nil {
+	if err := r.db.Model(&ep.Product{}).Where("product_id = ?", productId).Updates(ep.Product{ProductCategoryId: req.ProductCategoryId, Name: req.Name, Price: req.Price, Status: req.Status, Description: req.Description}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *productRepo) UpdateProductStock(productId string, stock uint) error {
+	if err := r.db.Exec("UPDATE products SET stock = ? WHERE product_id = ?", stock, productId).Error; err != nil {
 		return err
 	}
 
