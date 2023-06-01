@@ -6,9 +6,8 @@ import (
 )
 
 type UserUsecase interface {
-	CreateUser(user *ut.User) error
+	CreateUser(user *ut.UserRequest) error
 	LoginUser(user *ut.User) (error, interface{})
-	GetUserEmail(email string) error
 }
 
 type userUsecase struct {

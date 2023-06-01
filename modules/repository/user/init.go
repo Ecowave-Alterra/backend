@@ -6,7 +6,7 @@ import (
 )
 
 type UserRepo interface {
-	CreateUser(user *ut.User) error
+	CreateUser(user *ut.UserRequest) error
 	LoginUser(user *ut.User) (error, string)
 	GetUserEmail(email string) error
 }

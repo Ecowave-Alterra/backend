@@ -10,7 +10,7 @@ import (
 )
 
 func (h *UserHandler) CreateUser(c echo.Context) error {
-	var user userEntity.User
+	var user userEntity.UserRequest
 	err := c.Bind(&user)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -44,7 +44,7 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Status":  "500",
 			"Message": "Fail create user",
-			"Error":   err,
+			"Error":   err.Error(),
 		})
 	}
 
@@ -54,7 +54,7 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 	})
 }
 
-func (h *UserHandler) LoginCustomer(c echo.Context) error {
+func (h *UserHandler) LoginUser(c echo.Context) error {
 	user := userEntity.User{}
 	userLogin := userEntity.UserLogin{}
 
@@ -96,8 +96,8 @@ func (h *UserHandler) LoginCustomer(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Status":   "200",
-		"Message":  "success login",
-		"Customer": loginResponse,
+		"Status":  "200",
+		"Message": "success login",
+		"Data":    loginResponse,
 	})
 }

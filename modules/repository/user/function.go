@@ -13,9 +13,27 @@ func (r *userRepo) GetUserEmail(email string) error {
 	}
 	return nil
 }
-func (r *userRepo) CreateUser(user *ut.User) error {
+func (r *userRepo) CreateUser(user *ut.UserRequest) error {
 
-	err := r.db.Save(&user).Error
+	userTable := ut.User{
+		RoleId:   2,
+		Email:    user.Email,
+		Username: user.Username,
+		Password: user.Password,
+	}
+
+	userDetail := ut.UserDetail{
+		Name:  user.Name,
+		Phone: user.PhoneNumber,
+	}
+
+	//save table user
+	err := r.db.Save(&userTable).Error
+	if err != nil {
+		return err
+	}
+	// save table user detail
+	err = r.db.Save(&userDetail).Error
 	if err != nil {
 		return err
 	}
