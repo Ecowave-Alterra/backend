@@ -6,7 +6,6 @@ import (
 )
 
 type AuthUsecase interface {
-	// LoginAdmin(admin *ut.User) (string, error)
 	LoginAdmin(email, password string) (*ut.User, error)
 }
 

@@ -6,7 +6,6 @@ import (
 )
 
 type AuthRepo interface {
-	// LoginAdmin(user *ut.User) (string, error)
 	GetUserByEmail(email string) (*ut.User, error)
 }
 
