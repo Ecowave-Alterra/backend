@@ -3,11 +3,11 @@ package auth
 import (
 	"errors"
 
-	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
+	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
-func (ar *authRepo) GetUserByEmail(email string) (*ut.User, error) {
-	user := &ut.User{}
+func (ar *authRepo) GetUserByEmail(email string) (*ue.User, error) {
+	user := &ue.User{}
 	err := ar.db.Where("email = ?", email).Find(&user).Error
 	if err != nil {
 		//lint:ignore ST1005 Reason for ignoring this linter

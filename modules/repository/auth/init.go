@@ -1,12 +1,12 @@
 package auth
 
 import (
-	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
+	eu "github.com/berrylradianh/ecowave-go/modules/entity/user"
 	"gorm.io/gorm"
 )
 
 type AuthRepo interface {
-	GetUserByEmail(email string) (*ut.User, error)
+	GetUserByEmail(email string) (*eu.User, error)
 }
 
 type authRepo struct {
