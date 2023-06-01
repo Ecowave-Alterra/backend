@@ -15,6 +15,7 @@ type ProductUseCase interface {
 	UpdateProductImage(productID string, productImage *ep.ProductImage) error
 	DeleteProduct(productId string, product *ep.Product) error
 	DeleteProductImage(productID string, productImage *[]ep.ProductImage) error
+	DeleteProductImageByID(ProductImageID string, productImage *ep.ProductImage) error
 	SearchProductByID(productID string, product *ep.Product) (ep.Product, error)
 	SearchProductByName(name string, product *[]ep.Product) ([]ep.Product, error)
 	SearchProductByCategory(category string, product *[]ep.Product) ([]ep.Product, error)

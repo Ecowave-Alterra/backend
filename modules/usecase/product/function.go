@@ -40,6 +40,10 @@ func (pc *productUseCase) DeleteProductImage(productID string, productImages *[]
 	return pc.productRepo.DeleteProductImage(productID, productImages)
 }
 
+func (pc productUseCase) DeleteProductImageByID(ProductImageID string, productImage *ep.ProductImage) error {
+	return pc.productRepo.DeleteProductImageByID(ProductImageID, productImage)
+}
+
 func (pc *productUseCase) SearchProductByID(productID string, product *ep.Product) (ep.Product, error) {
 	return pc.productRepo.SearchProductByID(productID, product)
 }

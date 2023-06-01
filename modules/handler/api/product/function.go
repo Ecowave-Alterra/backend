@@ -336,13 +336,29 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 		})
 	}
 
-	var productImages []ep.ProductImage
-	err = h.productUseCase.DeleteProductImage(productID, &productImages)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "Failed to delete product image",
-			"error":   err,
-		})
+	var productImage ep.ProductImage
+	productImages, _ := h.productUseCase.GetProductImageURLById(productID, &productImage)
+
+	for _, image := range productImages {
+		filename, err := cloudstorage.GetFileName(image.ProductImageUrl)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"Message": "Gagal mendapatkan nama file",
+			})
+		}
+		err = cloudstorage.DeleteImage(filename)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"Message": "Gagal menghapus file pada cloud storage",
+			})
+		}
+
+		err = h.productUseCase.DeleteProductImageByID(strconv.Itoa(int(image.ID)), &productImage)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"Message": "Failed to delete product image",
+			})
+		}
 	}
 
 	err = h.productUseCase.DeleteProduct(productID, &product)

@@ -76,6 +76,14 @@ func (r *productRepo) DeleteProductImage(productID string, productImages *[]ep.P
 	return nil
 }
 
+func (r *productRepo) DeleteProductImageByID(ProductImageID string, productImage *ep.ProductImage) error {
+	if err := r.db.Where("id = ?", ProductImageID).Delete(productImage).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *productRepo) SearchProductByID(productID string, product *ep.Product) (ep.Product, error) {
 	if err := r.db.
 		Preload("ProductCategory").
