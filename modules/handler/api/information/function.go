@@ -11,12 +11,12 @@ import (
 	"strings"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
-	ei "github.com/berrylradianh/ecowave-go/modules/entity/information"
+	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 )
 
-func (informationHandler *InformationHandler) GetAllInformations() echo.HandlerFunc {
+func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 	return func(e echo.Context) error {
 		pageParam := e.QueryParam("page")
 		page, err := strconv.Atoi(pageParam)
@@ -27,7 +27,7 @@ func (informationHandler *InformationHandler) GetAllInformations() echo.HandlerF
 		pageSize := 10
 		offset := (page - 1) * pageSize
 
-		informations, total, err := informationHandler.informationUsecase.GetAllInformations(offset, pageSize)
+		informations, total, err := ih.informationUsecase.GetAllInformations(offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),
@@ -54,9 +54,9 @@ func (informationHandler *InformationHandler) GetAllInformations() echo.HandlerF
 	}
 }
 
-func (informationHandler *InformationHandler) GetInformationById() echo.HandlerFunc {
+func (ih *InformationHandler) GetInformationById() echo.HandlerFunc {
 	return func(e echo.Context) error {
-		var information *ei.Information
+		var information *ie.Information
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -64,7 +64,7 @@ func (informationHandler *InformationHandler) GetInformationById() echo.HandlerF
 			})
 		}
 
-		information, err = informationHandler.informationUsecase.GetInformationById(id)
+		information, err = ih.informationUsecase.GetInformationById(id)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),
@@ -77,7 +77,7 @@ func (informationHandler *InformationHandler) GetInformationById() echo.HandlerF
 	}
 }
 
-func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFunc {
+func (ih *InformationHandler) CreateInformation() echo.HandlerFunc {
 	return func(e echo.Context) error {
 		fileHeader, err := e.FormFile("PhotoContentUrl")
 		if err != nil {
@@ -108,7 +108,7 @@ func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFu
 
 		PhotoUrl, _ := cloudstorage.UploadToBucket(e.Request().Context(), fileHeader)
 
-		information := &ei.Information{
+		information := &ie.Information{
 			Title:           e.FormValue("Title"),
 			Content:         e.FormValue("Content"),
 			PhotoContentUrl: PhotoUrl,
@@ -129,7 +129,7 @@ func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFu
 			}
 		}
 
-		err = informationHandler.informationUsecase.CreateInformation(information)
+		err = ih.informationUsecase.CreateInformation(information)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),
@@ -148,7 +148,7 @@ func (informationHandler *InformationHandler) CreateInformation() echo.HandlerFu
 	}
 }
 
-func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFunc {
+func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 	return func(e echo.Context) error {
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
@@ -157,14 +157,14 @@ func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFu
 			})
 		}
 
-		informationBefore, err := informationHandler.informationUsecase.GetInformationById(id)
+		informationBefore, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": "Record Not Found",
 			})
 		}
 
-		information, err := informationHandler.informationUsecase.GetInformationById(id)
+		information, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": "Record Not Found",
@@ -219,7 +219,7 @@ func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFu
 			}
 		}
 
-		err = informationHandler.informationUsecase.UpdateInformation(int(information.InformationId), information)
+		err = ih.informationUsecase.UpdateInformation(int(information.InformationId), information)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
 				"Message": err,
@@ -245,9 +245,9 @@ func (informationHandler *InformationHandler) UpdateInformation() echo.HandlerFu
 	}
 }
 
-func (informationHandler *InformationHandler) DeleteInformation() echo.HandlerFunc {
+func (ih *InformationHandler) DeleteInformation() echo.HandlerFunc {
 	return func(e echo.Context) error {
-		var information *ei.Information
+		var information *ie.Information
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -255,7 +255,7 @@ func (informationHandler *InformationHandler) DeleteInformation() echo.HandlerFu
 			})
 		}
 
-		information, err = informationHandler.informationUsecase.GetInformationById(id)
+		information, err = ih.informationUsecase.GetInformationById(id)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": "Record Not Found",
@@ -278,7 +278,7 @@ func (informationHandler *InformationHandler) DeleteInformation() echo.HandlerFu
 			}
 		}
 
-		err = informationHandler.informationUsecase.DeleteInformation(int(information.InformationId))
+		err = ih.informationUsecase.DeleteInformation(int(information.InformationId))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),
@@ -291,9 +291,9 @@ func (informationHandler *InformationHandler) DeleteInformation() echo.HandlerFu
 	}
 }
 
-func (informationHandler *InformationHandler) SearchInformations() echo.HandlerFunc {
+func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 	return func(e echo.Context) error {
-		var informations *[]ei.Information
+		var informations *[]ie.Information
 		var err error
 
 		pageParam := e.QueryParam("page")
@@ -306,7 +306,7 @@ func (informationHandler *InformationHandler) SearchInformations() echo.HandlerF
 		offset := (page - 1) * pageSize
 
 		keyword := e.QueryParam("keyword")
-		informations, total, err := informationHandler.informationUsecase.SearchInformations(keyword, offset, pageSize)
+		informations, total, err := ih.informationUsecase.SearchInformations(keyword, offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),
@@ -333,7 +333,7 @@ func (informationHandler *InformationHandler) SearchInformations() echo.HandlerF
 	}
 }
 
-func (informationHandler *InformationHandler) FilterInformations() echo.HandlerFunc {
+func (ih *InformationHandler) FilterInformations() echo.HandlerFunc {
 	return func(e echo.Context) error {
 		pageParam := e.QueryParam("page")
 		page, err := strconv.Atoi(pageParam)
@@ -345,7 +345,7 @@ func (informationHandler *InformationHandler) FilterInformations() echo.HandlerF
 		offset := (page - 1) * pageSize
 
 		keyword := e.QueryParam("keyword")
-		informations, total, err := informationHandler.informationUsecase.FilterInformations(keyword, offset, pageSize)
+		informations, total, err := ih.informationUsecase.FilterInformations(keyword, offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),
@@ -380,9 +380,9 @@ func (informationHandler *InformationHandler) FilterInformations() echo.HandlerF
 	}
 }
 
-func (informationHandler *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
+func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 	return func(e echo.Context) error {
-		informations, err := informationHandler.informationUsecase.GetAllInformationsNoPagination()
+		informations, err := ih.informationUsecase.GetAllInformationsNoPagination()
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),

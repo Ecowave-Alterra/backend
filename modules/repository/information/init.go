@@ -1,20 +1,20 @@
 package information
 
 import (
-	ei "github.com/berrylradianh/ecowave-go/modules/entity/information"
+	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 	"gorm.io/gorm"
 )
 
 type InformationRepo interface {
-	GetAllInformationsNoPagination() (*[]ei.Information, error)
-	GetAllInformations(offset, pageSize int) (*[]ei.Information, int64, error)
-	GetInformationById(informationId int) (*ei.Information, error)
-	CreateInformation(information *ei.Information) error
+	GetAllInformationsNoPagination() (*[]ie.Information, error)
+	GetAllInformations(offset, pageSize int) (*[]ie.Information, int64, error)
+	GetInformationById(informationId int) (*ie.Information, error)
+	CreateInformation(information *ie.Information) error
 	CheckInformationExists(informationId uint) (bool, error)
-	UpdateInformation(informationId int, information *ei.Information) error
+	UpdateInformation(informationId int, information *ie.Information) error
 	DeleteInformation(informationId int) error
-	SearchInformations(keyword string, offset, pageSize int) (*[]ei.Information, int64, error)
-	FilterInformations(keyword string, offset, pageSize int) (*[]ei.Information, int64, error)
+	SearchInformations(keyword string, offset, pageSize int) (*[]ie.Information, int64, error)
+	FilterInformations(keyword string, offset, pageSize int) (*[]ie.Information, int64, error)
 }
 
 type informationRepo struct {
