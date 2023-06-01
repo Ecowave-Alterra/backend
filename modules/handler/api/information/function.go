@@ -79,6 +79,8 @@ func (ih *InformationHandler) GetInformationById() echo.HandlerFunc {
 
 func (ih *InformationHandler) CreateInformation() echo.HandlerFunc {
 	return func(e echo.Context) error {
+		cloudstorage.Folder = "img/informations/"
+
 		fileHeader, err := e.FormFile("PhotoContentUrl")
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -150,6 +152,8 @@ func (ih *InformationHandler) CreateInformation() echo.HandlerFunc {
 
 func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 	return func(e echo.Context) error {
+		cloudstorage.Folder = "img/informations/"
+
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{

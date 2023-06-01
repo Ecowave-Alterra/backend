@@ -12,6 +12,8 @@ import (
 	"google.golang.org/api/option"
 )
 
+var Folder string
+
 func UploadToBucket(ctx context.Context, fileHeader *multipart.FileHeader) (string, error) {
 	bucket := "ecowave_storage"
 
@@ -26,7 +28,7 @@ func UploadToBucket(ctx context.Context, fileHeader *multipart.FileHeader) (stri
 	}
 	defer file.Close()
 
-	objectName := "img/" + fileHeader.Filename
+	objectName := Folder + fileHeader.Filename
 	sw := storageClient.Bucket(bucket).Object(objectName).NewWriter(ctx)
 
 	if _, err := io.Copy(sw, file); err != nil {
