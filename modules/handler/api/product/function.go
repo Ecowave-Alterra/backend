@@ -65,6 +65,7 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 		})
 	}
 
+	cloudstorage.Folder = "img/products/"
 	for i := 1; i <= 10; i++ {
 		fileHeader, err := c.FormFile(fmt.Sprintf("PhotoContentUrl%d", i))
 		if fileHeader != nil {
@@ -283,6 +284,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		})
 	}
 
+	cloudstorage.Folder = "img/products/"
 	for i := 1; i <= 5; i++ {
 		fileHeader, err := c.FormFile(fmt.Sprintf("PhotoContentUrl%d", i))
 		if fileHeader != nil {
