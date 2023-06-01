@@ -274,6 +274,15 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		})
 	}
 
+	var productImages []ep.ProductImage
+	err = h.productUseCase.DeleteProductImage(productID, &productImages)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "Failed to delete product images",
+			"error":   err,
+		})
+	}
+
 	for i := 1; i <= 5; i++ {
 		fileHeader, err := c.FormFile(fmt.Sprintf("PhotoContentUrl%d", i))
 		if fileHeader != nil {
@@ -308,15 +317,6 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 				i = 1000
 			}
 		}
-	}
-
-	var productImages []ep.ProductImage
-	err = h.productUseCase.DeleteProductImage(productID, &productImages)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Failed to delete product images",
-			"error":   err,
-		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
