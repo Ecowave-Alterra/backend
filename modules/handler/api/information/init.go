@@ -1,14 +1,14 @@
 package information
 
 import (
-	ui "github.com/berrylradianh/ecowave-go/modules/usecase/information"
+	ic "github.com/berrylradianh/ecowave-go/modules/usecase/information"
 )
 
 type InformationHandler struct {
-	informationUsecase ui.InformationUsecase
+	informationUsecase ic.InformationUsecase
 }
 
-func New(informationUsecase ui.InformationUsecase) *InformationHandler {
+func New(informationUsecase ic.InformationUsecase) *InformationHandler {
 	return &InformationHandler{
 		informationUsecase,
 	}

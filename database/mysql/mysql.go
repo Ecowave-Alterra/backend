@@ -8,7 +8,7 @@ import (
 	re "github.com/berrylradianh/ecowave-go/modules/entity/role"
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 
-	ei "github.com/berrylradianh/ecowave-go/modules/entity/information"
+	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -46,7 +46,7 @@ func InitialMigration() {
 		re.Role{},
 		ue.User{},
 		ue.UserDetail{},
-		ei.Information{},
+		ie.Information{},
 	)
 	DB.Migrator().HasConstraint(&ue.User{}, "UserDetail")
 	DB.Migrator().HasConstraint(&re.Role{}, "Users")

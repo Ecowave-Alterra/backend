@@ -2,11 +2,11 @@ package seed
 
 import (
 	"github.com/berrylradianh/ecowave-go/helper/randomid"
-	ei "github.com/berrylradianh/ecowave-go/modules/entity/information"
+	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 )
 
-func CreateInformation() []*ei.Information {
-	information := []*ei.Information{
+func CreateInformation() []*ie.Information {
+	information := []*ie.Information{
 		{
 			InformationId:   randomid.GenerateRandomNumber(),
 			Title:           "Title Information 1",
