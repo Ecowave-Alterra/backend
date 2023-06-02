@@ -4,20 +4,20 @@ import (
 	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
-func (pr *profileRepo) GetUserProfile(user *ut.User, id int) (*ut.User, error) {
+func (pr *profileRepo) GetUserProfile(user *ut.User, id int) error {
 	if err := pr.db.Where("id = ?", id).Find(&user).Error; err != nil {
-		return nil, err
+		return err
 	}
 
-	return user, nil
+	return nil
 }
 
-func (pr *profileRepo) GetUserDetailProfile(userDetail *ut.UserDetail, id int) (*ut.UserDetail, error) {
+func (pr *profileRepo) GetUserDetailProfile(userDetail *ut.UserDetail, id int) error {
 	if err := pr.db.Raw("SELECT * FROM user_details WHERE user_id = ?", id).Scan(&userDetail).Error; err != nil {
-		return nil, err
+		return err
 	}
 
-	return userDetail, nil
+	return nil
 }
 
 func (pr *profileRepo) UpdateUserProfile(user *ut.User, id int) error {
