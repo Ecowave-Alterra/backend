@@ -211,3 +211,29 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 		"message": "success update address by id",
 	})
 }
+
+func (ph *ProfileHandler) UpdatePasswordProfile(c echo.Context) error {
+	var user ut.User
+	idUserSementara := 1
+
+	oldPassword := c.FormValue("OldPassword")
+	newPassword := c.FormValue("Password")
+	confirmNewPassword := c.FormValue("ConfirmNewPassword")
+
+	if newPassword != confirmNewPassword {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "password tidak cocok",
+		})
+	}
+
+	message, err := ph.profileUsecase.UpdatePasswordProfile(&user, oldPassword, newPassword, idUserSementara)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": message,
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "password berhasil diubah",
+	})
+}

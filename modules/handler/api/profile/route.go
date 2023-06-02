@@ -10,4 +10,5 @@ func (ph *ProfileHandler) RegisterRoute(e *echo.Echo) {
 	profileGroup.POST("/address", ph.CreateAddressProfile)
 	profileGroup.GET("/address", ph.GetAllAddressProfile)
 	profileGroup.PUT("/address/:id", ph.UpdateAddressProfile)
+	profileGroup.PUT("/password", ph.UpdatePasswordProfile)
 }

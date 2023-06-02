@@ -17,12 +17,6 @@ func (pr *profileRepo) GetUserDetailProfile(userDetail *ut.UserDetail, id int) (
 		return nil, err
 	}
 
-	// if err := pr.db.Preload("UserDetail").Find(&user, 1).Error; err != nil {
-	// 	return nil, err
-	// }
-
-	// log.Println(user.UserDetail.FullName)
-
 	return userDetail, nil
 }
 
@@ -68,6 +62,15 @@ func (pr *profileRepo) GetAddressByIdProfile(address *ut.UserAddress, idUser int
 
 func (pr *profileRepo) UpdateAddressProfile(address *ut.UserAddress, idUser int, idAddress int) error {
 	if err := pr.db.Where("user_id = ? AND id = ?", idUser, idAddress).Updates(&address).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (pr *profileRepo) UpdatePasswordProfile(newPassword string, id int) error {
+	var user *ut.User
+	if err := pr.db.Model(&user).Where("id = ?", id).Update("password", newPassword).Error; err != nil {
 		return err
 	}
 

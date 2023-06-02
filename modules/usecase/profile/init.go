@@ -14,6 +14,8 @@ type ProfileUsecase interface {
 	GetAllAddressProfile(address *[]ut.UserAddress, idUser int) error
 	GetAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error
 	UpdateAddressProfile(address *ut.UserAddress, idUser int, idAddress int) error
+	GetPasswordProfile(user *ut.User, id int) (string, error)
+	UpdatePasswordProfile(user *ut.User, oldPassword string, newPassword string, id int) (string, error)
 }
 
 type profileUsecase struct {

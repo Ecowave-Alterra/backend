@@ -1,6 +1,9 @@
 package profile
 
-import ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
+import (
+	p "github.com/berrylradianh/ecowave-go/helper/password"
+	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
+)
 
 func (pc *profileUsecase) GetUserProfile(id int) (*ut.UserResponse, error) {
 	var userDB *ut.User
@@ -74,4 +77,27 @@ func (pc *profileUsecase) GetAddressByIdProfile(address *ut.UserAddress, idUser 
 
 func (pc *profileUsecase) UpdateAddressProfile(address *ut.UserAddress, idUser int, idAddress int) error {
 	return pc.profileRepo.UpdateAddressProfile(address, idUser, idAddress)
+}
+
+func (pc *profileUsecase) GetPasswordProfile(user *ut.User, id int) (string, error) {
+	user, err := pc.profileRepo.GetUserProfile(user, id)
+	return user.Password, err
+}
+
+func (pc *profileUsecase) UpdatePasswordProfile(user *ut.User, oldPassword string, newPassword string, id int) (string, error) {
+	passwordDB, err := pc.GetPasswordProfile(user, id)
+	if err != nil {
+		return "", err
+	}
+
+	if err := p.VerifyPassword(passwordDB, oldPassword); err != nil {
+		return "password salah", err
+	}
+
+	hashNewPassword, err := p.HashPassword(newPassword)
+	if err != nil {
+		return "", err
+	}
+
+	return "", pc.profileRepo.UpdatePasswordProfile(string(hashNewPassword), id)
 }
