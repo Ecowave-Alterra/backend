@@ -1,6 +1,9 @@
 package config
 
-import "os"
+import (
+	"log"
+	"os"
+)
 
 type Configuration struct {
 	DB_USERNAME string
@@ -19,6 +22,7 @@ func GetConfig() Configuration {
 		DB_HOST:     os.Getenv("DB_HOST"),
 		DB_NAME:     os.Getenv("DB_NAME"),
 	}
+	log.Println(configuration)
 
 	return configuration
 }
