@@ -13,8 +13,7 @@ type InformationRepo interface {
 	CheckInformationExists(informationId uint) (bool, error)
 	UpdateInformation(informationId int, information *ie.Information) error
 	DeleteInformation(informationId int) error
-	SearchInformations(keyword string, offset, pageSize int) (*[]ie.Information, int64, error)
-	FilterInformations(keyword string, offset, pageSize int) (*[]ie.Information, int64, error)
+	SearchInformations(search, filter string, offset, pageSize int) (*[]ie.Information, int64, error)
 }
 
 type informationRepo struct {

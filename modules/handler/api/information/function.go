@@ -309,8 +309,19 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 		pageSize := 10
 		offset := (page - 1) * pageSize
 
-		keyword := e.QueryParam("keyword")
-		informations, total, err := ih.informationUsecase.SearchInformations(keyword, offset, pageSize)
+		search := e.QueryParam("search")
+		filter := e.QueryParam("filter")
+
+		validParams := map[string]bool{"search": true, "filter": true, "page": true}
+		for param := range e.QueryParams() {
+			if !validParams[param] {
+				return e.JSON(http.StatusBadRequest, echo.Map{
+					"Message": "Invalid parameter",
+				})
+			}
+		}
+
+		informations, total, err := ih.informationUsecase.SearchInformations(search, filter, offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Message": err.Error(),
@@ -334,54 +345,6 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 				"TotalPage":    int(math.Ceil(float64(total) / float64(pageSize))),
 			})
 		}
-	}
-}
-
-func (ih *InformationHandler) FilterInformations() echo.HandlerFunc {
-	return func(e echo.Context) error {
-		cloudstorage.Folder = "img/informations/"
-		pageParam := e.QueryParam("page")
-		page, err := strconv.Atoi(pageParam)
-		if err != nil || page < 1 {
-			page = 1
-		}
-
-		pageSize := 10
-		offset := (page - 1) * pageSize
-
-		keyword := e.QueryParam("keyword")
-		informations, total, err := ih.informationUsecase.FilterInformations(keyword, offset, pageSize)
-		if err != nil {
-			return e.JSON(http.StatusBadRequest, echo.Map{
-				"Message": err.Error(),
-			})
-		}
-
-		if strings.EqualFold(keyword, "Terbit") && len(*informations) == 0 {
-			return e.JSON(http.StatusOK, echo.Map{
-				"Message": "Belum ada informasi yang terbit",
-			})
-		} else if strings.EqualFold(keyword, "Draft") && len(*informations) == 0 {
-			return e.JSON(http.StatusOK, echo.Map{
-				"Message": "Belum ada informasi dalam draft",
-			})
-		} else if strings.EqualFold(keyword, "Terbit") || strings.EqualFold(keyword, "Draft") {
-			if page > int(math.Ceil(float64(total)/float64(pageSize))) {
-				return e.JSON(http.StatusNotFound, echo.Map{
-					"Message": "Not Found",
-				})
-			}
-
-			return e.JSON(http.StatusOK, map[string]interface{}{
-				"Informations": informations,
-				"Page":         page,
-				"TotalPage":    int(math.Ceil(float64(total) / float64(pageSize))),
-			})
-		}
-
-		return e.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Invalid parameters",
-		})
 	}
 }
 

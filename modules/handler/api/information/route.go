@@ -10,14 +10,13 @@ import (
 func (informationHandler *InformationHandler) RegisterRoutes(e *echo.Echo) {
 	jwtMiddleware := echojwt.JWT([]byte(os.Getenv("SECRET_KEY")))
 
-	informationGroup := e.Group("/informations")
+	informationGroup := e.Group("/admin/informations")
 	informationGroup.Use(jwtMiddleware)
 	informationGroup.GET("", informationHandler.GetAllInformations())
 	informationGroup.GET("/:id", informationHandler.GetInformationById())
 	informationGroup.POST("", informationHandler.CreateInformation())
 	informationGroup.PUT("/:id", informationHandler.UpdateInformation())
 	informationGroup.DELETE("/:id", informationHandler.DeleteInformation())
-	informationGroup.GET("/search", informationHandler.SearchInformations())
-	informationGroup.GET("/filter", informationHandler.FilterInformations())
+	informationGroup.GET("", informationHandler.SearchInformations())
 	informationGroup.GET("/download-csv", informationHandler.DownloadCSVFile())
 }
