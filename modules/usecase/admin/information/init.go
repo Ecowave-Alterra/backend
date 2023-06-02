@@ -2,7 +2,7 @@ package information
 
 import (
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
-	ir "github.com/berrylradianh/ecowave-go/modules/repository/information"
+	ir "github.com/berrylradianh/ecowave-go/modules/repository/admin/information"
 )
 
 type InformationUsecase interface {
