@@ -1,6 +1,10 @@
 package information
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Information struct {
 	*gorm.Model `json:"-"`
@@ -12,4 +16,17 @@ type Information struct {
 	ViewCount       uint   `json:"ViewCount," form:"ViewCount"`
 	BookmarkCount   uint   `json:"BookmarkCount," form:"BookmarkCount"`
 	Status          string `json:"Status" form:"Status"`
+}
+
+type UserInformationResponse struct {
+	InformationId   uint
+	Title           string
+	PhotoContentUrl string
+	Date            time.Time
+}
+type UserInformationDetailResponse struct {
+	Title           string
+	PhotoContentUrl string
+	Content         string
+	Date            time.Time
 }
