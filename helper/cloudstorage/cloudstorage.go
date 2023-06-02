@@ -66,7 +66,7 @@ func DeleteImage(fileName string) error {
 	}
 
 	bucketName := "ecowave_storage"
-	objectPath := "img/" + fileName
+	objectPath := Folder + fileName
 
 	obj := client.Bucket(bucketName).Object(objectPath)
 
