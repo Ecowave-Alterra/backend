@@ -7,6 +7,7 @@ import (
 
 type AuthRepo interface {
 	GetUserByEmail(email string) (*ue.User, error)
+	CreateUser(user *ue.User) error
 }
 
 type authRepo struct {
