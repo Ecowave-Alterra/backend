@@ -8,6 +8,7 @@ import (
 type InformationUsecase interface {
 	GetAllInformations() (*[]ie.UserInformationResponse, error)
 	GetDetailInformations(id string) (*ie.UserInformationDetailResponse, error)
+	UpdatePoint(id uint) error
 }
 
 type informationUsecase struct {

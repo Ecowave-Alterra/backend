@@ -14,6 +14,7 @@ func StartRoute(handler common.Handler) *echo.Echo {
 	log.LogMiddleware(e)
 
 	handler.ProductHandler.RegisterRoutes(e)
+	handler.InformationHandler.RegisterRoutes(e)
 
 	return e
 }
