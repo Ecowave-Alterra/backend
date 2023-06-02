@@ -339,6 +339,7 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 
 func (ih *InformationHandler) FilterInformations() echo.HandlerFunc {
 	return func(e echo.Context) error {
+		cloudstorage.Folder = "img/informations/"
 		pageParam := e.QueryParam("page")
 		page, err := strconv.Atoi(pageParam)
 		if err != nil || page < 1 {
