@@ -34,7 +34,7 @@ steps:
     - '--max-instances'
     - '10'
     - '--set-env-vars'
-    - 'DB_CONNECTION=mysql,DB_HOST=34.133.178.42,DB_PORT=3306,DB_NAME=ecowave_db,DB_USERNAME=root,DB_PASSWORD=secret-password,SECRET_KEY=BerrylradianHamEshA'
+    - 'CORS_ALLOWED_ORIGINS=*,DB_CONNECTION=mysql,DB_HOST=34.133.178.42,DB_PORT=3306,DB_NAME=ecowave_db,DB_USERNAME=root,DB_PASSWORD=secret-password,SECRET_KEY=BerrylradianHamEshA'
   timeout: 900s
 images:
 - gcr.io/$PROJECT_ID/ecowave:$SHORT_SHA
