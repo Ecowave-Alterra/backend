@@ -5,7 +5,6 @@ import (
 
 	"github.com/berrylradianh/ecowave-go/config"
 
-	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	eu "github.com/berrylradianh/ecowave-go/modules/entity/user"
 
 	"gorm.io/driver/mysql"
@@ -40,8 +39,6 @@ func InitDB() {
 
 func InitialMigration() {
 	DB.AutoMigrate(
-		ep.Product{},
-		ep.ProductCategory{},
 		eu.User{},
 		eu.UserDetail{},
 	)

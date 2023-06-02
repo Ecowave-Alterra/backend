@@ -13,7 +13,6 @@ func StartRoute(handler common.Handler) *echo.Echo {
 	e.Validator = &vld.CustomValidator{Validator: validator.New()}
 	log.LogMiddleware(e)
 
-	handler.ProductHandler.RegisterRoutes(e)
 	handler.UserHandler.RegisterRoutes(e)
 
 	return e
