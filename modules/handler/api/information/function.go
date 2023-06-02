@@ -66,7 +66,7 @@ func (ih *InformationHandler) GetInformationById() echo.HandlerFunc {
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Masukkan angka",
+				"Message": "Id harus berupa angka",
 				"Status":  http.StatusBadRequest,
 			})
 		}
@@ -173,7 +173,7 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Masukkan angka",
+				"Message": "Id harus berupa angka",
 				"Status":  http.StatusBadRequest,
 			})
 		}
@@ -281,7 +281,7 @@ func (ih *InformationHandler) DeleteInformation() echo.HandlerFunc {
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Masukkan angka",
+				"Message": "Id harus berupa angka",
 				"Status":  http.StatusBadRequest,
 			})
 		}
