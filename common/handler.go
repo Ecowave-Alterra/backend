@@ -1,9 +1,11 @@
 package common
 
 import (
-	userHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user"
+	ah "github.com/berrylradianh/ecowave-go/modules/handler/api/auth"
+	ih "github.com/berrylradianh/ecowave-go/modules/handler/api/information"
 )
 
 type Handler struct {
-	UserHandler *userHandler.UserHandler
+	AuthHandler        *ah.AuthHandler
+	InformationHandler *ih.InformationHandler
 }

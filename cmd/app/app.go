@@ -5,21 +5,29 @@ import (
 	"github.com/berrylradianh/ecowave-go/common"
 
 	"github.com/berrylradianh/ecowave-go/database/mysql"
-	userHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user"
-	userRepo "github.com/berrylradianh/ecowave-go/modules/repository/user"
-	userUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/user"
+	authHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/auth"
+	informationHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/information"
+	authRepo "github.com/berrylradianh/ecowave-go/modules/repository/auth"
+	informationRepo "github.com/berrylradianh/ecowave-go/modules/repository/information"
+	authUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/auth"
+	informationUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/information"
 	"github.com/labstack/echo/v4"
 )
 
 func StartApp() *echo.Echo {
 	mysql.Init()
 
-	userRepo := userRepo.New(mysql.DB)
-	userUsecase := userUsecase.New(userRepo)
-	userHandler := userHandler.New(userUsecase)
+	authRepo := authRepo.New(mysql.DB)
+	authUsecase := authUsecase.New(authRepo)
+	authHandler := authHandler.New(authUsecase)
+
+	informationRepo := informationRepo.New(mysql.DB)
+	informationUsecase := informationUsecase.New(informationRepo)
+	informationHandler := informationHandler.New(informationUsecase)
 
 	handler := common.Handler{
-		UserHandler: userHandler,
+		AuthHandler:        authHandler,
+		InformationHandler: informationHandler,
 	}
 
 	router := routes.StartRoute(handler)
