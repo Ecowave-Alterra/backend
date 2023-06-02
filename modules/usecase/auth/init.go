@@ -6,7 +6,8 @@ import (
 )
 
 type AuthUsecase interface {
-	LoginAdmin(email, password string) (*ue.User, error)
+	Login(email, password string) (*ue.User, string, error)
+	Register(user *ue.User) error
 }
 
 type authUsecase struct {
