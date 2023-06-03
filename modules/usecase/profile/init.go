@@ -17,7 +17,8 @@ type ProfileUsecase interface {
 	CreateAddressProfile(address *ut.UserAddress) error
 	GetAllAddressProfile(address *[]ut.UserAddress, idUser int) error
 	GetAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error
-	UpdateAddressProfile(address *ut.UserAddress, idUser int, idAddress int) error
+	UpdateAddressPrimaryProfile(address *ut.UserAddress, idUser int) error
+	UpdateAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error
 
 	UpdatePasswordProfile(user *ut.User, oldPassword string, newPassword string, id int) (string, error)
 }

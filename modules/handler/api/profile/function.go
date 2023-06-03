@@ -259,11 +259,17 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 	if mark != "" {
 		address.Mark = mark
 	}
-	if isPrimary != address.IsPrimary {
-		address.IsPrimary = isPrimary
-	}
 
-	if err := ph.profileUsecase.UpdateAddressProfile(&address, int(address.UserId), idAddress); err != nil {
+	if isPrimary == true {
+		if err := ph.profileUsecase.UpdateAddressPrimaryProfile(&address, int(address.UserId)); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "fail",
+			})
+		}
+	}
+	address.IsPrimary = isPrimary
+
+	if err := ph.profileUsecase.UpdateAddressByIdProfile(&address, int(address.UserId), idAddress); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
 		})

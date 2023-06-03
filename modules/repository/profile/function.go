@@ -1,6 +1,8 @@
 package profile
 
 import (
+	"log"
+
 	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
@@ -77,7 +79,21 @@ func (pr *profileRepo) GetAddressByIdProfile(address *ut.UserAddress, idUser int
 	return nil
 }
 
-func (pr *profileRepo) UpdateAddressProfile(address *ut.UserAddress, idUser int, idAddress int) error {
+func (pr *profileRepo) UpdateAddressPrimaryProfile(address *ut.UserAddress, idUser int) error {
+	if err := pr.db.Model(&address).Where("user_id = ?", idUser).Update("is_primary", false).Error; err != nil {
+		return err
+	}
+
+	if err := pr.db.Raw("UPDATE user_addresses SET is_primary = false WHERE user_id = ?", idUser).Scan(&address).Error; err != nil {
+		return err
+	}
+
+	log.Println(address.IsPrimary)
+
+	return nil
+}
+
+func (pr *profileRepo) UpdateAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error {
 	if err := pr.db.Where("user_id = ? AND id = ?", idUser, idAddress).Updates(&address).Error; err != nil {
 		return err
 	}

@@ -38,8 +38,12 @@ func (pc *profileUsecase) GetAddressByIdProfile(address *ut.UserAddress, idUser 
 	return pc.profileRepo.GetAddressByIdProfile(address, idUser, idAddress)
 }
 
-func (pc *profileUsecase) UpdateAddressProfile(address *ut.UserAddress, idUser int, idAddress int) error {
-	return pc.profileRepo.UpdateAddressProfile(address, idUser, idAddress)
+func (pc *profileUsecase) UpdateAddressPrimaryProfile(address *ut.UserAddress, idUser int) error {
+	return pc.profileRepo.UpdateAddressPrimaryProfile(address, idUser)
+}
+
+func (pc *profileUsecase) UpdateAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error {
+	return pc.profileRepo.UpdateAddressByIdProfile(address, idUser, idAddress)
 }
 
 func (pc *profileUsecase) UpdatePasswordProfile(user *ut.User, oldPassword string, newPassword string, id int) (string, error) {
