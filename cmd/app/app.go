@@ -5,17 +5,12 @@ import (
 	"github.com/berrylradianh/ecowave-go/common"
 
 	"github.com/berrylradianh/ecowave-go/database/mysql"
-	informationHandlerAdmin "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/information"
-	informationRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/information"
-	informationUsecaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/information"
-
-	informationHandlerUser "github.com/berrylradianh/ecowave-go/modules/handler/api/user/information"
-	informationRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/information"
-	informationUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/information"
-
 	authHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/auth"
+	informationHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/information"
 	authRepo "github.com/berrylradianh/ecowave-go/modules/repository/auth"
+	informationRepo "github.com/berrylradianh/ecowave-go/modules/repository/information"
 	authUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/auth"
+	informationUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/information"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,18 +21,13 @@ func StartApp() *echo.Echo {
 	authUsecase := authUsecase.New(authRepo)
 	authHandler := authHandler.New(authUsecase)
 
-	informationRepoAdmin := informationRepoAdmin.New(mysql.DB)
-	informationUsecaseAdmin := informationUsecaseAdmin.New(informationRepoAdmin)
-	informationHandlerAdmin := informationHandlerAdmin.New(informationUsecaseAdmin)
-
-	informationRepoUser := informationRepoUser.New(mysql.DB)
-	informationUsecaseUser := informationUsecaseUser.New(informationRepoUser)
-	informationHandlerUser := informationHandlerUser.New(informationUsecaseUser)
+	informationRepo := informationRepo.New(mysql.DB)
+	informationUsecase := informationUsecase.New(informationRepo)
+	informationHandler := informationHandler.New(informationUsecase)
 
 	handler := common.Handler{
-		AuthHandler:             authHandler,
-		InformationHandlerAdmin: informationHandlerAdmin,
-		InformationHandlerUser:  informationHandlerUser,
+		AuthHandler:        authHandler,
+		InformationHandler: informationHandler,
 	}
 
 	router := routes.StartRoute(handler)

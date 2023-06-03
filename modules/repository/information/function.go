@@ -73,17 +73,29 @@ func (ir *informationRepo) DeleteInformation(informationId int) error {
 	return nil
 }
 
-func (ir *informationRepo) SearchInformations(search, filter string, offset, pageSize int) (*[]ie.Information, int64, error) {
+func (ir *informationRepo) SearchInformations(keyword string, offset, pageSize int) (*[]ie.Information, int64, error) {
 	var informations []ie.Information
 	var count int64
-
-	countQuery := "SELECT COUNT(*) FROM information WHERE (title LIKE ? OR information_id LIKE ?) AND status LIKE ?"
-	if err := ir.db.Raw(countQuery, "%"+search+"%", "%"+search+"%", "%"+filter+"%").Count(&count).Error; err != nil {
+	if err := ir.db.Model(&ie.Information{}).Where("title LIKE ?", "%"+keyword+"%").Or(ir.db.Where("information_id LIKE ?", "%"+keyword+"%")).Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
 
-	selectQuery := "SELECT * FROM information WHERE (title LIKE ? OR information_id LIKE ?) AND status LIKE ? LIMIT ? OFFSET ?"
-	if err := ir.db.Raw(selectQuery, "%"+search+"%", "%"+search+"%", "%"+filter+"%", pageSize, offset).Scan(&informations).Error; err != nil {
+	if err := ir.db.Where("title LIKE ?", "%"+keyword+"%").Or(ir.db.Where("information_id LIKE ?", "%"+keyword+"%")).Find(&informations).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return &informations, count, nil
+}
+
+func (ir *informationRepo) FilterInformations(keyword string, offset, pageSize int) (*[]ie.Information, int64, error) {
+	var informations []ie.Information
+
+	var count int64
+	if err := ir.db.Model(&ie.Information{}).Where("status = ?", keyword).Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if err := ir.db.Where("status = ?", keyword).Find(&informations).Error; err != nil {
 		return nil, 0, err
 	}
 

@@ -14,8 +14,7 @@ func StartRoute(handler common.Handler) *echo.Echo {
 	e.Use(middleware.CORS())
 
 	handler.AuthHandler.RegisterRoutes(e)
-	handler.InformationHandlerAdmin.RegisterRoutes(e)
-	handler.InformationHandlerUser.RegisterRoutes(e)
+	handler.InformationHandler.RegisterRoutes(e)
 
 	return e
 }
