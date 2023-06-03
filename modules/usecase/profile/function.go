@@ -9,8 +9,9 @@ func (pc *profileUsecase) GetUserProfile(user *ut.User, id int) error {
 	return pc.profileRepo.GetUserProfile(user, id)
 }
 
-func (pc *profileUsecase) GetUserDetailProfile(userDetail *ut.UserDetail, id int) error {
-	return pc.profileRepo.GetUserDetailProfile(userDetail, id)
+func (pc *profileUsecase) GetUserDetailProfile(userDetail *ut.UserDetail, id int) (bool, error) {
+	available, err := pc.profileRepo.GetUserDetailProfile(userDetail, id)
+	return available, err
 }
 
 func (pc *profileUsecase) UpdateUserProfile(user *ut.User, id int) error {
@@ -19,6 +20,10 @@ func (pc *profileUsecase) UpdateUserProfile(user *ut.User, id int) error {
 
 func (pc *profileUsecase) UpdateUserDetailProfile(userDetail *ut.UserDetail, id int) error {
 	return pc.profileRepo.UpdateUserDetailProfile(userDetail, id)
+}
+
+func (pc *profileUsecase) CreateUserDetailProfile(userDetail *ut.UserDetail) error {
+	return pc.profileRepo.CreateUserDetailProfile(userDetail)
 }
 
 func (pc *profileUsecase) CreateAddressProfile(address *ut.UserAddress) error {

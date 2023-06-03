@@ -7,7 +7,9 @@ import (
 
 type ProfileRepo interface {
 	GetUserProfile(user *ut.User, id int) error
-	GetUserDetailProfile(userDetail *ut.UserDetail, id int) error
+	GetUserDetailProfile(userDetail *ut.UserDetail, id int) (bool, error)
+
+	CreateUserDetailProfile(userDetail *ut.UserDetail) error
 
 	UpdateUserProfile(user *ut.User, id int) error
 	UpdateUserDetailProfile(userDetail *ut.UserDetail, id int) error

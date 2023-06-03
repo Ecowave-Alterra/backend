@@ -12,8 +12,25 @@ func (pr *profileRepo) GetUserProfile(user *ut.User, id int) error {
 	return nil
 }
 
-func (pr *profileRepo) GetUserDetailProfile(userDetail *ut.UserDetail, id int) error {
-	if err := pr.db.Raw("SELECT * FROM user_details WHERE user_id = ?", id).Scan(&userDetail).Error; err != nil {
+func (pr *profileRepo) GetUserDetailProfile(userDetail *ut.UserDetail, id int) (bool, error) {
+	result := pr.db.Raw("SELECT * FROM user_details WHERE user_id = ?", id).Scan(&userDetail)
+	if result.Error != nil {
+		return false, result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return false, nil
+	}
+
+	// if err := pr.db.Raw("SELECT * FROM user_details WHERE user_id = ?", id).Scan(&userDetail).Error; err != nil {
+	// 	return err
+	// }
+
+	return true, nil
+}
+
+func (pr *profileRepo) CreateUserDetailProfile(userDetail *ut.UserDetail) error {
+	if err := pr.db.Save(&userDetail).Error; err != nil {
 		return err
 	}
 
@@ -21,9 +38,13 @@ func (pr *profileRepo) GetUserDetailProfile(userDetail *ut.UserDetail, id int) e
 }
 
 func (pr *profileRepo) UpdateUserProfile(user *ut.User, id int) error {
-	if err := pr.db.Where("id = ?", id).Updates(&user).Error; err != nil {
+	if err := pr.db.Raw("UPDATE users SET email = ?, username = ?, phone_number = ? WHERE id = ?", user.Email, user.Username, user.PhoneNumber, id).Scan(&user).Error; err != nil {
 		return err
 	}
+
+	// if err := pr.db.Where("id = ?", id).Updates(&user).Error; err != nil {
+	// 	return err
+	// }
 
 	return nil
 }

@@ -1,6 +1,7 @@
 package profile
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -13,7 +14,7 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	var user ut.User
 	var userDetail ut.UserDetail
 
-	idUserSementara := 1
+	idUserSementara := 2
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -21,10 +22,16 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 		})
 	}
 
-	if err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara); err != nil {
+	available, err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
 		})
+	}
+
+	if !available {
+		userDetail.FullName = ""
+		userDetail.EcoPoint = 0
 	}
 
 	userResponse := ut.UserResponse{
@@ -45,7 +52,7 @@ func (ph *ProfileHandler) GetUser2Profile(c echo.Context) error {
 	var user ut.User
 	var userDetail ut.UserDetail
 
-	idUserSementara := 1
+	idUserSementara := 2
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -53,10 +60,16 @@ func (ph *ProfileHandler) GetUser2Profile(c echo.Context) error {
 		})
 	}
 
-	if err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara); err != nil {
+	available, err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
 		})
+	}
+
+	if !available {
+		userDetail.FullName = ""
+		userDetail.ProfilePhotoUrl = ""
 	}
 
 	user2Response := ut.User2Response{
@@ -78,7 +91,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	var userDetail ut.UserDetail
 	var userDetailBefore ut.UserDetail
 
-	idUserSementara := 1
+	idUserSementara := 2
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -86,13 +99,15 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 		})
 	}
 
-	if err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara); err != nil {
+	available, err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
 		})
 	}
 
-	if err := ph.profileUsecase.GetUserDetailProfile(&userDetailBefore, idUserSementara); err != nil {
+	availableBefore, err := ph.profileUsecase.GetUserDetailProfile(&userDetailBefore, idUserSementara)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
 		})
@@ -143,6 +158,20 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 		})
 	}
 
+	if !available && !availableBefore {
+		userDetail = ut.UserDetail{
+			FullName:        userDetail.FullName,
+			ProfilePhotoUrl: userDetail.ProfilePhotoUrl,
+			UserId:          uint(idUserSementara),
+		}
+
+		if err := ph.profileUsecase.CreateUserDetailProfile(&userDetail); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "fail",
+			})
+		}
+	}
+
 	if err := ph.profileUsecase.UpdateUserDetailProfile(&userDetail, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
@@ -155,24 +184,37 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 }
 
 func (ph *ProfileHandler) UpdateAddUserProfile(c echo.Context) error {
-	// var user ut.User
+	var user ut.User
 
-	idUserSementara := 5
+	idUserSementara := 3
+
+	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "fail",
+		})
+	}
+
+	log.Println(user.Email)
+	log.Println(user.Username)
 
 	username := c.FormValue("Username")
 	phoneNumber := c.FormValue("PhoneNumber")
 
-	// if username != "" {
-	// 	user.Username = username
-	// }
-	// if phoneNumber != "" {
-	// 	user.PhoneNumber = phoneNumber
-	// }
-
-	user := ut.User{
-		Username:    username,
-		PhoneNumber: phoneNumber,
+	if username != "" {
+		user.Username = username
 	}
+	if phoneNumber != "" {
+		user.PhoneNumber = phoneNumber
+	}
+
+	user = ut.User{
+		Email:       user.Email,
+		Username:    user.Username,
+		PhoneNumber: user.PhoneNumber,
+	}
+
+	log.Println(user.Email)
+	log.Println(user.Username)
 
 	if err := ph.profileUsecase.UpdateUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
