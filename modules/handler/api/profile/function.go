@@ -1,7 +1,6 @@
 package profile
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -14,7 +13,7 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	var user ut.User
 	var userDetail ut.UserDetail
 
-	idUserSementara := 2
+	idUserSementara := 5
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -91,7 +90,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	var userDetail ut.UserDetail
 	var userDetailBefore ut.UserDetail
 
-	idUserSementara := 2
+	idUserSementara := 5
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -180,50 +179,6 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "success update user detail profile",
-	})
-}
-
-func (ph *ProfileHandler) UpdateAddUserProfile(c echo.Context) error {
-	var user ut.User
-
-	idUserSementara := 3
-
-	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "fail",
-		})
-	}
-
-	log.Println(user.Email)
-	log.Println(user.Username)
-
-	username := c.FormValue("Username")
-	phoneNumber := c.FormValue("PhoneNumber")
-
-	if username != "" {
-		user.Username = username
-	}
-	if phoneNumber != "" {
-		user.PhoneNumber = phoneNumber
-	}
-
-	user = ut.User{
-		Email:       user.Email,
-		Username:    user.Username,
-		PhoneNumber: user.PhoneNumber,
-	}
-
-	log.Println(user.Email)
-	log.Println(user.Username)
-
-	if err := ph.profileUsecase.UpdateUserProfile(&user, idUserSementara); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "fail",
-		})
-	}
-
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "success update add user profile",
 	})
 }
 

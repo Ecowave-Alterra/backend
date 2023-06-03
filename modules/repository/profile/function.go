@@ -22,10 +22,6 @@ func (pr *profileRepo) GetUserDetailProfile(userDetail *ut.UserDetail, id int) (
 		return false, nil
 	}
 
-	// if err := pr.db.Raw("SELECT * FROM user_details WHERE user_id = ?", id).Scan(&userDetail).Error; err != nil {
-	// 	return err
-	// }
-
 	return true, nil
 }
 
