@@ -2,26 +2,26 @@ package information
 
 import (
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
-	ir "github.com/berrylradianh/ecowave-go/modules/repository/information"
+	"gorm.io/gorm"
 )
 
-type InformationUsecase interface {
+type InformationRepo interface {
 	GetAllInformationsNoPagination() (*[]ie.Information, error)
 	GetAllInformations(offset, pageSize int) (*[]ie.Information, int64, error)
 	GetInformationById(informationId int) (*ie.Information, error)
 	CreateInformation(information *ie.Information) error
+	CheckInformationExists(informationId uint) (bool, error)
 	UpdateInformation(informationId int, information *ie.Information) error
 	DeleteInformation(informationId int) error
-	SearchInformations(keyword string, offset, pageSize int) (*[]ie.Information, int64, error)
-	FilterInformations(keyword string, offset, pageSize int) (*[]ie.Information, int64, error)
+	SearchInformations(search, filter string, offset, pageSize int) (*[]ie.Information, int64, error)
 }
 
-type informationUsecase struct {
-	informationRepo ir.InformationRepo
+type informationRepo struct {
+	db *gorm.DB
 }
 
-func New(informationRepo ir.InformationRepo) *informationUsecase {
-	return &informationUsecase{
-		informationRepo,
+func New(db *gorm.DB) InformationRepo {
+	return &informationRepo{
+		db,
 	}
 }
