@@ -15,7 +15,7 @@ func (vh *VoucherHandler) CreateVoucher(c echo.Context) error {
 	voucherTypeID, err := strconv.ParseUint(voucherTypeIDstr, 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "VoucherTypeID must be numeric",
+			"Message": "VoucherTypeID harus berupa angka",
 		})
 	}
 
@@ -23,7 +23,7 @@ func (vh *VoucherHandler) CreateVoucher(c echo.Context) error {
 	startDate, err := time.Parse("02 January 2006", startDateStr)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "err",
+			"Message": "Tanggal mulai tidak valid",
 		})
 	}
 
@@ -31,7 +31,7 @@ func (vh *VoucherHandler) CreateVoucher(c echo.Context) error {
 	endDate, err := time.Parse("02 January 2006", endDateStr)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "err",
+			"Message": "Tanggal berakhir tidak valid",
 		})
 	}
 
@@ -89,7 +89,7 @@ func (vh *VoucherHandler) CreateVoucher(c echo.Context) error {
 	err = vh.voucherUsecase.CreateVoucher(&voucher)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"Message": "Failed to create voucher",
+			"Message": "Gagal membuat voucher baru",
 		})
 	}
 
@@ -136,7 +136,7 @@ func (vh *VoucherHandler) UpdateVoucher(c echo.Context) error {
 	voucherTypeID, err := strconv.ParseUint(voucherTypeIDstr, 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "VoucherTypeID must be numeric",
+			"Message": "VoucherTypeID harus berupa angka",
 		})
 	}
 
