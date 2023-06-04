@@ -17,3 +17,11 @@ func (vr *voucherRepo) GetAllVoucher(vouchers *[]ve.Voucher) ([]ve.Voucher, erro
 
 	return *vouchers, nil
 }
+
+func (vr *voucherRepo) UpdateVoucher(voucherID string, voucher *ve.Voucher) error {
+	if err := vr.db.Model(&ve.Voucher{}).Where("id = ?", voucherID).Updates(&voucher).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -9,3 +9,7 @@ func (vc *voucherUsecase) CreateVoucher(voucher *ve.Voucher) error {
 func (vc *voucherUsecase) GetAllVoucher(vouchers *[]ve.Voucher) ([]ve.Voucher, error) {
 	return vc.voucherRepo.GetAllVoucher(vouchers)
 }
+
+func (vc *voucherUsecase) UpdateVoucher(voucherID string, voucher *ve.Voucher) error {
+	return vc.voucherRepo.UpdateVoucher(voucherID, voucher)
+}

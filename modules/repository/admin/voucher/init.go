@@ -8,6 +8,7 @@ import (
 type VoucherRepo interface {
 	CreateVoucher(voucher *ve.Voucher) error
 	GetAllVoucher(vouchers *[]ve.Voucher) ([]ve.Voucher, error)
+	UpdateVoucher(voucherID string, voucher *ve.Voucher) error
 }
 
 type voucherRepo struct {
