@@ -15,7 +15,7 @@ import (
 var Folder string
 
 func UploadToBucket(ctx context.Context, fileHeader *multipart.FileHeader) (string, error) {
-	bucket := "ecowave_storage"
+	bucket := "ecowave"
 
 	storageClient, err := storage.NewClient(ctx, option.WithCredentialsFile("storage.json"))
 	if err != nil {
@@ -65,7 +65,7 @@ func DeleteImage(fileName string) error {
 		return err
 	}
 
-	bucketName := "ecowave_storage"
+	bucketName := "ecowave"
 	objectPath := Folder + fileName
 
 	obj := client.Bucket(bucketName).Object(objectPath)
