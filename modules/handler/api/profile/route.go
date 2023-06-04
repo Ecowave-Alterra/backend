@@ -10,15 +10,7 @@ import (
 func (ph *ProfileHandler) RegisterRoute(e *echo.Echo) {
 	jwtMiddleware := echojwt.JWT([]byte(os.Getenv("SECRET_KEY")))
 
-	// config := echojwt.Config{
-	// 	NewClaimsFunc: func(c echo.Context) jwt.Claims {
-	// 		return new(midjwt.JwtCustomClaims)
-	// 	},
-	// 	SigningKey: []byte(os.Getenv("SECRET_KEY")),
-	// }
-
 	profileGroup := e.Group("/user")
-	// profileGroup.Use(echojwt.WithConfig(config))
 	profileGroup.Use(jwtMiddleware)
 	profileGroup.GET("", ph.GetUserProfile)
 

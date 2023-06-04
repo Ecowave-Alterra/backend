@@ -1,13 +1,13 @@
 package profile
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
+	midjwt "github.com/berrylradianh/ecowave-go/middleware/jwt"
 	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
-
-	// "github.com/dgrijalva/jwt-go"
 
 	"github.com/labstack/echo/v4"
 )
@@ -16,21 +16,10 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	var user ut.User
 	var userDetail ut.UserDetail
 
-	// user := e.Get("user").(*jwt.Token)
-	// claims := user.Claims.(jwt.MapClaims)
-	// claimsID := fmt.Sprint(claims["user_id"])
-	// convClaimsID, _ := strconv.Atoi(claimsID)
-	// log.Println(convClaimsID)
+	var claims = midjwt.GetClaims2(c)
+	var userId = claims["user_id"].(float64)
+	log.Println(userId)
 
-	// var claims = midjwt.GetClaims(c)
-	// log.Println(claims["user_id"])
-
-	// var userId = midjwt.GetClaims(c).User_Id
-	// var userEmail = midjwt.GetClaims(c).Email
-	// var userExp = midjwt.GetClaims(c).Exp
-	// log.Println(userId)
-	// log.Println(userEmail)
-	// log.Println(userExp)
 	idUserSementara := 1
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
@@ -69,7 +58,8 @@ func (ph *ProfileHandler) GetUser2Profile(c echo.Context) error {
 	var user ut.User
 	var userDetail ut.UserDetail
 
-	// var userId = midjwt.GetClaims(c).User_Id
+	// var claims = midjwt.GetClaims2(c)
+	// var userId = claims["user_id"].(float64)
 	idUserSementara := 2
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
@@ -109,8 +99,9 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	var userDetail ut.UserDetail
 	var userDetailBefore ut.UserDetail
 
-	// var userId = midjwt.GetClaims(c).User_Id
-	idUserSementara := 4
+	// var claims = midjwt.GetClaims2(c)
+	// var userId = claims["user_id"].(float64)
+	idUserSementara := 5
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -205,7 +196,8 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 	var address ut.UserAddress
 
-	// var userId = midjwt.GetClaims(c).User_Id
+	// var claims = midjwt.GetClaims2(c)
+	// var userId = claims["user_id"].(float64)
 	address.UserId = 1
 
 	if err := c.Bind(&address); err != nil {
@@ -239,7 +231,8 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 func (ph *ProfileHandler) GetAllAddressProfile(c echo.Context) error {
 	var address []ut.UserAddress
 
-	// var userId = midjwt.GetClaims(c).User_Id
+	// var claims = midjwt.GetClaims2(c)
+	// var userId = claims["user_id"].(float64)
 	idUserSementara := 1
 
 	if err := ph.profileUsecase.GetAllAddressProfile(&address, idUserSementara); err != nil {
@@ -257,7 +250,8 @@ func (ph *ProfileHandler) GetAllAddressProfile(c echo.Context) error {
 func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 	var address ut.UserAddress
 
-	// var userId = midjwt.GetClaims(c).User_Id
+	// var claims = midjwt.GetClaims2(c)
+	// var userId = claims["user_id"].(float64)
 	address.UserId = 1
 
 	idAddress, err := strconv.Atoi(c.Param("id"))
@@ -320,7 +314,8 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 func (ph *ProfileHandler) UpdatePasswordProfile(c echo.Context) error {
 	var user ut.User
 
-	// var userId = midjwt.GetClaims(c).User_Id
+	// var claims = midjwt.GetClaims2(c)
+	// var userId = claims["user_id"].(float64)
 	idUserSementara := 1
 
 	oldPassword := c.FormValue("OldPassword")
