@@ -33,3 +33,11 @@ func (vr *voucherRepo) DeleteVoucher(voucherID string, voucher *ve.Voucher) erro
 
 	return nil
 }
+
+func (vr *voucherRepo) FilterVouchersByType(voucherType string, vouchers *[]ve.Voucher) ([]ve.Voucher, error) {
+	if err := vr.db.Preload("VoucherType").Where("voucher_type_id IN (SELECT id FROM voucher_types WHERE type = ?)", voucherType).Find(&vouchers).Error; err != nil {
+		return nil, err
+	}
+
+	return *vouchers, nil
+}

@@ -16,4 +16,5 @@ func (voucherHandler *VoucherHandler) RegisterRoutes(e *echo.Echo) {
 	voucherGroup.GET("/", voucherHandler.GetAllVoucher)
 	voucherGroup.PUT("/:id", voucherHandler.UpdateVoucher)
 	voucherGroup.DELETE("/:id", voucherHandler.DeleteVoucher)
+	voucherGroup.GET("/filter", voucherHandler.FilterVouchersByType)
 }

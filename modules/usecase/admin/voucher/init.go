@@ -10,6 +10,7 @@ type VoucherUseCase interface {
 	GetAllVoucher(vouchers *[]ve.Voucher) ([]ve.Voucher, error)
 	UpdateVoucher(voucherID string, voucher *ve.Voucher) error
 	DeleteVoucher(voucherID string, voucher *ve.Voucher) error
+	FilterVouchersByType(voucherType string, vouchers *[]ve.Voucher) ([]ve.Voucher, error)
 }
 
 type voucherUsecase struct {

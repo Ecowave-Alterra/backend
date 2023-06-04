@@ -17,3 +17,7 @@ func (vc *voucherUsecase) UpdateVoucher(voucherID string, voucher *ve.Voucher) e
 func (vc *voucherUsecase) DeleteVoucher(voucherID string, voucher *ve.Voucher) error {
 	return vc.voucherRepo.DeleteVoucher(voucherID, voucher)
 }
+
+func (vc *voucherUsecase) FilterVouchersByType(voucherType string, vouchers *[]ve.Voucher) ([]ve.Voucher, error) {
+	return vc.voucherRepo.FilterVouchersByType(voucherType, vouchers)
+}

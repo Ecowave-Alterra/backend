@@ -288,3 +288,36 @@ func (vh *VoucherHandler) DeleteVoucher(c echo.Context) error {
 		"Message": "Anda berhasil menghapus voucher",
 	})
 }
+
+func (vh *VoucherHandler) FilterVouchersByType(c echo.Context) error {
+	voucherType := c.QueryParam("type")
+
+	var voucher []ve.Voucher
+	vouchers, err := vh.voucherUsecase.FilterVouchersByType(voucherType, &voucher)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"Message": "Gagal memfilter voucher",
+		})
+	}
+
+	var voucherResponses []ve.VoucherResponse
+	for _, voucher := range vouchers {
+		outputDateFormat := "02 January 2006"
+		startDate := voucher.StartDate.Format(outputDateFormat)
+		endDate := voucher.EndDate.Format(outputDateFormat)
+
+		voucherResponse := ve.VoucherResponse{
+			Type:           voucher.VoucherType.Type,
+			ClaimableCount: voucher.ClaimableCount,
+			StartDate:      startDate,
+			EndDate:        endDate,
+		}
+
+		voucherResponses = append(voucherResponses, voucherResponse)
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"Message":  "Berhasil memfilter data voucher",
+		"Vouchers": voucherResponses,
+	})
+}
