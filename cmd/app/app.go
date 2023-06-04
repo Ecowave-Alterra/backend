@@ -16,6 +16,11 @@ import (
 	authHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/auth"
 	authRepo "github.com/berrylradianh/ecowave-go/modules/repository/auth"
 	authUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/auth"
+
+	voucherHandlerAdmin "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/voucher"
+	voucherRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/voucher"
+	voucherUsecaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/voucher"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -34,10 +39,15 @@ func StartApp() *echo.Echo {
 	informationUsecaseUser := informationUsecaseUser.New(informationRepoUser)
 	informationHandlerUser := informationHandlerUser.New(informationUsecaseUser)
 
+	voucherRepoAdmin := voucherRepoAdmin.New(mysql.DB)
+	voucherUsecaseAdmin := voucherUsecaseAdmin.New(voucherRepoAdmin)
+	voucherHandlerAdmin := voucherHandlerAdmin.New(voucherUsecaseAdmin)
+
 	handler := common.Handler{
 		AuthHandler:             authHandler,
 		InformationHandlerAdmin: informationHandlerAdmin,
 		InformationHandlerUser:  informationHandlerUser,
+		VoucherHandlerAdmin:     voucherHandlerAdmin,
 	}
 
 	router := routes.StartRoute(handler)

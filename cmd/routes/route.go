@@ -16,6 +16,7 @@ func StartRoute(handler common.Handler) *echo.Echo {
 	handler.AuthHandler.RegisterRoutes(e)
 	handler.InformationHandlerAdmin.RegisterRoutes(e)
 	handler.InformationHandlerUser.RegisterRoutes(e)
+	handler.VoucherHandlerAdmin.RegisterRoutes(e)
 
 	return e
 }
