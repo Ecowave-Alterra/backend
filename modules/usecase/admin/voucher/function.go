@@ -13,3 +13,7 @@ func (vc *voucherUsecase) GetAllVoucher(vouchers *[]ve.Voucher) ([]ve.Voucher, e
 func (vc *voucherUsecase) UpdateVoucher(voucherID string, voucher *ve.Voucher) error {
 	return vc.voucherRepo.UpdateVoucher(voucherID, voucher)
 }
+
+func (vc *voucherUsecase) DeleteVoucher(voucherID string, voucher *ve.Voucher) error {
+	return vc.voucherRepo.DeleteVoucher(voucherID, voucher)
+}

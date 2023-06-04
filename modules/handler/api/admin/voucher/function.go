@@ -272,3 +272,19 @@ func (vh *VoucherHandler) UpdateVoucher(c echo.Context) error {
 		"Message": "Anda berhasil mengubah voucher",
 	})
 }
+
+func (vh *VoucherHandler) DeleteVoucher(c echo.Context) error {
+	voucherID := c.Param("id")
+
+	var voucher ve.Voucher
+	err := vh.voucherUsecase.DeleteVoucher(voucherID, &voucher)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"Message": "Gagal menghapus voucher",
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"Message": "Anda berhasil menghapus voucher",
+	})
+}

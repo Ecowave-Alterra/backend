@@ -25,3 +25,11 @@ func (vr *voucherRepo) UpdateVoucher(voucherID string, voucher *ve.Voucher) erro
 
 	return nil
 }
+
+func (vr *voucherRepo) DeleteVoucher(voucherID string, voucher *ve.Voucher) error {
+	if err := vr.db.Where("id = ?", voucherID).Delete(&voucher).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
