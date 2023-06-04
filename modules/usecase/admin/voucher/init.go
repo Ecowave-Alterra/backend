@@ -7,6 +7,7 @@ import (
 
 type VoucherUseCase interface {
 	CreateVoucher(voucher *ve.Voucher) error
+	GetAllVoucher(vouchers *[]ve.Voucher) ([]ve.Voucher, error)
 }
 
 type voucherUsecase struct {

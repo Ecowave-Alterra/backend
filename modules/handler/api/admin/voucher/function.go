@@ -97,3 +97,37 @@ func (vh *VoucherHandler) CreateVoucher(c echo.Context) error {
 		"Message": "Anda berhasil menambahkan voucher",
 	})
 }
+
+func (vh *VoucherHandler) GetAllVoucher(c echo.Context) error {
+	var vouchers []ve.Voucher
+
+	vouchers, err := vh.voucherUsecase.GetAllVoucher(&vouchers)
+	if err != nil {
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": "Gagal mengambil data voucher",
+			})
+		}
+	}
+
+	var voucherResponses []ve.VoucherResponse
+	for _, voucher := range vouchers {
+		outputDateFormat := "02 January 2006"
+		startDate := voucher.StartDate.Format(outputDateFormat)
+		endDate := voucher.EndDate.Format(outputDateFormat)
+
+		voucherResponse := ve.VoucherResponse{
+			Type:           voucher.VoucherType.Type,
+			ClaimableCount: voucher.ClaimableCount,
+			StartDate:      startDate,
+			EndDate:        endDate,
+		}
+
+		voucherResponses = append(voucherResponses, voucherResponse)
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"Message":  "Berhasil mengambil data voucher",
+		"Vouchers": voucherResponses,
+	})
+}

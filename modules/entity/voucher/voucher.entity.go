@@ -23,7 +23,7 @@ type Voucher struct {
 type VoucherResponse struct {
 	// VoucherID uint
 	Type           string
-	RemainingClaim uint
-	StartDate      time.Time
-	EndDate        time.Time
+	ClaimableCount uint
+	StartDate      string
+	EndDate        string
 }

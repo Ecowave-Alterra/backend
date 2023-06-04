@@ -9,3 +9,11 @@ func (vr *voucherRepo) CreateVoucher(voucher *ve.Voucher) error {
 
 	return nil
 }
+
+func (vr *voucherRepo) GetAllVoucher(vouchers *[]ve.Voucher) ([]ve.Voucher, error) {
+	if err := vr.db.Preload("VoucherType").Find(&vouchers).Error; err != nil {
+		return nil, err
+	}
+
+	return *vouchers, nil
+}

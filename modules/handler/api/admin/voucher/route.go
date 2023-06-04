@@ -13,4 +13,5 @@ func (voucherHandler *VoucherHandler) RegisterRoutes(e *echo.Echo) {
 	voucherGroup := e.Group("/admin/voucher")
 	// voucherGroup.Use(jwtMiddleware)
 	voucherGroup.POST("/", voucherHandler.CreateVoucher)
+	voucherGroup.GET("/", voucherHandler.GetAllVoucher)
 }
