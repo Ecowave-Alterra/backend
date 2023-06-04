@@ -9,6 +9,7 @@ import (
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
+	ve "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -47,6 +48,8 @@ func InitialMigration() {
 		ue.User{},
 		ue.UserDetail{},
 		ie.Information{},
+		ve.Voucher{},
+		ve.VoucherType{},
 	)
 	DB.Migrator().HasConstraint(&ue.User{}, "UserDetail")
 	DB.Migrator().HasConstraint(&re.Role{}, "Users")
