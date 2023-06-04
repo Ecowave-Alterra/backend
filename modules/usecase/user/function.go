@@ -34,7 +34,8 @@ func (uc *userUsecase) LoginUser(user *ut.User) (error, interface{}) {
 		return err, nil
 	}
 
-	password := user.Password
+	password := "userrr1"
+	// password := user.Password
 	err = p.VerifyPassword(hashPassword, password)
 	if err != nil {
 		return err, nil

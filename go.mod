@@ -6,7 +6,9 @@ require (
 	cloud.google.com/go/storage v1.30.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/joho/godotenv v1.5.1
+	github.com/labstack/echo-jwt v0.0.0-20221127215225-c84d41a71003
 	github.com/labstack/echo/v4 v4.10.2
 	golang.org/x/crypto v0.9.0
 	google.golang.org/api v0.125.0
