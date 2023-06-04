@@ -214,6 +214,17 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 		})
 	}
 
+	if address.IsPrimary {
+		if err := ph.profileUsecase.UpdateAddressPrimaryProfile(&address, int(address.UserId)); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "fail",
+			})
+		}
+		address.IsPrimary = true
+	}
+
+	address.IsPrimary = false
+
 	if err := ph.profileUsecase.CreateAddressProfile(&address); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "fail",
@@ -286,7 +297,7 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 		address.Mark = mark
 	}
 
-	if isPrimary == true {
+	if isPrimary {
 		if err := ph.profileUsecase.UpdateAddressPrimaryProfile(&address, int(address.UserId)); err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
 				"message": "fail",
