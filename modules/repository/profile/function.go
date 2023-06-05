@@ -6,6 +6,14 @@ import (
 	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
+func (pr *profileRepo) GetAllUserProfile(user *[]ut.User) error {
+	if err := pr.db.Find(&user).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (pr *profileRepo) GetUserProfile(user *ut.User, id int) error {
 	if err := pr.db.Where("id = ?", id).Find(&user).Error; err != nil {
 		return err

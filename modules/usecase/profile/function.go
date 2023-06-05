@@ -5,6 +5,10 @@ import (
 	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
+func (pc *profileUsecase) GetAllUserProfile(user *[]ut.User) error {
+	return pc.profileRepo.GetAllUserProfile(user)
+}
+
 func (pc *profileUsecase) GetUserProfile(user *ut.User, id int) error {
 	return pc.profileRepo.GetUserProfile(user, id)
 }
@@ -47,12 +51,8 @@ func (pc *profileUsecase) UpdateAddressByIdProfile(address *ut.UserAddress, idUs
 }
 
 func (pc *profileUsecase) UpdatePasswordProfile(user *ut.User, oldPassword string, newPassword string, id int) (string, error) {
-	if err := pc.GetUserProfile(user, id); err != nil {
-		return "", err
-	}
-
 	if err := p.VerifyPassword(user.Password, oldPassword); err != nil {
-		return "password salah", err
+		return "Password salah", err
 	}
 
 	hashNewPassword, err := p.HashPassword(newPassword)

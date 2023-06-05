@@ -6,6 +6,8 @@ import (
 )
 
 type ProfileUsecase interface {
+	GetAllUserProfile(user *[]ut.User) error
+
 	GetUserProfile(user *ut.User, id int) error
 	GetUserDetailProfile(userDetail *ut.UserDetail, id int) (bool, error)
 
