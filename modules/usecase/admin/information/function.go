@@ -47,16 +47,8 @@ func (ic *informationUsecase) DeleteInformation(informationId int) error {
 	return err
 }
 
-func (ic *informationUsecase) SearchInformations(keyword string, offset, pageSize int) (*[]ie.Information, int64, error) {
-	informations, count, err := ic.informationRepo.SearchInformations(keyword, offset, pageSize)
-	if err != nil {
-		return nil, 0, err
-	}
-	return informations, count, nil
-}
-
-func (ic *informationUsecase) FilterInformations(keyword string, offset, pageSize int) (*[]ie.Information, int64, error) {
-	informations, count, err := ic.informationRepo.FilterInformations(keyword, offset, pageSize)
+func (ic *informationUsecase) SearchInformations(search, filter string, offset, pageSize int) (*[]ie.Information, int64, error) {
+	informations, count, err := ic.informationRepo.SearchInformations(search, filter, offset, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}

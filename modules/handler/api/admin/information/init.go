@@ -1,7 +1,7 @@
 package information
 
 import (
-	ic "github.com/berrylradianh/ecowave-go/modules/usecase/information"
+	ic "github.com/berrylradianh/ecowave-go/modules/usecase/admin/information"
 )
 
 type InformationHandler struct {
