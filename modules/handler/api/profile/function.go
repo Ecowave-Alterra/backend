@@ -102,10 +102,11 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	var userDetailBefore ut.UserDetail
 
 	var message string
+	var messagePhoto string
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	idUserSementara := 4
+	idUserSementara := 1
 
 	if err := ph.profileUsecase.GetAllUserProfile(&allUser); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -169,8 +170,14 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 		}
 
 		profilePhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
+		if profilePhotoUrl == "" {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": "Ups! Foto profil gagal diunggah. Coba lagi ya",
+			})
+		}
+
 		userDetail.ProfilePhotoUrl = profilePhotoUrl
-		message = "Berhasil! Foto profil berhasil diubah"
+		messagePhoto = "Berhasil! Foto profil berhasil diubah"
 	}
 
 	for _, value := range allUser {
@@ -199,7 +206,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 
 	if err := ph.profileUsecase.UpdateUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Gagal mengubah profil",
+			"Message": "Ups! Ada kendala saat mengubah profil kamu. Coba lagi ya",
 		})
 	} else {
 		message = "Yey! Profil kamu berhasil diubah"
@@ -221,14 +228,15 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 
 	if err := ph.profileUsecase.UpdateUserDetailProfile(&userDetail, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Gagal mengubah profil",
+			"Message": "Ups! Ada kendala saat mengubah profil kamu. Coba lagi ya",
 		})
 	} else {
 		message = "Yey! Profil kamu berhasil diubah"
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message": message,
+		"MessagePhoto": messagePhoto,
+		"Message":      message,
 	})
 }
 
