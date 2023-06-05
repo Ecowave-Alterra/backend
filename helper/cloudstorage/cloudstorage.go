@@ -13,7 +13,7 @@ import (
 )
 
 func UploadToBucket(ctx context.Context, fileHeader *multipart.FileHeader) (string, error) {
-	bucket := "ecowave_storage"
+	bucket := "ecowave"
 
 	storageClient, err := storage.NewClient(ctx, option.WithCredentialsFile("storage.json"))
 	if err != nil {
@@ -26,7 +26,7 @@ func UploadToBucket(ctx context.Context, fileHeader *multipart.FileHeader) (stri
 	}
 	defer file.Close()
 
-	objectName := "img/" + fileHeader.Filename
+	objectName := "/img/users/profile" + fileHeader.Filename
 	sw := storageClient.Bucket(bucket).Object(objectName).NewWriter(ctx)
 
 	if _, err := io.Copy(sw, file); err != nil {
