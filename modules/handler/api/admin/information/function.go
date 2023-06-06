@@ -30,7 +30,7 @@ func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 		informations, total, err := ih.informationUsecase.GetAllInformations(offset, pageSize)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Gagal mendapatkan informasi",
+				"Message": err.Error(),
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -73,7 +73,7 @@ func (ih *InformationHandler) GetInformationById() echo.HandlerFunc {
 		information, err = ih.informationUsecase.GetInformationById(id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Gagal mendapatkan informasi",
+				"Message": err.Error(),
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -164,7 +164,7 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 		informationBefore, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
 			return c.JSON(http.StatusNotFound, echo.Map{
-				"Message": "Informasi tidak ditemukan",
+				"Message": err.Error(),
 				"Status":  http.StatusNotFound,
 			})
 		}
@@ -172,7 +172,7 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 		information, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
 			return c.JSON(http.StatusNotFound, echo.Map{
-				"Message": "Informasi tidak ditemukan",
+				"Message": err.Error(),
 				"Status":  http.StatusNotFound,
 			})
 		}
@@ -279,7 +279,7 @@ func (ih *InformationHandler) DeleteInformation() echo.HandlerFunc {
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return c.JSON(http.StatusNotFound, echo.Map{
-					"Message": "Informasi tidak ditemukan",
+					"Message": err.Error(),
 					"Status":  http.StatusNotFound,
 				})
 			}
@@ -352,7 +352,7 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 		informations, total, err := ih.informationUsecase.SearchInformations(search, filter, offset, pageSize)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Gagal mendapatkan informasi",
+				"Message": err.Error(),
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -365,7 +365,7 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 		} else {
 			if page > int(math.Ceil(float64(total)/float64(pageSize))) {
 				return c.JSON(http.StatusNotFound, echo.Map{
-					"Message": "Not Found",
+					"Message": "Halaman Tidak Ditemukan",
 					"Status":  http.StatusNotFound,
 				})
 			}
@@ -385,7 +385,7 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 		informations, err := ih.informationUsecase.GetAllInformationsNoPagination()
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Gagal mendapatkan informasi",
+				"Message": err.Error(),
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -393,7 +393,7 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 		file, err := os.Create("information-data.csv")
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Gagal membuat file csv",
+				"Message": err.Error(),
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -411,7 +411,7 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 		err = writer.Write(csvHeader)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Gagal membaca file csv",
+				"Message": err.Error(),
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -430,7 +430,7 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 			err = writer.Write(record)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"Message": "Gagal membaca file csv",
+					"Message": err.Error(),
 					"Status":  http.StatusInternalServerError,
 				})
 			}
@@ -439,7 +439,7 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 		writer.Flush()
 		if err := writer.Error(); err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Gagal flush file",
+				"Message": err.Error(),
 				"Status":  http.StatusInternalServerError,
 			})
 		}
