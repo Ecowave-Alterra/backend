@@ -11,9 +11,11 @@ type UserDetail struct {
 }
 
 type User2Response struct {
+	UserId          int
 	FullName        string
 	Email           string
 	Username        string
 	PhoneNumber     string
 	ProfilePhotoUrl string
+	UserDetailId    int
 }

@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
-	midjwt "github.com/berrylradianh/ecowave-go/middleware/jwt"
 	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
 	"github.com/go-playground/validator"
 
@@ -17,9 +16,9 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	var user ut.User
 	var userDetail ut.UserDetail
 
-	var claims = midjwt.GetClaims2(c)
-	var userId = claims["user_id"].(float64)
-	log.Println(userId)
+	// var claims = midjwt.GetClaims2(c)
+	// var userId = claims["user_id"].(float64)
+	// log.Println(userId)
 
 	idUserSementara := 1
 
@@ -42,11 +41,13 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	}
 
 	userResponse := ut.UserResponse{
-		FullName:    userDetail.FullName,
-		Username:    user.Username,
-		Email:       user.Email,
-		PhoneNumber: user.PhoneNumber,
-		EcoPoint:    userDetail.EcoPoint,
+		UserId:       int(user.ID),
+		FullName:     userDetail.FullName,
+		Username:     user.Username,
+		Email:        user.Email,
+		PhoneNumber:  user.PhoneNumber,
+		EcoPoint:     userDetail.EcoPoint,
+		UserDetailId: int(userDetail.ID),
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
@@ -82,11 +83,13 @@ func (ph *ProfileHandler) GetUser2Profile(c echo.Context) error {
 	}
 
 	user2Response := ut.User2Response{
+		UserId:          int(user.ID),
 		FullName:        userDetail.FullName,
 		Username:        user.Username,
 		Email:           user.Email,
 		PhoneNumber:     user.PhoneNumber,
 		ProfilePhotoUrl: userDetail.ProfilePhotoUrl,
+		UserDetailId:    int(userDetail.ID),
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
@@ -319,21 +322,37 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 }
 
 func (ph *ProfileHandler) GetAllAddressProfile(c echo.Context) error {
-	var address []ut.UserAddress
+	var addresses []ut.UserAddress
+	var addressResponses []ut.UserAddressResponse
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
 	idUserSementara := 1
 
-	if err := ph.profileUsecase.GetAllAddressProfile(&address, idUserSementara); err != nil {
+	if err := ph.profileUsecase.GetAllAddressProfile(&addresses, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Gagal mendapatkan alamat",
 		})
 	}
 
+	for _, address := range addresses {
+		addressResponse := ut.UserAddressResponse{
+			UserAddress: int(address.ID),
+			Recipient:   address.Recipient,
+			PhoneNumber: address.PhoneNumber,
+			Address:     address.Address,
+			Note:        address.Note,
+			Mark:        address.Mark,
+			IsPrimary:   address.IsPrimary,
+			UserId:      int(address.UserId),
+		}
+
+		addressResponses = append(addressResponses, addressResponse)
+	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": "Alamat berhasil didapatkan",
-		"Data":    address,
+		"Data":    addressResponses,
 	})
 }
 

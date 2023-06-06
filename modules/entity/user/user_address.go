@@ -12,3 +12,14 @@ type UserAddress struct {
 	IsPrimary   bool   `json:"IsPrimary" form:"IsPrimary"`
 	UserId      uint   `json:"UserId" form:"UserId"`
 }
+
+type UserAddressResponse struct {
+	UserAddress int
+	Recipient   string
+	PhoneNumber string
+	Address     string
+	Note        string
+	Mark        string
+	IsPrimary   bool
+	UserId      int
+}

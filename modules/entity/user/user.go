@@ -26,9 +26,11 @@ type UserResponseLogin struct {
 }
 
 type UserResponse struct {
-	FullName    string
-	Username    string
-	Email       string
-	PhoneNumber string
-	EcoPoint    int
+	UserId       int
+	FullName     string
+	Username     string
+	Email        string
+	PhoneNumber  string
+	EcoPoint     int
+	UserDetailId int
 }
