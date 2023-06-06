@@ -62,7 +62,7 @@ func (ph *ProfileHandler) GetUser2Profile(c echo.Context) error {
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	idUserSementara := 2
+	idUserSementara := 1
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -109,7 +109,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	idUserSementara := 4
+	idUserSementara := 1
 
 	if err := ph.profileUsecase.GetAllUserProfile(&allUser); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -306,9 +306,9 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 			})
 		}
 		address.IsPrimary = true
+	} else {
+		address.IsPrimary = false
 	}
-
-	address.IsPrimary = false
 
 	if err := ph.profileUsecase.CreateAddressProfile(&address); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -426,6 +426,12 @@ func (ph *ProfileHandler) UpdatePasswordProfile(c echo.Context) error {
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
 	idUserSementara := 1
+
+	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Gagal mendapatkan profil",
+		})
+	}
 
 	oldPassword := c.FormValue("OldPassword")
 	newPassword := c.FormValue("Password")
