@@ -7,13 +7,12 @@ import (
 	"math"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
+	vld "github.com/berrylradianh/ecowave-go/helper/validator"
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
-	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 )
 
@@ -31,7 +30,7 @@ func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 		informations, total, err := ih.informationUsecase.GetAllInformations(offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Kesalahan Internal Server",
+				"Message": "Gagal mendapatkan informasi",
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -74,7 +73,7 @@ func (ih *InformationHandler) GetInformationById() echo.HandlerFunc {
 		information, err = ih.informationUsecase.GetInformationById(id)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Kesalahan server internal",
+				"Message": "Gagal mendapatkan informasi",
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -98,29 +97,28 @@ func (ih *InformationHandler) CreateInformation() echo.HandlerFunc {
 			})
 		}
 
-		fileExtension := filepath.Ext(fileHeader.Filename)
-		allowedExtensions := map[string]bool{
-			".png":  true,
-			".jpeg": true,
-			".jpg":  true,
-		}
-		if !allowedExtensions[fileExtension] {
+		if err := vld.ValidateFileExtension(fileHeader); err != nil {
 			return e.JSON(http.StatusUnsupportedMediaType, map[string]interface{}{
-				"Message": "Mohon maaf, format file yang Anda unggah tidak sesuai",
+				"Message": err.Error(),
 				"Status":  http.StatusUnsupportedMediaType,
 			})
 		}
 
 		maxFileSize := 4 * 1024 * 1024
-		fileSize := fileHeader.Size
-		if fileSize > int64(maxFileSize) {
+		if err := vld.ValidateFileSize(fileHeader, int64(maxFileSize)); err != nil {
 			return e.JSON(http.StatusRequestEntityTooLarge, map[string]interface{}{
-				"Message": "Mohon maaf, ukuran file Anda melebihi batas maksimum 4MB",
+				"Message": err.Error(),
 				"Status":  http.StatusRequestEntityTooLarge,
 			})
 		}
 
-		PhotoUrl, _ := cloudstorage.UploadToBucket(e.Request().Context(), fileHeader)
+		PhotoUrl, err := cloudstorage.UploadToBucket(e.Request().Context(), fileHeader)
+		if err != nil {
+			return e.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": "Gagal upload image",
+				"Status":  http.StatusInternalServerError,
+			})
+		}
 
 		information := &ie.Information{
 			Title:           e.FormValue("Title"),
@@ -129,25 +127,10 @@ func (ih *InformationHandler) CreateInformation() echo.HandlerFunc {
 			Status:          e.FormValue("Status"),
 		}
 
-		if err := e.Validate(information); err != nil {
-			if validationErrs, ok := err.(validator.ValidationErrors); ok {
-				message := ""
-				for _, e := range validationErrs {
-					if e.Tag() == "max" && e.Field() == "Title" {
-						message = "Mohon maaf, entri anda melebihi batas maksimum 65 karakter"
-					}
-				}
-				return e.JSON(http.StatusBadRequest, map[string]interface{}{
-					"Message": message,
-					"Status":  http.StatusBadRequest,
-				})
-			}
-		}
-
 		err = ih.informationUsecase.CreateInformation(information)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Kesalahan server internal",
+				"Message": err.Error(),
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -199,6 +182,21 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 		status := e.FormValue("Status")
 		fileHeader, err := e.FormFile("PhotoContentUrl")
 
+		if err := vld.ValidateFileExtension(fileHeader); err != nil {
+			return e.JSON(http.StatusUnsupportedMediaType, map[string]interface{}{
+				"Message": err.Error(),
+				"Status":  http.StatusUnsupportedMediaType,
+			})
+		}
+
+		maxFileSize := 4 * 1024 * 1024
+		if err := vld.ValidateFileSize(fileHeader, int64(maxFileSize)); err != nil {
+			return e.JSON(http.StatusRequestEntityTooLarge, map[string]interface{}{
+				"Message": err.Error(),
+				"Status":  http.StatusRequestEntityTooLarge,
+			})
+		}
+
 		if title != "" {
 			information.Title = title
 		}
@@ -228,21 +226,6 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 
 			PhotoUrl, _ := cloudstorage.UploadToBucket(e.Request().Context(), fileHeader)
 			information.PhotoContentUrl = PhotoUrl
-		}
-
-		if err := e.Validate(information); err != nil {
-			if validationErrs, ok := err.(validator.ValidationErrors); ok {
-				message := ""
-				for _, e := range validationErrs {
-					if e.Tag() == "max" && e.Field() == "Title" {
-						message = "Mohon maaf, entri anda melebihi batas maksimum 65 karakter"
-					}
-				}
-				return e.JSON(http.StatusBadRequest, map[string]interface{}{
-					"Message": message,
-					"Status":  http.StatusBadRequest,
-				})
-			}
 		}
 
 		err = ih.informationUsecase.UpdateInformation(int(information.InformationId), information)
