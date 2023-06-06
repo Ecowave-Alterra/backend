@@ -11,7 +11,7 @@ import (
 
 func (ah *AuthHandler) Register() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var user *ue.UserRequest
+		var user *ue.RegisterRequest
 		if err := c.Bind(&user); err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
 				"Message": err.Error(),

@@ -12,10 +12,15 @@ type User struct {
 	UserDetail  UserDetail
 }
 
-type UserRequest struct {
+type RegisterRequest struct {
 	Name     string `json:"Name" form:"Name" validate:"required"`
 	Email    string `json:"Email" form:"Email" validate:"required,email"`
 	Username string `json:"Username" form:"Username" validate:"required"`
 	Phone    string `json:"Phone" form:"Phone" validate:"required,min=10,max=15,numeric"`
+	Password string `json:"Password" form:"Password" validate:"required"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"Email" form:"Email" validate:"required,email"`
 	Password string `json:"Password" form:"Password" validate:"required"`
 }

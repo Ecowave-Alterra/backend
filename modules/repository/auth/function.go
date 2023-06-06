@@ -17,7 +17,7 @@ func (ar *authRepo) GetUserByEmail(email string) (*ue.User, error) {
 	return user, nil
 }
 
-func (ar *authRepo) CreateUser(user *ue.UserRequest) error {
+func (ar *authRepo) CreateUser(user *ue.RegisterRequest) error {
 	userTable := ue.User{
 		RoleId:   2,
 		Email:    user.Email,

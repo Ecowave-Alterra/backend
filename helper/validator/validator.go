@@ -7,7 +7,7 @@ import (
 	"github.com/go-playground/validator"
 )
 
-func ValidateRegister(user *ue.UserRequest) error {
+func ValidateRegister(user *ue.RegisterRequest) error {
 	validate := validator.New()
 	if err := validate.Struct(user); err != nil {
 		if validationErrs, ok := err.(validator.ValidationErrors); ok {

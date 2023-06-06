@@ -9,7 +9,7 @@ import (
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
-func (ac *authUsecase) Register(user *ue.UserRequest) error {
+func (ac *authUsecase) Register(user *ue.RegisterRequest) error {
 	if err := vld.ValidateRegister(user); err != nil {
 		return err
 	}
