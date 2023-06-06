@@ -34,3 +34,9 @@ type UserResponse struct {
 	EcoPoint     int
 	UserDetailId int
 }
+
+type UserPasswordRequest struct {
+	OldPassword        string `json:"OldPassword" form:"OldPassword" validate:"required"`
+	Password           string `json:"Password" form:"Password" validate:"required"`
+	ConfirmNewPassword string `json:"ConfirmNewPassword" form:"ConfirmNewPassword" validate:"required"`
+}

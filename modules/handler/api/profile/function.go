@@ -374,40 +374,51 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 		})
 	}
 
-	recipient := c.FormValue("Recipient")
-	phoneNumber := c.FormValue("PhoneNumber")
-	addressFV := c.FormValue("Address")
-	note := c.FormValue("Note")
-	mark := c.FormValue("Mark")
-	isPrimary, err := strconv.ParseBool(c.FormValue("IsPrimary"))
-	if err != nil {
-		return err
+	if err := c.Bind(&address); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Gagal",
+		})
 	}
 
-	if recipient != "" {
-		address.Recipient = recipient
-	}
-	if phoneNumber != "" {
-		address.PhoneNumber = phoneNumber
-	}
-	if addressFV != "" {
-		address.Address = addressFV
-	}
-	if note != "" {
-		address.Note = note
-	}
-	if mark != "" {
-		address.Mark = mark
+	if err := c.Validate(address); err != nil {
+		if validationErr, ok := err.(validator.ValidationErrors); ok {
+			message := ""
+			for _, e := range validationErr {
+				if e.Tag() == "max" {
+					message = "Nomor telepon tidak boleh lebih dari 13 digit"
+				}
+			}
+
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": message,
+			})
+		}
 	}
 
-	if isPrimary {
+	checkPhoneNumber := ""
+	for i := 0; i < len(address.PhoneNumber); i++ {
+		if i == 2 {
+			break
+		}
+		checkPhoneNumber += string(address.PhoneNumber[i])
+	}
+
+	if checkPhoneNumber != "08" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Pastikan nomor kamu dimulai dengan '08'",
+		})
+	}
+
+	if address.IsPrimary {
 		if err := ph.profileUsecase.UpdateAddressPrimaryProfile(&address, int(address.UserId)); err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
 				"Message": "Gagal mengubah alamat utama",
 			})
 		}
+		address.IsPrimary = true
+	} else {
+		address.IsPrimary = false
 	}
-	address.IsPrimary = isPrimary
 
 	if err := ph.profileUsecase.UpdateAddressByIdProfile(&address, int(address.UserId), idAddress); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -422,6 +433,7 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 
 func (ph *ProfileHandler) UpdatePasswordProfile(c echo.Context) error {
 	var user ut.User
+	var userPassword ut.UserPasswordRequest
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
@@ -433,23 +445,25 @@ func (ph *ProfileHandler) UpdatePasswordProfile(c echo.Context) error {
 		})
 	}
 
-	oldPassword := c.FormValue("OldPassword")
-	newPassword := c.FormValue("Password")
-	confirmNewPassword := c.FormValue("ConfirmNewPassword")
+	if err := c.Bind(&userPassword); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Gagal",
+		})
+	}
 
-	if len(newPassword) < 8 {
+	if len(userPassword.Password) < 8 {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Password harus mengandung minimal 8 karakter",
 		})
 	}
 
-	if newPassword != confirmNewPassword {
+	if userPassword.Password != userPassword.ConfirmNewPassword {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Password tidak cocok",
 		})
 	}
 
-	message, err := ph.profileUsecase.UpdatePasswordProfile(&user, oldPassword, newPassword, idUserSementara)
+	message, err := ph.profileUsecase.UpdatePasswordProfile(&user, userPassword.OldPassword, userPassword.Password, idUserSementara)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": message,
