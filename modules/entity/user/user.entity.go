@@ -26,7 +26,7 @@ type LoginRequest struct {
 }
 
 type AuthResponse struct {
-	ID    int    `json:"id" form:"id"`
-	Email string `json:"email" form:"email"`
-	Token string `json:"token" form:"token"`
+	ID    int    `json:"Id" form:"Id"`
+	Email string `json:"Email" form:"Email"`
+	Token string `json:"Token" form:"Token"`
 }
