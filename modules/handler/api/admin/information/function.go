@@ -224,7 +224,13 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 				}
 			}
 
-			PhotoUrl, _ := cloudstorage.UploadToBucket(e.Request().Context(), fileHeader)
+			PhotoUrl, err := cloudstorage.UploadToBucket(e.Request().Context(), fileHeader)
+			if err != nil {
+				return e.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"Message": "Gagal upload image",
+					"Status":  http.StatusInternalServerError,
+				})
+			}
 			information.PhotoContentUrl = PhotoUrl
 		}
 
@@ -273,12 +279,12 @@ func (ih *InformationHandler) DeleteInformation() echo.HandlerFunc {
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return e.JSON(http.StatusNotFound, echo.Map{
-					"Message": "Data tidak ditemukan",
+					"Message": "Informasi tidak ditemukan",
 					"Status":  http.StatusNotFound,
 				})
 			}
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Internal Server Error",
+				"Message": "Gagal mendapatkan informasi",
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -346,7 +352,7 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 		informations, total, err := ih.informationUsecase.SearchInformations(search, filter, offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Kesalahan server internal",
+				"Message": "Gagal mendapatkan informasi",
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -379,7 +385,7 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 		informations, err := ih.informationUsecase.GetAllInformationsNoPagination()
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Kesalahan server internal",
+				"Message": "Gagal mendapatkan informasi",
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -433,7 +439,7 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 		writer.Flush()
 		if err := writer.Error(); err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Gagal membaca file csv",
+				"Message": "Gagal flush file",
 				"Status":  http.StatusInternalServerError,
 			})
 		}
