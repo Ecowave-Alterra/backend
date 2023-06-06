@@ -106,7 +106,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	idUserSementara := 1
+	idUserSementara := 4
 
 	if err := ph.profileUsecase.GetAllUserProfile(&allUser); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -154,6 +154,8 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	}
 
 	if fileHeader != nil {
+		cloudstorage.Folder = "img/users/profile/"
+
 		if userDetailBefore.ProfilePhotoUrl != "" {
 			fileName, _ := cloudstorage.GetFileName(userDetailBefore.ProfilePhotoUrl)
 			if err != nil {
@@ -234,9 +236,12 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 		message = "Yey! Profil kamu berhasil diubah"
 	}
 
+	if fullName == "" && email == "" && username == "" && phoneNumber == "" {
+		message = messagePhoto
+	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"MessagePhoto": messagePhoto,
-		"Message":      message,
+		"Message": message,
 	})
 }
 
