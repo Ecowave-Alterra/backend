@@ -11,3 +11,11 @@ type User struct {
 	RoleId      uint   `json:"RoleId" form:"RoleId"`
 	UserDetail  UserDetail
 }
+
+type UserRequest struct {
+	Name     string `json:"Name" form:"Name" validate:"required"`
+	Email    string `json:"Email" form:"Email" validate:"required,email"`
+	Username string `json:"Username" form:"Username" validate:"required"`
+	Phone    string `json:"Phone" form:"Phone" validate:"required,min=10,max=15,numeric"`
+	Password string `json:"Password" form:"Password" validate:"required"`
+}

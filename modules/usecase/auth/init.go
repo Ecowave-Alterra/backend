@@ -7,7 +7,7 @@ import (
 
 type AuthUsecase interface {
 	Login(email, password string) (*ue.User, string, error)
-	Register(user *ue.User) error
+	Register(user *ue.UserRequest) error
 }
 
 type authUsecase struct {

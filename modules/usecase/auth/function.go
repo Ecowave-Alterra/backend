@@ -1,12 +1,25 @@
 package auth
 
 import (
+	"errors"
+
 	pw "github.com/berrylradianh/ecowave-go/helper/password"
+	vld "github.com/berrylradianh/ecowave-go/helper/validator"
 	"github.com/berrylradianh/ecowave-go/middleware/jwt"
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
-func (ac *authUsecase) Register(user *ue.User) error {
+func (ac *authUsecase) Register(user *ue.UserRequest) error {
+	if err := vld.ValidateRegister(user); err != nil {
+		return err
+	}
+
+	_, err := ac.authRepo.GetUserByEmail(user.Email)
+	if err != nil {
+		//lint:ignore ST1005 Reason for ignoring this linter
+		return errors.New("Email already exist")
+	}
+
 	hashedPassword, err := pw.HashPassword(user.Password)
 	if err != nil {
 		return err

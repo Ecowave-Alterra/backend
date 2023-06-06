@@ -11,42 +11,25 @@ import (
 
 func (ah *AuthHandler) Register() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		user := &ue.User{
-			Email:    c.FormValue("email"),
-			Password: c.FormValue("password"),
-			Username: c.FormValue("username"),
-			RoleId:   2,
-			UserDetail: ue.UserDetail{
-				Name:  c.FormValue("name"),
-				Phone: c.FormValue("phone"),
-			},
-		}
-
-		if err := c.Validate(user); err != nil {
-			if validationErrs, ok := err.(validator.ValidationErrors); ok {
-				message := ""
-				for _, e := range validationErrs {
-					if e.Tag() == "required" {
-						message = fmt.Sprintf("%s is required", e.Field())
-					} else if e.Tag() == "email" {
-						message = "Invalid email address"
-					}
-				}
-				return c.JSON(http.StatusBadRequest, map[string]interface{}{
-					"Message": message,
-				})
-			}
+		var user *ue.UserRequest
+		if err := c.Bind(&user); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+				"Message": err.Error(),
+				"Status":  http.StatusBadRequest,
+			})
 		}
 
 		err := ah.authUsecase.Register(user)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
+			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"Message": err.Error(),
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Message": "Register Successfull",
+			"Message": "Register Sukses",
+			"Status":  http.StatusOK,
 		})
 	}
 }
@@ -130,7 +113,7 @@ func (ah *AuthHandler) LoginUser() echo.HandlerFunc {
 				}
 
 				return c.JSON(http.StatusBadRequest, map[string]interface{}{
-					"message": message,
+					"Message": message,
 				})
 			}
 		}
