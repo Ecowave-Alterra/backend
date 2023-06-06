@@ -24,3 +24,9 @@ type LoginRequest struct {
 	Email    string `json:"Email" form:"Email" validate:"required,email"`
 	Password string `json:"Password" form:"Password" validate:"required"`
 }
+
+type AuthResponse struct {
+	ID    int    `json:"id" form:"id"`
+	Email string `json:"email" form:"email"`
+	Token string `json:"token" form:"token"`
+}

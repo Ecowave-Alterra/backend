@@ -9,25 +9,25 @@ import (
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
-func (ac *authUsecase) Register(user *ue.RegisterRequest) error {
-	if err := vld.ValidateRegister(user); err != nil {
+func (ac *authUsecase) Register(request *ue.RegisterRequest) error {
+	if err := vld.ValidateRegister(request); err != nil {
 		return err
 	}
 
-	_, err := ac.authRepo.GetUserByEmail(user.Email)
+	_, err := ac.authRepo.GetUserByEmail(request.Email)
 	if err != nil {
 		//lint:ignore ST1005 Reason for ignoring this linter
 		return errors.New("Email already exist")
 	}
 
-	hashedPassword, err := pw.HashPassword(user.Password)
+	hashedPassword, err := pw.HashPassword(request.Password)
 	if err != nil {
 		return err
 	}
 
-	user.Password = string(hashedPassword)
+	request.Password = string(hashedPassword)
 
-	err = ac.authRepo.CreateUser(user)
+	err = ac.authRepo.CreateUser(request)
 	if err != nil {
 		return err
 	}
@@ -35,15 +35,21 @@ func (ac *authUsecase) Register(user *ue.RegisterRequest) error {
 	return nil
 }
 
-func (ac *authUsecase) Login(email, password string) (*ue.User, string, error) {
-	user, err := ac.authRepo.GetUserByEmail(email)
-	if err != nil {
+func (ac *authUsecase) Login(request *ue.LoginRequest) (*ue.User, string, error) {
+	if err := vld.ValidateLogin(request); err != nil {
 		return nil, "", err
 	}
 
-	err = pw.VerifyPassword(user.Password, password)
+	user, err := ac.authRepo.GetUserByEmail(request.Email)
 	if err != nil {
-		return nil, "", err
+		//lint:ignore ST1005 Reason for ignoring this linter
+		return nil, "", errors.New("Email atau password salah")
+	}
+
+	err = pw.VerifyPassword(user.Password, request.Password)
+	if err != nil {
+		//lint:ignore ST1005 Reason for ignoring this linter
+		return nil, "", errors.New("Email atau password salah")
 	}
 
 	token, err := jwt.CreateToken(int(user.ID), user.Email)

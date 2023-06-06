@@ -6,7 +6,7 @@ import (
 )
 
 type AuthUsecase interface {
-	Login(email, password string) (*ue.User, string, error)
+	Login(request *ue.LoginRequest) (*ue.User, string, error)
 	Register(user *ue.RegisterRequest) error
 }
 
