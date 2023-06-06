@@ -31,7 +31,7 @@ func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 		informations, total, err := ih.informationUsecase.GetAllInformations(offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
+				"Message": "Kesalahan Internal Server",
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -39,7 +39,7 @@ func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
 		if page > totalPages {
 			return e.JSON(http.StatusNotFound, echo.Map{
-				"Message": "Tidak ditemukan",
+				"Message": "Halaman Tidak Ditemukan",
 				"Status":  http.StatusNotFound,
 			})
 		}
@@ -66,16 +66,16 @@ func (ih *InformationHandler) GetInformationById() echo.HandlerFunc {
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Id harus berupa angka",
+				"Message": "ID harus berupa angka",
 				"Status":  http.StatusBadRequest,
 			})
 		}
 
 		information, err = ih.informationUsecase.GetInformationById(id)
 		if err != nil {
-			return e.JSON(http.StatusNotFound, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusNotFound,
+			return e.JSON(http.StatusInternalServerError, echo.Map{
+				"Message": "Kesalahan server internal",
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
@@ -92,9 +92,9 @@ func (ih *InformationHandler) CreateInformation() echo.HandlerFunc {
 
 		fileHeader, err := e.FormFile("PhotoContentUrl")
 		if err != nil {
-			return e.JSON(http.StatusBadRequest, map[string]interface{}{
+			return e.JSON(http.StatusUnprocessableEntity, map[string]interface{}{
 				"Message": "Mohon maaf, Anda harus mengungga foto",
-				"Status":  http.StatusBadRequest,
+				"Status":  http.StatusUnprocessableEntity,
 			})
 		}
 
@@ -105,18 +105,18 @@ func (ih *InformationHandler) CreateInformation() echo.HandlerFunc {
 			".jpg":  true,
 		}
 		if !allowedExtensions[fileExtension] {
-			return e.JSON(http.StatusBadRequest, map[string]interface{}{
+			return e.JSON(http.StatusUnsupportedMediaType, map[string]interface{}{
 				"Message": "Mohon maaf, format file yang Anda unggah tidak sesuai",
-				"Status":  http.StatusBadRequest,
+				"Status":  http.StatusUnsupportedMediaType,
 			})
 		}
 
 		maxFileSize := 4 * 1024 * 1024
 		fileSize := fileHeader.Size
 		if fileSize > int64(maxFileSize) {
-			return e.JSON(http.StatusBadRequest, map[string]interface{}{
+			return e.JSON(http.StatusRequestEntityTooLarge, map[string]interface{}{
 				"Message": "Mohon maaf, ukuran file Anda melebihi batas maksimum 4MB",
-				"Status":  http.StatusBadRequest,
+				"Status":  http.StatusRequestEntityTooLarge,
 			})
 		}
 
@@ -147,7 +147,7 @@ func (ih *InformationHandler) CreateInformation() echo.HandlerFunc {
 		err = ih.informationUsecase.CreateInformation(information)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
+				"Message": "Kesalahan server internal",
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -173,7 +173,7 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Id harus berupa angka",
+				"Message": "ID harus berupa angka",
 				"Status":  http.StatusBadRequest,
 			})
 		}
@@ -181,7 +181,7 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 		informationBefore, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
 			return e.JSON(http.StatusNotFound, echo.Map{
-				"Message": "Data tidak ditemukan",
+				"Message": "Informasi tidak ditemukan",
 				"Status":  http.StatusNotFound,
 			})
 		}
@@ -189,7 +189,7 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 		information, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
 			return e.JSON(http.StatusNotFound, echo.Map{
-				"Message": "Data tidak ditemukan",
+				"Message": "Informasi tidak ditemukan",
 				"Status":  http.StatusNotFound,
 			})
 		}
@@ -281,7 +281,7 @@ func (ih *InformationHandler) DeleteInformation() echo.HandlerFunc {
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Id harus berupa angka",
+				"Message": "ID harus berupa angka",
 				"Status":  http.StatusBadRequest,
 			})
 		}
@@ -363,7 +363,7 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 		informations, total, err := ih.informationUsecase.SearchInformations(search, filter, offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
+				"Message": "Kesalahan server internal",
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -396,7 +396,7 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 		informations, err := ih.informationUsecase.GetAllInformationsNoPagination()
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
+				"Message": "Kesalahan server internal",
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -405,7 +405,6 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
 				"Message": "Gagal membuat file csv",
-				"Error":   err,
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -424,7 +423,6 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
 				"Message": "Gagal membaca file csv",
-				"Error":   err,
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -444,7 +442,6 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 			if err != nil {
 				return e.JSON(http.StatusInternalServerError, echo.Map{
 					"Message": "Gagal membaca file csv",
-					"Error":   err,
 					"Status":  http.StatusInternalServerError,
 				})
 			}
@@ -454,7 +451,6 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 		if err := writer.Error(); err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
 				"Message": "Gagal membaca file csv",
-				"Error":   err,
 				"Status":  http.StatusInternalServerError,
 			})
 		}
