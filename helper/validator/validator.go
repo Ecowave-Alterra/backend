@@ -14,7 +14,7 @@ func ValidateInformation(information *ie.Information) error {
 			message := ""
 			for _, e := range validationErrs {
 				if e.Tag() == "required" {
-					message = fmt.Sprintf("%s is required ", e.Field())
+					message = fmt.Sprintf("Masukkan %s", e.Field())
 				} else if e.Tag() == "max" && e.Field() == "Title" {
 					message = "Mohon maaf, entri anda melebihi batas maksimum 65 karakter"
 				}
