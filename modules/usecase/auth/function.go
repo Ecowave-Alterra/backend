@@ -14,12 +14,6 @@ func (ac *authUsecase) Register(request *ue.RegisterRequest) error {
 		return err
 	}
 
-	_, err := ac.authRepo.GetUserByEmail(request.Email)
-	if err != nil {
-		//lint:ignore ST1005 Reason for ignoring this linter
-		return errors.New("Email already exist")
-	}
-
 	hashedPassword, err := pw.HashPassword(request.Password)
 	if err != nil {
 		return err

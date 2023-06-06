@@ -66,6 +66,7 @@ func (ah *AuthHandler) LoginUser() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"Message": "Berhasil login",
 			"Data":    authResponse,
+			"Status":  http.StatusOK,
 		})
 	}
 }
@@ -104,6 +105,7 @@ func (ah *AuthHandler) LoginAdmin() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"Message": "Berhasil login",
 			"Data":    authResponse,
+			"Status":  http.StatusOK,
 		})
 	}
 }
