@@ -8,13 +8,13 @@ func CreateUserDetail() []*ut.UserDetail {
 	userDetail := []*ut.UserDetail{
 		{
 			FullName:        "user1 fullname",
-			ProfilePhotoUrl: "https://storage.cloud.google.com/ecowave_storage/img/swis.jpg",
+			ProfilePhotoUrl: "https://storage.cloud.google.com/ecowave/img/users/profile/profile.png",
 			EcoPoint:        0,
 			UserId:          1,
 		},
 		{
 			FullName:        "user2 fullname",
-			ProfilePhotoUrl: "https://storage.cloud.google.com/ecowave_storage/img/swis.jpg",
+			ProfilePhotoUrl: "https://storage.cloud.google.com/ecowave/img/users/profile/profile.png",
 			EcoPoint:        0,
 			UserId:          2,
 		},
