@@ -1,11 +1,26 @@
 package validator
 
-import "github.com/go-playground/validator"
+import (
+	"fmt"
 
-type CustomValidator struct {
-	Validator *validator.Validate
-}
+	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
+	"github.com/go-playground/validator"
+)
 
-func (cv *CustomValidator) Validate(i interface{}) error {
-	return cv.Validator.Struct(i)
+func ValidateInformation(information *ie.Information) error {
+	validate := validator.New()
+	if err := validate.Struct(information); err != nil {
+		if validationErrs, ok := err.(validator.ValidationErrors); ok {
+			message := ""
+			for _, e := range validationErrs {
+				if e.Tag() == "required" {
+					message = fmt.Sprintf("Masukkan %s", e.Field())
+				} else if e.Tag() == "max" && e.Field() == "Title" {
+					message = "Mohon maaf, entri anda melebihi batas maksimum 65 karakter"
+				}
+			}
+			return fmt.Errorf(message)
+		}
+	}
+	return nil
 }
