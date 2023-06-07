@@ -22,7 +22,7 @@ func (ic *informationUsecase) GetInformationById(informationId int) (*ie.Informa
 }
 
 func (ic *informationUsecase) CreateInformation(information *ie.Information) error {
-	if err := vld.ValidateInformation(information); err != nil {
+	if err := vld.Validation(information); err != nil {
 		return err
 	}
 
@@ -43,7 +43,7 @@ func (ic *informationUsecase) CreateInformation(information *ie.Information) err
 }
 
 func (ic *informationUsecase) UpdateInformation(informationId int, information *ie.Information) error {
-	if err := vld.ValidateInformation(information); err != nil {
+	if err := vld.Validation(information); err != nil {
 		return err
 	}
 
