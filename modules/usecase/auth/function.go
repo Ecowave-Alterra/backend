@@ -10,7 +10,7 @@ import (
 )
 
 func (ac *authUsecase) Register(request *ue.RegisterRequest) error {
-	if err := vld.ValidateRegister(request); err != nil {
+	if err := vld.Validation(request); err != nil {
 		return err
 	}
 
@@ -30,7 +30,7 @@ func (ac *authUsecase) Register(request *ue.RegisterRequest) error {
 }
 
 func (ac *authUsecase) Login(request *ue.LoginRequest) (*ue.User, string, error) {
-	if err := vld.ValidateLogin(request); err != nil {
+	if err := vld.Validation(request); err != nil {
 		return nil, "", err
 	}
 

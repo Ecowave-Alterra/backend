@@ -29,21 +29,13 @@ func (ar *authRepo) CreateUser(user *ue.RegisterRequest) error {
 		Email:    user.Email,
 		Username: user.Username,
 		Password: user.Password,
-	}
-
-	userDetail := ue.UserDetail{
-		Name:  user.Name,
-		Phone: user.Phone,
+		UserDetail: ue.UserDetail{
+			Name:  user.Name,
+			Phone: user.Phone,
+		},
 	}
 
 	if err := ar.db.Create(&userTable).Error; err != nil {
-		return err
-	}
-
-	userDetail.UserId = userTable.ID
-
-	if err := ar.db.Create(&userDetail).Error; err != nil {
-		ar.db.Delete(&userTable)
 		return err
 	}
 	return nil
