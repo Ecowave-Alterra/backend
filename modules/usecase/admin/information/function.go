@@ -2,6 +2,7 @@ package information
 
 import (
 	"github.com/berrylradianh/ecowave-go/helper/randomid"
+	vld "github.com/berrylradianh/ecowave-go/helper/validator"
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 )
 
@@ -21,6 +22,10 @@ func (ic *informationUsecase) GetInformationById(informationId int) (*ie.Informa
 }
 
 func (ic *informationUsecase) CreateInformation(information *ie.Information) error {
+	if err := vld.Validation(information); err != nil {
+		return err
+	}
+
 	for {
 		informationId := randomid.GenerateRandomNumber()
 
@@ -38,6 +43,10 @@ func (ic *informationUsecase) CreateInformation(information *ie.Information) err
 }
 
 func (ic *informationUsecase) UpdateInformation(informationId int, information *ie.Information) error {
+	if err := vld.Validation(information); err != nil {
+		return err
+	}
+
 	result := ic.informationRepo.UpdateInformation(informationId, information)
 	return result
 }
