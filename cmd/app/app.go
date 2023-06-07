@@ -13,6 +13,10 @@ import (
 	informationRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/information"
 	informationUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/information"
 
+	transactionHandlerUser "github.com/berrylradianh/ecowave-go/modules/handler/api/user/transaction"
+	transactionRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/transaction"
+	transactionUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/transaction"
+
 	authHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/auth"
 	authRepo "github.com/berrylradianh/ecowave-go/modules/repository/auth"
 	authUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/auth"
@@ -34,10 +38,15 @@ func StartApp() *echo.Echo {
 	informationUsecaseUser := informationUsecaseUser.New(informationRepoUser)
 	informationHandlerUser := informationHandlerUser.New(informationUsecaseUser)
 
+	transactionRepoUser := transactionRepoUser.New(mysql.DB)
+	transactionUsecaseUser := transactionUsecaseUser.New(transactionRepoUser)
+	transactionHandlerUser := transactionHandlerUser.New(transactionUsecaseUser)
+
 	handler := common.Handler{
 		AuthHandler:             authHandler,
 		InformationHandlerAdmin: informationHandlerAdmin,
 		InformationHandlerUser:  informationHandlerUser,
+		TransactionHandlerUser:  transactionHandlerUser,
 	}
 
 	router := routes.StartRoute(handler)

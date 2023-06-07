@@ -48,6 +48,7 @@ func (ih *InformationHandler) UpdatePoint() echo.HandlerFunc {
 	return func(e echo.Context) error {
 
 		// user := e.Get("user").(*jwt.Token)
+		// log.Println(user)
 		// claims := user.Claims.(jwt.MapClaims)
 		// claimsID := fmt.Sprint(claims["user_id"])
 		// convClaimsID, err := strconv.Atoi(claimsID)

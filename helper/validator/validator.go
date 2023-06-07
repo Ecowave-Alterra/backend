@@ -3,7 +3,9 @@ package validator
 import (
 	"fmt"
 
+	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	"github.com/go-playground/validator"
+	"github.com/labstack/echo/v4"
 )
 
 func Validation(request interface{}) error {
@@ -12,7 +14,9 @@ func Validation(request interface{}) error {
 		if validationErrs, ok := err.(validator.ValidationErrors); ok {
 			message := ""
 			for _, e := range validationErrs {
-				if e.Tag() == "required" {
+				if e.Tag() == "required" && e.Field() == "Email" {
+					message = fmt.Sprintf("Masukkan %s", e.Field())
+				} else if e.Tag() == "required" {
 					message = fmt.Sprintf("Masukkan %s", e.Field())
 				} else if e.Tag() == "email" {
 					message = "Email yang anda masukkan tidak valid"
@@ -26,4 +30,26 @@ func Validation(request interface{}) error {
 		}
 	}
 	return nil
+}
+
+func StructValidator(c echo.Context, transaction et.Transaction) (string, error) {
+	message := ""
+	if err := c.Validate(transaction); err != nil {
+		if validationErrs, ok := err.(validator.ValidationErrors); ok {
+			for _, e := range validationErrs {
+				if e.Tag() == "required" && e.Field() == "Email" {
+					message = fmt.Sprintf("%s is required", e.Field())
+					break
+				} else if e.Tag() == "required" {
+					message = fmt.Sprintf("%s is required", e.Field())
+					break
+				} else if e.Tag() == "email" {
+					message = "Invalid email address"
+					break
+				}
+			}
+		}
+		return message, err
+	}
+	return message, nil
 }
