@@ -9,9 +9,13 @@ import (
 
 func StartRoute(handler common.Handler) *echo.Echo {
 	e := echo.New()
-	e.Use(middleware.CORS())
 	log.LogMiddleware(e)
+	e.Use(middleware.CORS())
 
+	handler.AuthHandler.RegisterRoutes(e)
+	handler.InformationHandlerAdmin.RegisterRoutes(e)
+	handler.InformationHandlerUser.RegisterRoutes(e)
+	handler.TransactionHandlerUser.RegisterRoutes(e)
 	handler.ProductCategoryHandler.RegisterRoutes(e)
 
 	return e

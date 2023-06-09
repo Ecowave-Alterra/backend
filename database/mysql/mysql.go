@@ -5,7 +5,12 @@ import (
 
 	"github.com/berrylradianh/ecowave-go/config"
 	"github.com/berrylradianh/ecowave-go/database/seed"
-	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
+	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
+	re "github.com/berrylradianh/ecowave-go/modules/entity/role"
+	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
+	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
+
+	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -40,6 +45,14 @@ func InitDB() {
 
 func InitialMigration() {
 	DB.AutoMigrate(
-		ep.ProductCategory{},
+		re.Role{},
+		ue.User{},
+		ue.UserDetail{},
+		ie.Information{},
+		et.Transaction{},
+		et.TransactionDetail{},
+		pe.ProductCategory{},
 	)
+	DB.Migrator().HasConstraint(&ue.User{}, "UserDetail")
+	DB.Migrator().HasConstraint(&re.Role{}, "Users")
 }

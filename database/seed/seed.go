@@ -1,6 +1,8 @@
 package seed
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Seed struct {
 	Seed interface{}
@@ -9,6 +11,12 @@ type Seed struct {
 func RegisterSeed(db *gorm.DB) []Seed {
 	return []Seed{
 		{Seed: CreateProductCategory(db)},
+		{Seed: CreateRoles()},
+		{Seed: CreateUser()},
+		{Seed: CreateUserDetail()},
+		{Seed: CreateInformation()},
+		{Seed: CreateTransaction()},
+		{Seed: CreateTransactionDetail()},
 	}
 }
 
@@ -20,11 +28,11 @@ func DBSeed(db *gorm.DB) error {
 		}
 
 		if count == 0 {
-			if err := db.Debug().Create(seed.Seed).Error; err != nil {
+			err := db.Debug().Create(seed.Seed).Error
+			if err != nil {
 				return err
 			}
 		}
 	}
-
 	return nil
 }
