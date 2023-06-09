@@ -44,9 +44,9 @@ func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 		}
 
 		if informations == nil || len(*informations) == 0 {
-			return c.JSON(http.StatusOK, map[string]interface{}{
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
 				"Message": "Belum ada list informasi",
-				"Status":  http.StatusOK,
+				"Status":  http.StatusNotFound,
 			})
 		}
 
@@ -343,7 +343,7 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 		for param := range c.QueryParams() {
 			if !validParams[param] {
 				return c.JSON(http.StatusBadRequest, echo.Map{
-					"Message": "Masukkan paramter dengan benar",
+					"Message": "Masukkan parameter dengan benar",
 					"Status":  http.StatusBadRequest,
 				})
 			}
@@ -358,9 +358,19 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 		}
 
 		if len(*informations) == 0 {
-			return c.JSON(http.StatusOK, echo.Map{
+			return c.JSON(http.StatusNotFound, echo.Map{
 				"Message": "Informasi yang anda cari tidak ditemukan",
-				"Status":  http.StatusOK,
+				"Status":  http.StatusNotFound,
+			})
+		} else if len(*informations) == 0 && filter == "Terbit" {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Message": "Belum ada informasi yang terbit",
+				"Status":  http.StatusNotFound,
+			})
+		} else if len(*informations) == 0 && filter == "Draft" {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Message": "Belum ada informasi dalam draft",
+				"Status":  http.StatusNotFound,
 			})
 		} else {
 			if page > int(math.Ceil(float64(total)/float64(pageSize))) {
