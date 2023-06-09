@@ -114,6 +114,14 @@ func (eh *EcommerceHandler) FilterProductByCategoryAndPrice(c echo.Context) erro
 					"Error":   err,
 				})
 			}
+		} else if qPrice == "min" {
+			products, err = eh.ecommerceUseCase.FilterProductByCategoryAndPriceMin(qCategory, &products)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, echo.Map{
+					"Message": "Failed to get product",
+					"Error":   err,
+				})
+			}
 		} else {
 			products, err = eh.ecommerceUseCase.FilterProductByCategory(qCategory, &products)
 			if err != nil {
