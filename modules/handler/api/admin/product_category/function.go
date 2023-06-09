@@ -108,6 +108,20 @@ func (pch *ProductCategoryHandler) UpdateProductCategory(c echo.Context) error {
 		})
 	}
 
+	_, err = pch.productCategoryUsecase.GetProductCategoryById(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Message": err.Error(),
+				"Status":  http.StatusNotFound,
+			})
+		}
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"Message": "Gagal mendapatkan kategori",
+			"Status":  http.StatusInternalServerError,
+		})
+	}
+
 	available, err := pch.productCategoryUsecase.UpdateProductCategory(&productCategory, id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
