@@ -1,10 +1,10 @@
 package product_category
 
 import (
-	pct "github.com/berrylradianh/ecowave-go/modules/entity/product"
+	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
 )
 
-func (pcr *productCategoryRepo) CreateProductCategory(productCategory *pct.ProductCategory) error {
+func (pcr *productCategoryRepo) CreateProductCategory(productCategory *pe.ProductCategory) error {
 	if err := pcr.db.Save(&productCategory).Error; err != nil {
 		return err
 	}
@@ -12,7 +12,7 @@ func (pcr *productCategoryRepo) CreateProductCategory(productCategory *pct.Produ
 	return nil
 }
 
-func (pcr *productCategoryRepo) UpdateProductCategory(productCategory *pct.ProductCategory, id int) error {
+func (pcr *productCategoryRepo) UpdateProductCategory(productCategory *pe.ProductCategory, id int) error {
 	if err := pcr.db.Where("id = ?", id).Updates(&productCategory).Error; err != nil {
 		return err
 	}
@@ -20,17 +20,17 @@ func (pcr *productCategoryRepo) UpdateProductCategory(productCategory *pct.Produ
 	return nil
 }
 
-func (pcr *productCategoryRepo) DeleteProductCategory(productCategory *pct.ProductCategory, id int) error {
+func (pcr *productCategoryRepo) DeleteProductCategory(productCategory *pe.ProductCategory, id int) error {
 	if err := pcr.db.Where("id = ?", id).Delete(&productCategory).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
-func (pcr *productCategoryRepo) GetAllProductCategory(offset, pageSize int) (*[]pct.ProductCategory, int64, error) {
-	var productCategories []pct.ProductCategory
+func (pcr *productCategoryRepo) GetAllProductCategory(offset, pageSize int) (*[]pe.ProductCategory, int64, error) {
+	var productCategories []pe.ProductCategory
 	var count int64
-	if err := pcr.db.Model(&pct.ProductCategory{}).Count(&count).Error; err != nil {
+	if err := pcr.db.Model(&pe.ProductCategory{}).Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -41,7 +41,7 @@ func (pcr *productCategoryRepo) GetAllProductCategory(offset, pageSize int) (*[]
 	return &productCategories, count, nil
 }
 
-func (pcr *productCategoryRepo) SearchingProductCategoryByName(productCategory *[]pct.ProductCategory, name string) (bool, error) {
+func (pcr *productCategoryRepo) SearchingProductCategoryByName(productCategory *[]pe.ProductCategory, name string) (bool, error) {
 	result := pcr.db.Where("name LIKE ?", "%"+name+"%").Find(&productCategory)
 	if result.Error != nil {
 		return false, result.Error
@@ -54,7 +54,7 @@ func (pcr *productCategoryRepo) SearchingProductCategoryByName(productCategory *
 	return true, nil
 }
 
-func (pcr *productCategoryRepo) IsProductCategoryAvailable(productCategory *pct.ProductCategory, name string) (bool, error) {
+func (pcr *productCategoryRepo) IsProductCategoryAvailable(productCategory *pe.ProductCategory, name string) (bool, error) {
 	result := pcr.db.Where("name = ?", name).Find(&productCategory)
 	if result.Error != nil {
 		return false, result.Error

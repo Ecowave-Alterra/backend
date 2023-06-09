@@ -39,7 +39,7 @@ func (pch *ProductCategoryHandler) GetAllProductCategory(c echo.Context) error {
 
 	if productCategories == nil || len(*productCategories) == 0 {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"Message": "Belum ada list informasi",
+			"Message": "Belum ada list kategori",
 			"Status":  http.StatusNotFound,
 		})
 	}
