@@ -171,19 +171,21 @@ func (pch *ProductCategoryHandler) SearchingProductCategoyByName(c echo.Context)
 
 	available, err := pch.productCategoryUsecase.SearchingProductCategoryByName(&productCategory, name)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "fail",
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"Message": err.Error(),
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
 	if !available {
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"message": "product category not available",
+			"Message": "Kategori yang anda cari tidak ditemukan",
+			"Status":  http.StatusOK,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "success get product category by name",
-		"data":    &productCategory,
+		"ProductCategory": &productCategory,
+		"Status":          http.StatusOK,
 	})
 }
