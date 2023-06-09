@@ -27,6 +27,7 @@ func StartRoute(handler common.Handler) *echo.Echo {
 	// productGroup.GET("/filter", handler.ProductHandler.FilterProductByStatus)
 
 	handler.ProductHandler.RegisterRoutes(e)
+	handler.EcommerceHandler.RegisterRoutes(e)
 
 	return e
 }
