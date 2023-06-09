@@ -1,8 +1,15 @@
 package product_category
 
-import pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
+import (
+	vld "github.com/berrylradianh/ecowave-go/helper/validator"
+	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
+)
 
 func (pcc *productCategoryUsecase) CreateProductCategory(productCategory *pe.ProductCategory) (bool, error) {
+	if err := vld.Validation(productCategory); err != nil {
+		return false, err
+	}
+
 	available, _ := pcc.productCategoryRepo.IsProductCategoryAvailable(productCategory, productCategory.Name)
 	return available, pcc.productCategoryRepo.CreateProductCategory(productCategory)
 }
