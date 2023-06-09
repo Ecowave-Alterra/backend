@@ -27,6 +27,25 @@ func (pcr *productCategoryRepo) DeleteProductCategory(productCategory *pe.Produc
 
 	return nil
 }
+
+func (pcr *productCategoryRepo) GetAllProductCategoryNoPagination() (*[]pe.ProductCategory, error) {
+	var productCategories []pe.ProductCategory
+	if err := pcr.db.Find(&productCategories).Error; err != nil {
+		return nil, err
+	}
+
+	return &productCategories, nil
+}
+
+func (pcr *productCategoryRepo) GetProductCategoryById(id int) (*pe.ProductCategory, error) {
+	var productCategory pe.ProductCategory
+	if err := pcr.db.Where("id = ?", id).First(&productCategory).Error; err != nil {
+		return nil, err
+	}
+
+	return &productCategory, nil
+}
+
 func (pcr *productCategoryRepo) GetAllProductCategory(offset, pageSize int) (*[]pe.ProductCategory, int64, error) {
 	var productCategories []pe.ProductCategory
 	var count int64

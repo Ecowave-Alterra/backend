@@ -10,6 +10,8 @@ type ProductCategoryUsecase interface {
 	UpdateProductCategory(productCategory *pe.ProductCategory, id int) (bool, error)
 	DeleteProductCategory(productCategory *pe.ProductCategory, id int) error
 	GetAllProductCategory(offset, pageSize int) (*[]pe.ProductCategory, int64, error)
+	GetProductCategoryById(id int) (*pe.ProductCategory, error)
+	GetAllProductCategoryNoPagination() (*[]pe.ProductCategory, error)
 	SearchingProductCategoryByName(productCategory *[]pe.ProductCategory, name string) (bool, error)
 }
 

@@ -1,6 +1,7 @@
 package productcategory
 
 import (
+	"database/sql"
 	"math"
 	"net/http"
 	"reflect"
@@ -136,14 +137,30 @@ func (pch *ProductCategoryHandler) DeleteProductCategory(c echo.Context) error {
 		return err
 	}
 
+	_, err = pch.productCategoryUsecase.GetProductCategoryById(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Message": err.Error(),
+				"Status":  http.StatusNotFound,
+			})
+		}
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"Message": "Gagal mendapatkan kategori",
+			"Status":  http.StatusInternalServerError,
+		})
+	}
+
 	if err := pch.productCategoryUsecase.DeleteProductCategory(&productCategory, id); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "fail",
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"Message": err.Error(),
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "success delete product category by id",
+		"Message": "Anda berhasil menghapus kategori",
+		"Status":  http.StatusOK,
 	})
 }
 

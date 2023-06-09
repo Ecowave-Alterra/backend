@@ -23,6 +23,16 @@ func (pcc *productCategoryUsecase) DeleteProductCategory(productCategory *pe.Pro
 	return pcc.productCategoryRepo.DeleteProductCategory(productCategory, id)
 }
 
+func (pcc *productCategoryUsecase) GetAllProductCategoryNoPagination() (*[]pe.ProductCategory, error) {
+	productCategories, err := pcc.productCategoryRepo.GetAllProductCategoryNoPagination()
+	return productCategories, err
+}
+
+func (pcc *productCategoryUsecase) GetProductCategoryById(id int) (*pe.ProductCategory, error) {
+	productCategories, err := pcc.productCategoryRepo.GetProductCategoryById(id)
+	return productCategories, err
+}
+
 func (pcc *productCategoryUsecase) GetAllProductCategory(offset, pageSize int) (*[]pe.ProductCategory, int64, error) {
 	productCategories, count, err := pcc.productCategoryRepo.GetAllProductCategory(offset, pageSize)
 	return productCategories, count, err
