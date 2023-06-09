@@ -1,13 +1,12 @@
 package productcategory
 
 import (
-	"fmt"
 	"math"
 	"net/http"
+	"reflect"
 	"strconv"
 
 	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
-	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 )
 
@@ -87,46 +86,45 @@ func (pch *ProductCategoryHandler) UpdateProductCategory(c echo.Context) error {
 	var productCategory pe.ProductCategory
 
 	if err := c.Bind(&productCategory); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "fail",
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"Message": err.Error(),
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
-	if err := c.Validate(productCategory); err != nil {
-		if validationErr, ok := err.(validator.ValidationErrors); ok {
-			message := ""
-			for _, e := range validationErr {
-				if e.Tag() == "required" {
-					message = fmt.Sprintf("%s is required", e.Field())
-				}
-			}
-
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"message": message,
-			})
-		}
+	if reflect.DeepEqual(productCategory, pe.ProductCategory{}) {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Masukkan kategori",
+			"Status":  http.StatusBadRequest,
+		})
 	}
 
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "ID harus berupa angka",
+			"Status":  http.StatusBadRequest,
+		})
 	}
 
 	available, err := pch.productCategoryUsecase.UpdateProductCategory(&productCategory, id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "fail",
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"Message": err.Error(),
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
 	if available {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "product category already available",
+			"Message": "Kategori sudah ada",
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "success update product category by id",
+		"Message": "Anda berhasil mengubah kategori",
+		"Status":  http.StatusOK,
 	})
 }
 
