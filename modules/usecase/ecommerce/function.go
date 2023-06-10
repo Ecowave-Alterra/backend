@@ -1,13 +1,17 @@
 package ecommerce
 
-import ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
+import (
+	ee "github.com/berrylradianh/ecowave-go/modules/entity/ecommerce"
+	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
+)
 
 func (ec *ecommerceUseCase) GetAllProduct(products *[]ep.Product) ([]ep.Product, error) {
 	return ec.ecommerceRepo.GetAllProduct(products)
 }
 
-func (ec *ecommerceUseCase) GetProductByID(productId string, product *ep.Product) (ep.Product, error) {
-	return ec.ecommerceRepo.GetProductByID(productId, product)
+func (ec *ecommerceUseCase) GetProductByID(productId string) ([]ee.QueryResponse, error) {
+	rq, err := ec.ecommerceRepo.GetProductByID(productId)
+	return rq, err
 }
 
 func (ec *ecommerceUseCase) GetProductImageURLById(productId string, productImage *ep.ProductImage) ([]ep.ProductImage, error) {

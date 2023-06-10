@@ -55,10 +55,9 @@ func (eh *EcommerceHandler) GetProductEcommerce(c echo.Context) error {
 }
 
 func (eh *EcommerceHandler) GetProductDetailEcommerce(c echo.Context) error {
-	var product ep.Product
 	productID := c.Param("id")
 
-	product, err := eh.ecommerceUseCase.GetProductByID(productID, &product)
+	queryResponse, err := eh.ecommerceUseCase.GetProductByID(productID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": "Failed to get product datas",
@@ -66,8 +65,21 @@ func (eh *EcommerceHandler) GetProductDetailEcommerce(c echo.Context) error {
 		})
 	}
 
+	var reviews []ee.ReviewResponse
+	for _, value := range queryResponse {
+		review := ee.ReviewResponse{
+			FullName:     value.FullName,
+			Rating:       float32(value.Rating),
+			Comment:      value.Comment,
+			CommentAdmin: value.CommentAdmin,
+			PhotoURL:     value.PhotoURL,
+			VideoURL:     value.VideoURL,
+		}
+		reviews = append(reviews, review)
+	}
+
 	var productImage ep.ProductImage
-	productImages, err := eh.ecommerceUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
+	productImages, err := eh.ecommerceUseCase.GetProductImageURLById(fmt.Sprint(queryResponse[0].Id), &productImage)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"Message": "Failed to get product images",
@@ -75,20 +87,20 @@ func (eh *EcommerceHandler) GetProductDetailEcommerce(c echo.Context) error {
 		})
 	}
 
-	var imageURLs []string
+	var productImageURLs []string
 	for _, image := range productImages {
-		imageURLs = append(imageURLs, image.ProductImageUrl)
+		productImageURLs = append(productImageURLs, image.ProductImageUrl)
 	}
 
 	productDetailResponse := ee.ProductDetailResponse{
-		Name:            product.Name,
-		Category:        product.ProductCategory.Category,
-		Stock:           product.Stock,
-		Price:           product.Price,
-		Status:          product.Status,
-		Rating:          product.Rating,
-		Description:     product.Description,
-		ProductImageUrl: imageURLs,
+		Name:            queryResponse[0].Name,
+		Category:        queryResponse[0].Category,
+		Stock:           queryResponse[0].Stock,
+		Price:           queryResponse[0].Price,
+		Status:          queryResponse[0].Status,
+		Description:     queryResponse[0].Description,
+		ProductImageUrl: productImageURLs,
+		Review:          reviews,
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
