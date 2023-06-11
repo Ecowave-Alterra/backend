@@ -5,12 +5,18 @@ import (
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 )
 
-func (er *ecommerceRepo) GetAllProduct(products *[]ep.Product) ([]ep.Product, error) {
-	if err := er.db.Preload("ProductCategory").Find(&products).Error; err != nil {
-		return nil, err
+func (er *ecommerceRepo) GetAllProduct(products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error) {
+	var count int64
+
+	if err := er.db.Model(&products).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return *products, nil
+	if err := er.db.Offset(offset).Limit(pageSize).Preload("ProductCategory").Find(&products).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return products, count, nil
 }
 
 func (er *ecommerceRepo) GetProductByID(productId string) ([]ee.QueryResponse, error) {
@@ -32,45 +38,72 @@ func (er *ecommerceRepo) GetProductImageURLById(productId string, productImage *
 	return productImages, nil
 }
 
-func (er *ecommerceRepo) FilterProductByCategory(category string, products *[]ep.Product) ([]ep.Product, error) {
-	if err := er.db.Preload("ProductCategory").
-		Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&products).Error; err != nil {
-		return nil, err
+func (er *ecommerceRepo) FilterProductByCategory(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error) {
+	var count int64
+
+	if err := er.db.Model(&products).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return *products, nil
+	if err := er.db.Offset(offset).Limit(pageSize).Preload("ProductCategory").Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&products).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return products, count, nil
 }
 
-func (er *ecommerceRepo) FilterProductByCategoryAndPriceMax(category string, products *[]ep.Product) ([]ep.Product, error) {
-	if err := er.db.Order("price desc").Preload("ProductCategory").
-		Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&products).Error; err != nil {
-		return nil, err
+func (er *ecommerceRepo) FilterProductByCategoryAndPriceMax(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error) {
+	var count int64
+
+	if err := er.db.Model(&products).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return *products, nil
+	if err := er.db.Offset(offset).Limit(pageSize).Order("price desc").Preload("ProductCategory").Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&products).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return products, count, nil
 }
 
-func (er *ecommerceRepo) FilterProductByCategoryAndPriceMin(category string, products *[]ep.Product) ([]ep.Product, error) {
-	if err := er.db.Order("price asc").Preload("ProductCategory").
-		Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&products).Error; err != nil {
-		return nil, err
+func (er *ecommerceRepo) FilterProductByCategoryAndPriceMin(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error) {
+	var count int64
+
+	if err := er.db.Model(&products).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return *products, nil
+	if err := er.db.Offset(offset).Limit(pageSize).Order("price asc").Preload("ProductCategory").Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&products).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return products, count, nil
 }
 
-func (er *ecommerceRepo) FilterProductByAllCategoryAndPriceMax(products *[]ep.Product) ([]ep.Product, error) {
-	if err := er.db.Order("price desc").Preload("ProductCategory").Find(&products).Error; err != nil {
-		return nil, err
+func (er *ecommerceRepo) FilterProductByAllCategoryAndPriceMax(products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error) {
+	var count int64
+
+	if err := er.db.Model(&products).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return *products, nil
+	if err := er.db.Offset(offset).Limit(pageSize).Order("price desc").Preload("ProductCategory").Find(&products).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return products, count, nil
 }
 
-func (er *ecommerceRepo) FilterProductByAllCategoryAndPriceMin(products *[]ep.Product) ([]ep.Product, error) {
-	if err := er.db.Order("price asc").Preload("ProductCategory").Find(&products).Error; err != nil {
-		return nil, err
+func (er *ecommerceRepo) FilterProductByAllCategoryAndPriceMin(products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error) {
+	var count int64
+
+	if err := er.db.Model(&products).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return *products, nil
+	if err := er.db.Offset(offset).Limit(pageSize).Order("price asc").Preload("ProductCategory").Find(&products).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return products, count, nil
 }

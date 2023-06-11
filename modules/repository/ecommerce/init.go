@@ -7,14 +7,14 @@ import (
 )
 
 type EcommerceRepo interface {
-	GetAllProduct(products *[]ep.Product) ([]ep.Product, error)
+	GetAllProduct(products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
 	GetProductByID(productId string) ([]ee.QueryResponse, error)
 	GetProductImageURLById(productId string, productImage *ep.ProductImage) ([]ep.ProductImage, error)
-	FilterProductByCategory(category string, products *[]ep.Product) ([]ep.Product, error)
-	FilterProductByCategoryAndPriceMax(category string, products *[]ep.Product) ([]ep.Product, error)
-	FilterProductByCategoryAndPriceMin(category string, products *[]ep.Product) ([]ep.Product, error)
-	FilterProductByAllCategoryAndPriceMax(products *[]ep.Product) ([]ep.Product, error)
-	FilterProductByAllCategoryAndPriceMin(products *[]ep.Product) ([]ep.Product, error)
+	FilterProductByCategory(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
+	FilterProductByCategoryAndPriceMax(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
+	FilterProductByCategoryAndPriceMin(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
+	FilterProductByAllCategoryAndPriceMax(products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
+	FilterProductByAllCategoryAndPriceMin(products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
 }
 
 type ecommerceRepo struct {
