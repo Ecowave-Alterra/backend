@@ -426,6 +426,7 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 			})
 		}
 
+		records := make([][]string, 0)
 		for _, info := range *informations {
 			record := []string{
 				strconv.Itoa(int(info.InformationId)),
@@ -436,6 +437,7 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 				strconv.Itoa(int(info.BookmarkCount)),
 				info.PhotoContentUrl,
 			}
+			records = append(records, record)
 
 			err = writer.Write(record)
 			if err != nil {
@@ -446,17 +448,11 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 			}
 		}
 
-		writer.Flush()
-		if err := writer.Error(); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusInternalServerError,
-			})
-		}
-
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Message": "Berhasil membuat file csv",
+			"Message": "Berhasil membuat file CSV",
 			"Status":  http.StatusOK,
+			"Header":  csvHeader,
+			"Records": records,
 		})
 	}
 }
