@@ -1,8 +1,6 @@
 package transaction
 
 import (
-	"errors"
-	"log"
 	"time"
 
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
@@ -22,10 +20,7 @@ func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) err
 	transaction.StatusTransaction = "Belum Bayar"
 	transaction.TotalProductPrice = productCost
 
-	var diskon float64
-
-	transaction.TotalPrice = (transaction.TotalProductPrice + transaction.TotalShippingPrice) - (transaction.Point + diskon)
-	log.Println(transaction)
+	transaction.TotalPrice = (transaction.TotalProductPrice + transaction.TotalShippingPrice) - (transaction.Point + transaction.Discount)
 
 	err := tu.transactionRepo.CreateTransaction(transaction)
 	if err != nil {
@@ -33,7 +28,7 @@ func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) err
 	}
 	return nil
 }
-func (tu *transactionUsecase) GetPoint(id uint) (uint, error) {
+func (tu *transactionUsecase) GetPoint(id uint) (interface{}, error) {
 
 	res, err := tu.transactionRepo.GetPoint(id)
 	if err != nil {
@@ -41,7 +36,7 @@ func (tu *transactionUsecase) GetPoint(id uint) (uint, error) {
 	}
 
 	if res == 0 {
-		return 0, errors.New("Maaf, Kamu tidak punya point")
+		return "Maaf, Kamu tidak punya point", nil
 	}
 
 	return res, nil
@@ -59,7 +54,6 @@ func (tu *transactionUsecase) GetVoucherUser(id uint, offset int, pageSize int) 
 	return res, count, nil
 }
 
-// sini
 func (tu *transactionUsecase) DetailVoucher(id uint) (interface{}, error) {
 
 	res, err := tu.transactionRepo.DetailVoucher(id)
@@ -68,7 +62,7 @@ func (tu *transactionUsecase) DetailVoucher(id uint) (interface{}, error) {
 	}
 	res.ID = 0
 	if res.ID == 0 {
-		return nil, echo.NewHTTPError(400, "Belum ada detail voucher")
+		return nil, echo.NewHTTPError(404, "Belum ada detail voucher")
 	}
 
 	detailVoucher := ev.VoucherUserResponse{
@@ -98,21 +92,21 @@ func (tu *transactionUsecase) ClaimVoucher(idUser uint, idVoucher uint, shipCost
 		return 0, err
 	}
 	if res.ClaimableCount > userClaim {
-		return 0, errors.New("User telah melebihi batas penggunaan voucher")
+		return 0, echo.NewHTTPError(400, "User telah melebihi batas penggunaan voucher")
 	}
 	// validasi limit voucher
 	if res.MaxClaimLimit <= 0 {
-		return 0, errors.New("Sudah melebihi batas penggunaan voucher")
+		return 0, echo.NewHTTPError(400, "Voucher telah melebihi batas penggunaan")
 	}
 	// validasi tanggal
 	now := time.Now()
 	date := res.EndDate.Before(now)
 	if !date {
-		return 0, errors.New("Telah melewati batas tanggal penggunaan voucher")
+		return 0, echo.NewHTTPError(400, "Telah melewati batas tanggal penggunaan voucher")
 	}
 	// validasi minimal belanjaan
 	if res.MinimumPurchase > productCost {
-		return 0, errors.New("Total pembelian kurang untuk menggunakan voucher ini")
+		return 0, echo.NewHTTPError(400, "Total pembelian kurang untuk menggunakan voucher ini")
 	}
 
 	if res.VoucherType.Type == "Gratis Ongkir" {

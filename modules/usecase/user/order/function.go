@@ -109,7 +109,7 @@ func (oc *orderUsecase) ConfirmOrder(id uint) error {
 
 	statusTransaction, err := oc.orderRepo.GetStatusOrder(id)
 	if err != nil {
-		return echo.NewHTTPError(500, err)
+		return err
 	}
 
 	if statusTransaction != "Dikirim" {
@@ -118,7 +118,7 @@ func (oc *orderUsecase) ConfirmOrder(id uint) error {
 
 	err = oc.orderRepo.ConfirmOrder(id)
 	if err != nil {
-		return echo.NewHTTPError(500, err)
+		return err
 	}
 
 	return nil
@@ -127,7 +127,7 @@ func (oc *orderUsecase) CancelOrder(id uint, canceledReason string) error {
 
 	statusTransaction, err := oc.orderRepo.GetStatusOrder(id)
 	if err != nil {
-		return echo.NewHTTPError(500, err)
+		return err
 	}
 
 	if statusTransaction != "Belum Bayar" {
@@ -136,7 +136,7 @@ func (oc *orderUsecase) CancelOrder(id uint, canceledReason string) error {
 
 	err = oc.orderRepo.CancelOrder(id, canceledReason)
 	if err != nil {
-		return echo.NewHTTPError(500, err)
+		return err
 	}
 
 	return nil

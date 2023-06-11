@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	h "github.com/berrylradianh/ecowave-go/helper/getIdUser"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 
@@ -26,22 +27,25 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 
 		id := e.QueryParam("filter")
 		order, total, err := oh.orderUsecase.GetOrder(id, idUser, offset, pageSize)
+
+		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
-			return e.JSON(http.StatusBadRequest, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusBadRequest,
+			return e.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
 		if page > totalPages {
 			return e.JSON(http.StatusNotFound, echo.Map{
+				"Status":  404,
 				"Message": "Halaman Tidak Ditemukan",
-				"Status":  http.StatusNotFound,
 			})
 		}
 
 		return e.JSON(http.StatusOK, map[string]interface{}{
 			"Status":    200,
+			"Message":   "Succes get order",
 			"Page":      page,
 			"TotalPage": totalPages,
 			"Order":     order,
@@ -55,22 +59,24 @@ func (oh *OrderHandler) OrderDetail() echo.HandlerFunc {
 		id, err := strconv.Atoi(e.Param("id"))
 		if err != nil {
 			e.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Invalid Id",
 				"Status":  400,
+				"Message": "Invalid Id",
 			})
 		}
 
 		OrderDetail, err := oh.orderUsecase.OrderDetail(uint(id))
+		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
-			return e.JSON(http.StatusBadRequest, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusBadRequest,
+			return e.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
 		return e.JSON(http.StatusOK, map[string]interface{}{
-			"OrderDetail": OrderDetail,
 			"Status":      200,
+			"Message":     "Succes get order detail",
+			"OrderDetail": OrderDetail,
 		})
 	}
 }
@@ -82,15 +88,16 @@ func (oh *OrderHandler) ConfirmOrder() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": "Invalid param",
+				"Message": "Invalid id",
 			})
 		}
 
 		err = oh.orderUsecase.ConfirmOrder(uint(id))
+		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
-				"Status":  400,
-				"Message": err,
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 

@@ -4,8 +4,8 @@ import (
 	"math"
 	"net/http"
 	"strconv"
-	"strings"
 
+	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	h "github.com/berrylradianh/ecowave-go/helper/getIdUser"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	"github.com/labstack/echo/v4"
@@ -14,28 +14,23 @@ import (
 func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		id, err := h.GetIdUser(c)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Status":  400,
-				"Message": "Need Login",
-			})
-		}
+		id, _ := h.GetIdUser(c)
 
 		transaction := et.Transaction{}
 		c.Bind(&transaction)
 		transaction.UserId = uint(id)
 
-		err = th.transactionUsecase.CreateTransaction(&transaction)
+		err := th.transactionUsecase.CreateTransaction(&transaction)
+		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
-				"Status":  400,
-				"Message": err.Error(),
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Status":  200,
+			"Status":  201,
 			"Message": "Success Create Transaction",
 		})
 	}
@@ -48,10 +43,11 @@ func (th *TransactionHandler) GetPoint() echo.HandlerFunc {
 		id, _ := h.GetIdUser(c)
 
 		res, err := th.transactionUsecase.GetPoint(id)
+		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
-				"Status":  400,
-				"Message": err,
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
@@ -78,17 +74,18 @@ func (th *TransactionHandler) GetVoucherUser() echo.HandlerFunc {
 		id, _ := h.GetIdUser(c)
 
 		res, total, err := th.transactionUsecase.GetVoucherUser(id, offset, pageSize)
+		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
-				"Status":  400,
-				"Message": err,
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
 		if page > totalPages {
 			return c.JSON(http.StatusNotFound, echo.Map{
+				"Status":  404,
 				"Message": "Halaman Tidak Ditemukan",
-				"Status":  http.StatusNotFound,
 			})
 		}
 
@@ -109,15 +106,16 @@ func (th *TransactionHandler) DetailVoucher() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": "Parameter tidak valid",
+				"Message": "Invalid Id",
 			})
 		}
 
 		res, err := th.transactionUsecase.DetailVoucher(uint(id))
+		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
-				"Status":  400,
-				"Message": strings.Split(err.Error(), ", "),
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
@@ -139,7 +137,7 @@ func (th *TransactionHandler) ClaimVoucher() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
 				"Status":  400,
-				"Message": "Invalid param id",
+				"Message": "Invalid Id",
 			})
 		}
 		shipCost, err := strconv.Atoi(c.QueryParam("ship-cost"))
@@ -158,10 +156,11 @@ func (th *TransactionHandler) ClaimVoucher() echo.HandlerFunc {
 		}
 
 		res, err := th.transactionUsecase.ClaimVoucher(idUser, uint(idVoucher), float64(shipCost), float64(productCost))
+		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
-				"Status":  400,
-				"Message": err,
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
