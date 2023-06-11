@@ -34,12 +34,14 @@ type VoucherUserResponse struct {
 	EndDate         time.Time
 	PhotoUrl        string
 	MinimumPurchase float64
-	UserClaim       uint
-	MaxClaimLimit   uint
+	UserClaim       uint    `json:"UserClaim,omitempty"`
+	MaximumDiscount float64 `json:"MaximumDiscount,omitempty"`
+	DiscountPercent float64 `json:"DiscountPercent,omitempty"`
 }
-type DetailVoucherResponse struct {
-	Type            string
-	EndDate         time.Time
-	PhotoUrl        string
-	MinimumPurchase float64
-}
+
+// type DetailVoucherResponse struct {
+// 	Type            string
+// 	EndDate         time.Time
+// 	PhotoUrl        string
+// 	MinimumPurchase float64 `json:"omitempty"`
+// }

@@ -7,9 +7,10 @@ import (
 
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	ev "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
+	"github.com/labstack/echo/v4"
 )
 
-func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (interface{}, error) {
+func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) error {
 
 	transactionDetail := transaction.TransactionDetails
 	var productCost float64
@@ -26,13 +27,11 @@ func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (in
 	transaction.TotalPrice = (transaction.TotalProductPrice + transaction.TotalShippingPrice) - (transaction.Point + diskon)
 	log.Println(transaction)
 
-	res, err := tu.transactionRepo.CreateTransaction(transaction)
-
+	err := tu.transactionRepo.CreateTransaction(transaction)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	return res, nil
+	return nil
 }
 func (tu *transactionUsecase) GetPoint(id uint) (uint, error) {
 
@@ -47,33 +46,38 @@ func (tu *transactionUsecase) GetPoint(id uint) (uint, error) {
 
 	return res, nil
 }
-func (tu *transactionUsecase) GetVoucherUser(id uint) (interface{}, error) {
+func (tu *transactionUsecase) GetVoucherUser(id uint, offset int, pageSize int) (interface{}, int64, error) {
 
-	res, err := tu.transactionRepo.GetVoucherUser(id)
+	res, count, err := tu.transactionRepo.GetVoucherUser(id, offset, pageSize)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	if res == nil {
-		return "Kamu tidak mempunyai voucher", nil
+		return "Kamu tidak mempunyai voucher", 0, nil
 	}
 
-	return res, nil
+	return res, count, nil
 }
+
+// sini
 func (tu *transactionUsecase) DetailVoucher(id uint) (interface{}, error) {
 
 	res, err := tu.transactionRepo.DetailVoucher(id)
 	if err != nil {
 		return nil, err
 	}
+	res.ID = 0
 	if res.ID == 0 {
-		return "Belum ada detail voucher", nil
+		return nil, echo.NewHTTPError(400, "Belum ada detail voucher")
 	}
 
-	detailVoucher := ev.DetailVoucherResponse{
+	detailVoucher := ev.VoucherUserResponse{
 		Type:            res.VoucherType.Type,
 		EndDate:         res.EndDate,
 		PhotoUrl:        res.VoucherType.PhotoURL,
 		MinimumPurchase: res.MinimumPurchase,
+		MaximumDiscount: res.MaximumDiscount,
+		DiscountPercent: res.DiscountPercent,
 	}
 
 	return detailVoucher, nil

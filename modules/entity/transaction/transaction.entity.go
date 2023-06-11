@@ -18,8 +18,12 @@ type Transaction struct {
 	PaymentStatus      string  `json:"PaymentStatus" form:"PaymentStatus" validate:"required"`
 	ExpeditionName     string  `json:"ExpeditionName" form:"ExpeditionName" validate:"required"`
 	ExpeditionStatus   string  `json:"ExpeditionStatus" form:"ExpeditionStatus"`
-	CanceledReason     string  `json:"CanceledReason" form:"CanceledReason"`
+	CanceledReason     string
 	ExpeditionRating   float32 `json:"ExpeditionRating" form:"ExpeditionRating"`
+	Discount           float64 `json:"Discount" form:"Discount"`
 	TotalPrice         float64
 	TransactionDetails []TransactionDetail `json:"TransactionDetails" form:"TransactionDetails" gorm:"foreignKey:TransactionId"`
+}
+type CanceledReason struct {
+	CanceledReason string `json:"CanceledReason" form:"CanceledReason" validate:"required"`
 }

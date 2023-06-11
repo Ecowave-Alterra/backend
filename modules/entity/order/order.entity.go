@@ -1,13 +1,13 @@
 package order
 
 type OrderResponse struct {
-	ProductImageUrl      string
-	PaymentStatus        string
-	ProductName          string
-	ProductQty           uint
-	ProductPrice         float64
-	TransactionDetailQty uint
-	Total                float64
+	ProductImageUrl string
+	PaymentStatus   string
+	ProductName     string
+	ProductQty      uint
+	ProductPrice    float64
+	TotalQty        uint
+	Total           float64
 }
 
 type OrderDetailResponse struct {
@@ -20,17 +20,20 @@ type OrderDetailResponse struct {
 }
 
 type Order struct {
-	UserId             uint
-	PaymentMethod      string
-	ExpeditionId       uint
-	VoucherId          uint
-	PromoName          string
-	AddressId          uint
-	StatusTransaction  string
-	ShippingCost       float64
-	ProductCost        float64
-	Point              float64
-	TotalPrice         float64
-	TotalProduct       uint
-	TransactionDetails []OrderDetailResponse
+	ExpeditionName   string
+	ReceiptNumber    string
+	ExpeditionStatus string
+	AddressId        uint
+	ShippingCost     float64
+
+	PromoName         string
+	TotalProduct      uint
+	ProductCost       float64
+	PaymentMethod     string
+	StatusTransaction string
+	Point             float64
+	TotalPrice        float64
+	VoucherId         uint
+	Discount          float64
+	OrderDetails      []OrderDetailResponse
 }

@@ -6,10 +6,13 @@ import (
 )
 
 type OrderRepo interface {
-	GetOrder(id string, idUser uint) ([]et.Transaction, error)
+	GetOrder(id string, idUser uint, offset int, pageSize int) ([]et.Transaction, int64, error)
 	OrderDetail(id uint) (et.Transaction, error)
 	GetNameProductandImageUrl(id uint) (string, string, error)
 	GetPromoName(id uint) (string, error)
+	ConfirmOrder(id uint) error
+	GetStatusOrder(id uint) (string, error)
+	CancelOrder(id uint, canceledReason string) error
 }
 
 type orderRepo struct {

@@ -7,11 +7,11 @@ import (
 )
 
 type TransactionRepo interface {
-	CreateTransaction(transaction *et.Transaction) (interface{}, error)
+	CreateTransaction(transaction *et.Transaction) error
 	GetPoint(id uint) (uint, error)
 	ClaimVoucher(id uint) (ev.Voucher, error)
 	CountVoucherUser(idUser uint, idVoucher uint) (uint, error)
-	GetVoucherUser(id uint) ([]ev.VoucherUserResponse, error)
+	GetVoucherUser(id uint, offset int, pageSize int) ([]ev.VoucherUserResponse, int64, error)
 	DetailVoucher(id uint) (ev.Voucher, error)
 }
 

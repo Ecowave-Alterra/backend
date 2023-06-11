@@ -1,8 +1,10 @@
 package transaction
 
 import (
+	"math"
 	"net/http"
 	"strconv"
+	"strings"
 
 	h "github.com/berrylradianh/ecowave-go/helper/getIdUser"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
@@ -24,7 +26,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		c.Bind(&transaction)
 		transaction.UserId = uint(id)
 
-		res, err := th.transactionUsecase.CreateTransaction(&transaction)
+		err = th.transactionUsecase.CreateTransaction(&transaction)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
@@ -33,9 +35,8 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Status":      200,
-			"Message":     "Success Create Transaction",
-			"Transaction": res,
+			"Status":  200,
+			"Message": "Success Create Transaction",
 		})
 	}
 
@@ -65,21 +66,38 @@ func (th *TransactionHandler) GetPoint() echo.HandlerFunc {
 
 func (th *TransactionHandler) GetVoucherUser() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		pageParam := c.QueryParam("page")
+		page, err := strconv.Atoi(pageParam)
+		if err != nil || page < 1 {
+			page = 1
+		}
+
+		pageSize := 10
+		offset := (page - 1) * pageSize
 
 		id, _ := h.GetIdUser(c)
 
-		res, err := th.transactionUsecase.GetVoucherUser(id)
+		res, total, err := th.transactionUsecase.GetVoucherUser(id, offset, pageSize)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
 				"Message": err,
 			})
 		}
+		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+		if page > totalPages {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Message": "Halaman Tidak Ditemukan",
+				"Status":  http.StatusNotFound,
+			})
+		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Status":  200,
-			"Message": "Success Get Voucher User",
-			"Voucher": res,
+			"Status":    200,
+			"Message":   "Success Get Voucher User",
+			"Page":      page,
+			"TotalPage": totalPages,
+			"Voucher":   res,
 		})
 	}
 
@@ -99,7 +117,7 @@ func (th *TransactionHandler) DetailVoucher() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": strings.Split(err.Error(), ", "),
 			})
 		}
 
