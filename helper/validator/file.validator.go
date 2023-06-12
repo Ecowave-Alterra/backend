@@ -1,9 +1,10 @@
 package validator
 
 import (
-	"fmt"
 	"mime/multipart"
 	"path/filepath"
+
+	"github.com/labstack/echo/v4"
 )
 
 func ValidateFileExtension(fileHeader *multipart.FileHeader) error {
@@ -15,8 +16,7 @@ func ValidateFileExtension(fileHeader *multipart.FileHeader) error {
 	}
 
 	if !allowedExtensions[fileExtension] {
-		//lint:ignore ST1005 Reason for ignoring this linter
-		return fmt.Errorf("Mohon maaf, format file yang anda unggah tidak sesuai")
+		return echo.NewHTTPError(400, "Mohon maaf format file yang anda unggah tidak sesuai")
 	}
 
 	return nil
@@ -25,8 +25,7 @@ func ValidateFileExtension(fileHeader *multipart.FileHeader) error {
 func ValidateFileSize(fileHeader *multipart.FileHeader, maxFileSize int64) error {
 	fileSize := fileHeader.Size
 	if fileSize > maxFileSize {
-		//lint:ignore ST1005 Reason for ignoring this linter
-		return fmt.Errorf("Mohon maaf, ukuran file Anda melebihi batas maksimum 4MB")
+		return echo.NewHTTPError(413, "Mohon maaf ukuran file Anda melebihi batas maksimum 4MB")
 	}
 
 	return nil
