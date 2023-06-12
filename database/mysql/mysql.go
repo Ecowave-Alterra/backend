@@ -57,6 +57,7 @@ func InitialMigration() {
 		ep.ProductImage{},
 		ve.Voucher{},
 		ve.VoucherType{},
+		ue.UserAddress{},
 	)
 	DB.Migrator().HasConstraint(&ue.User{}, "UserDetail")
 	DB.Migrator().HasConstraint(&re.Role{}, "Users")

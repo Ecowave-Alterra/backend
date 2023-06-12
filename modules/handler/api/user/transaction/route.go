@@ -17,4 +17,5 @@ func (transactionHandler *TransactionHandler) RegisterRoutes(e *echo.Echo) {
 	transactionGroup.GET("/claim-voucher", transactionHandler.ClaimVoucher())
 	transactionGroup.GET("/voucher", transactionHandler.GetVoucherUser())
 	transactionGroup.GET("/voucher/:id", transactionHandler.DetailVoucher())
+	transactionGroup.POST("/shipping-options", ShippingOptions())
 }

@@ -28,8 +28,8 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 		id := e.QueryParam("filter")
 		order, total, err := oh.orderUsecase.GetOrder(id, idUser, offset, pageSize)
 
-		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
 			return e.JSON(code, echo.Map{
 				"Status":  code,
 				"Message": msg,
@@ -65,8 +65,8 @@ func (oh *OrderHandler) OrderDetail() echo.HandlerFunc {
 		}
 
 		OrderDetail, err := oh.orderUsecase.OrderDetail(uint(id))
-		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
 			return e.JSON(code, echo.Map{
 				"Status":  code,
 				"Message": msg,
@@ -93,8 +93,8 @@ func (oh *OrderHandler) ConfirmOrder() echo.HandlerFunc {
 		}
 
 		err = oh.orderUsecase.ConfirmOrder(uint(id))
-		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{
 				"Status":  code,
 				"Message": msg,

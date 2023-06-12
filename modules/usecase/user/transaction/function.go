@@ -1,6 +1,13 @@
 package transaction
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
@@ -122,4 +129,45 @@ func (tu *transactionUsecase) ClaimVoucher(idUser uint, idVoucher uint, shipCost
 	}
 
 	return diskon, nil
+}
+func ShippingOptions(ship *et.ShippingRequest) (interface{}, error) {
+
+	// malang kota
+	alamatPengirim := "256"
+	destination := ship.CityId
+	weight := strconv.FormatUint(uint64(ship.Weight), 10)
+	courier := []string{"jne", "pos", "tiki"}
+
+	var result []et.ShippingResponse
+
+	for _, val := range courier {
+		url := "https://api.rajaongkir.com/starter/cost"
+
+		log.Println(val)
+
+		payloadStrings := fmt.Sprintf("origin=%s&destination=%s&weight=%s&courier=%s",
+			alamatPengirim,
+			destination,
+			weight,
+			val,
+		)
+
+		payload := strings.NewReader(payloadStrings)
+
+		req, _ := http.NewRequest("POST", url, payload)
+		req.Header.Add("key", "8bb5248063ed493d90aac0311f8a3edb")
+		req.Header.Add("content-type", "application/x-www-form-urlencoded")
+		res, _ := http.DefaultClient.Do(req)
+		body, _ := ioutil.ReadAll(res.Body)
+
+		var responseData et.ShippingResponse
+		if err := json.Unmarshal(body, &responseData); err != nil {
+			echo.NewHTTPError(500, "Can't Unmarshal JSON")
+		}
+
+		result = append(result, responseData)
+	}
+
+	return result, nil
+
 }

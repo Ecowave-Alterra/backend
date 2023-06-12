@@ -8,6 +8,8 @@ import (
 	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	h "github.com/berrylradianh/ecowave-go/helper/getIdUser"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
+	ut "github.com/berrylradianh/ecowave-go/modules/usecase/user/transaction"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -21,8 +23,8 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		transaction.UserId = uint(id)
 
 		err := th.transactionUsecase.CreateTransaction(&transaction)
-		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{
 				"Status":  code,
 				"Message": msg,
@@ -43,8 +45,9 @@ func (th *TransactionHandler) GetPoint() echo.HandlerFunc {
 		id, _ := h.GetIdUser(c)
 
 		res, err := th.transactionUsecase.GetPoint(id)
-		code, msg := cs.CustomStatus(err.Error())
+
 		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{
 				"Status":  code,
 				"Message": msg,
@@ -74,8 +77,8 @@ func (th *TransactionHandler) GetVoucherUser() echo.HandlerFunc {
 		id, _ := h.GetIdUser(c)
 
 		res, total, err := th.transactionUsecase.GetVoucherUser(id, offset, pageSize)
-		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{
 				"Status":  code,
 				"Message": msg,
@@ -111,8 +114,8 @@ func (th *TransactionHandler) DetailVoucher() echo.HandlerFunc {
 		}
 
 		res, err := th.transactionUsecase.DetailVoucher(uint(id))
-		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{
 				"Status":  code,
 				"Message": msg,
@@ -156,8 +159,8 @@ func (th *TransactionHandler) ClaimVoucher() echo.HandlerFunc {
 		}
 
 		res, err := th.transactionUsecase.ClaimVoucher(idUser, uint(idVoucher), float64(shipCost), float64(productCost))
-		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{
 				"Status":  code,
 				"Message": msg,
@@ -168,6 +171,30 @@ func (th *TransactionHandler) ClaimVoucher() echo.HandlerFunc {
 			"Status":  200,
 			"Message": "Success Get Point",
 			"Point":   res,
+		})
+	}
+}
+
+func ShippingOptions() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		ship := et.ShippingRequest{}
+		c.Bind(&ship)
+
+		res, err := ut.ShippingOptions(&ship)
+
+		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Status":  200,
+			"Message": "Success Get Shipping Options",
+			"Options": res,
 		})
 	}
 }

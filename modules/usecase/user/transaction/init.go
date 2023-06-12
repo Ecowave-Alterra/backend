@@ -11,6 +11,7 @@ type TransactionUsecase interface {
 	ClaimVoucher(idUser uint, idVoucher uint, shipCost float64, productCost float64) (float64, error)
 	GetVoucherUser(id uint, offset int, pageSize int) (interface{}, int64, error)
 	DetailVoucher(id uint) (interface{}, error)
+	// ShippingOptions(ship *et.ShippingRequest) (interface{}, error)
 }
 
 type transactionUsecase struct {

@@ -24,7 +24,6 @@ func (tr *transactionRepo) CreateTransaction(transaction *et.Transaction) error 
 		}
 
 		stock := product.Stock - val.Qty
-
 		err = tr.db.Model(&ep.Product{}).Where("product_id = ?", val.ProductId).Update("stock", stock).Error
 		if err != nil {
 			return echo.NewHTTPError(500, err)
