@@ -13,7 +13,7 @@ type InformationUsecase interface {
 	GetInformationById(informationId string) (*ie.Information, error)
 	CreateInformation(fileHeader *multipart.FileHeader, title, content, status string) error
 	CreateInformationDraft(fileHeader *multipart.FileHeader, title, content, status string) error
-	UpdateInformation(informationId string, information *ie.Information) error
+	UpdateInformation(informationBefore *ie.Information, information *ie.Information, fileHeader *multipart.FileHeader, title, content, status string) error
 	DeleteInformation(informationId string) error
 	SearchInformations(search, filter string, offset, pageSize int) (*[]ie.Information, int64, error)
 }

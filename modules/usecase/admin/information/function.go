@@ -2,14 +2,14 @@ package information
 
 import (
 	"context"
-	"errors"
-	"fmt"
+	"log"
 	"mime/multipart"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
 	"github.com/berrylradianh/ecowave-go/helper/randomid"
 	vld "github.com/berrylradianh/ecowave-go/helper/validator"
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
+	"github.com/labstack/echo/v4"
 )
 
 func (ic *informationUsecase) GetAllInformationsNoPagination() (*[]ie.Information, error) {
@@ -28,30 +28,33 @@ func (ic *informationUsecase) GetInformationById(informationId string) (*ie.Info
 }
 
 func (ic *informationUsecase) CreateInformation(fileHeader *multipart.FileHeader, title, content, status string) error {
+	var information *ie.Information
+
 	if fileHeader == nil {
-		//lint:ignore ST1005 Reason for ignoring this linter
-		return errors.New("Mohon maaf, anda harus mengunggah file")
-	}
+		return echo.NewHTTPError(422, "Mohon maaf anda harus mengunggah file")
+	} else {
+		if err := vld.ValidateFileExtension(fileHeader); err != nil {
+			return err
+		}
 
-	if err := vld.ValidateFileExtension(fileHeader); err != nil {
-		return err
-	}
+		maxFileSize := 4 * 1024 * 1024
+		if err := vld.ValidateFileSize(fileHeader, int64(maxFileSize)); err != nil {
+			return err
+		}
 
-	maxFileSize := 4 * 1024 * 1024
-	if err := vld.ValidateFileSize(fileHeader, int64(maxFileSize)); err != nil {
-		return err
-	}
+		PhotoUrl, err := cloudstorage.UploadToBucket(context.Background(), fileHeader)
+		if err != nil {
+			return err
+		}
 
-	PhotoUrl, err := cloudstorage.UploadToBucket(context.Background(), fileHeader)
-	if err != nil {
-		return err
-	}
+		log.Println(PhotoUrl)
 
-	information := &ie.Information{
-		Title:           title,
-		Content:         content,
-		PhotoContentUrl: PhotoUrl,
-		Status:          status,
+		information = &ie.Information{
+			Title:           title,
+			Content:         content,
+			PhotoContentUrl: PhotoUrl,
+			Status:          status,
+		}
 	}
 
 	if err := vld.Validation(information); err != nil {
@@ -71,7 +74,7 @@ func (ic *informationUsecase) CreateInformation(fileHeader *multipart.FileHeader
 		}
 	}
 
-	err = ic.informationRepo.CreateInformation(information, nil)
+	err := ic.informationRepo.CreateInformation(information, nil)
 	return err
 }
 
@@ -81,8 +84,7 @@ func (ic *informationUsecase) CreateInformationDraft(fileHeader *multipart.FileH
 	information.Status = status
 
 	if fileHeader == nil && title == "" && content == "" {
-		//lint:ignore ST1005 Reason for ignoring this linter
-		return fmt.Errorf("Masukkan data")
+		return echo.NewHTTPError(422, "Masukkan data")
 	}
 
 	if title == "" {
@@ -134,12 +136,40 @@ func (ic *informationUsecase) CreateInformationDraft(fileHeader *multipart.FileH
 	return err
 }
 
-func (ic *informationUsecase) UpdateInformation(informationId string, information *ie.Information) error {
-	if err := vld.Validation(information); err != nil {
+func (ic *informationUsecase) UpdateInformation(informationBefore *ie.Information, information *ie.Information, fileHeader *multipart.FileHeader, title, content, status string) error {
+	if title != "" {
+		information.Title = title
+	}
+
+	if content != "" {
+		information.Content = content
+	}
+
+	if status != "" {
+		information.Status = status
+	}
+
+	if fileHeader != nil {
+		if informationBefore.PhotoContentUrl != "" {
+			fileName := cloudstorage.GetFileName(informationBefore.PhotoContentUrl)
+			err := cloudstorage.DeleteImage(fileName)
+			if err != nil {
+				return err
+			}
+		}
+
+		PhotoUrl, err := cloudstorage.UploadToBucket(context.Background(), fileHeader)
+		if err != nil {
+			return err
+		}
+		information.PhotoContentUrl = PhotoUrl
+	}
+
+	if err := vld.Validation(information.Title); err != nil {
 		return err
 	}
 
-	result := ic.informationRepo.UpdateInformation(informationId, information)
+	result := ic.informationRepo.UpdateInformation(information.InformationId, information)
 	return result
 }
 

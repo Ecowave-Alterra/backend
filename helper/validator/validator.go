@@ -26,7 +26,7 @@ func Validation(request interface{}) error {
 					message = fmt.Sprintf("%s tidak valid", e.Field())
 				}
 			}
-			return fmt.Errorf(message)
+			return echo.NewHTTPError(422, message)
 		}
 	}
 	return nil
