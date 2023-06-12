@@ -255,19 +255,33 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 			})
 		}
 
-		if len(*informations) == 0 {
-			return c.JSON(http.StatusNotFound, echo.Map{
-				"Message": "Informasi yang anda cari tidak ditemukan",
-				"Status":  http.StatusNotFound,
-			})
-		} else if len(*informations) == 0 && filter == "Terbit" {
+		draftInformations := make([]ie.Information, 0)
+		for _, info := range *informations {
+			if strings.EqualFold(info.Status, "Draft") {
+				draftInformations = append(draftInformations, info)
+			}
+		}
+
+		terbittInformations := make([]ie.Information, 0)
+		for _, info := range *informations {
+			if strings.EqualFold(info.Status, "Terbit") {
+				terbittInformations = append(terbittInformations, info)
+			}
+		}
+
+		if len(terbittInformations) == 0 && strings.EqualFold(filter, "Terbit") {
 			return c.JSON(http.StatusNotFound, echo.Map{
 				"Message": "Belum ada informasi yang terbit",
 				"Status":  http.StatusNotFound,
 			})
-		} else if len(*informations) == 0 && filter == "Draft" {
+		} else if len(draftInformations) == 0 && strings.EqualFold(filter, "Draft") {
 			return c.JSON(http.StatusNotFound, echo.Map{
 				"Message": "Belum ada informasi dalam draft",
+				"Status":  http.StatusNotFound,
+			})
+		} else if len(*informations) == 0 {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Message": "Informasi yang anda cari tidak ditemukan",
 				"Status":  http.StatusNotFound,
 			})
 		} else {
