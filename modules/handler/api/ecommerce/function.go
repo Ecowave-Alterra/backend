@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	ee "github.com/berrylradianh/ecowave-go/modules/entity/ecommerce"
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	"github.com/labstack/echo/v4"
@@ -31,13 +32,13 @@ func (eh *EcommerceHandler) GetProductEcommerce(c echo.Context) error {
 		})
 	}
 
-	// code, msg := cs.CustomStatus(err.Error())
-	// if err != nil {
-	// 	return c.JSON(code, echo.Map{
-	// 		"Status":  code,
-	// 		"Message": msg,
-	// 	})
-	// }
+	if err != nil {
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
+		})
+	}
 
 	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
 	if page > totalPages {
@@ -73,13 +74,13 @@ func (eh *EcommerceHandler) GetProductDetailEcommerce(c echo.Context) error {
 		})
 	}
 
-	// code, msg := cs.CustomStatus(err.Error())
-	// if err != nil {
-	// 	return c.JSON(code, echo.Map{
-	// 		"Status":  code,
-	// 		"Message": msg,
-	// 	})
-	// }
+	if err != nil {
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
+		})
+	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Products": productDetailResponse,
@@ -108,13 +109,13 @@ func (eh *EcommerceHandler) FilterProductByCategoryAndPrice(c echo.Context) erro
 		})
 	}
 
-	// code, msg := cs.CustomStatus(err.Error())
-	// if err != nil {
-	// 	return c.JSON(code, echo.Map{
-	// 		"Status":  code,
-	// 		"Message": msg,
-	// 	})
-	// }
+	if err != nil {
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
+		})
+	}
 
 	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
 	if page > totalPages {
