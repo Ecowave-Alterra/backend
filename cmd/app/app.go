@@ -9,6 +9,10 @@ import (
 	informationRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/information"
 	informationUsecaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/information"
 
+	productCategoryHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/product_category"
+	productCategoryRepo "github.com/berrylradianh/ecowave-go/modules/repository/admin/product_category"
+	productCategoryUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/admin/product_category"
+
 	informationHandlerUser "github.com/berrylradianh/ecowave-go/modules/handler/api/user/information"
 	informationRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/information"
 	informationUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/information"
@@ -38,6 +42,10 @@ func StartApp() *echo.Echo {
 	informationUsecaseAdmin := informationUsecaseAdmin.New(informationRepoAdmin)
 	informationHandlerAdmin := informationHandlerAdmin.New(informationUsecaseAdmin)
 
+	productCategoryRepo := productCategoryRepo.New(mysql.DB)
+	productCategoryUsecase := productCategoryUsecase.New(productCategoryRepo)
+	productCategoryHandler := productCategoryHandler.New(productCategoryUsecase)
+
 	informationRepoUser := informationRepoUser.New(mysql.DB)
 	informationUsecaseUser := informationUsecaseUser.New(informationRepoUser)
 	informationHandlerUser := informationHandlerUser.New(informationUsecaseUser)
@@ -56,6 +64,7 @@ func StartApp() *echo.Echo {
 		InformationHandlerUser:  informationHandlerUser,
 		TransactionHandlerUser:  transactionHandlerUser,
 		OrderHandlerUser:        orderHandlerUser,
+		ProductCategoryHandler:  productCategoryHandler,
 	}
 
 	router := routes.StartRoute(handler)
