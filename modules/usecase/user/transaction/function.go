@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -154,8 +155,10 @@ func ShippingOptions(ship *et.ShippingRequest) (interface{}, error) {
 
 		payload := strings.NewReader(payloadStrings)
 
+		key := os.Getenv("RAJAONGKIR_KEY")
+
 		req, _ := http.NewRequest("POST", url, payload)
-		req.Header.Add("key", "8bb5248063ed493d90aac0311f8a3edb")
+		req.Header.Add("key", key)
 		req.Header.Add("content-type", "application/x-www-form-urlencoded")
 		res, _ := http.DefaultClient.Do(req)
 		body, _ := ioutil.ReadAll(res.Body)
