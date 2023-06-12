@@ -10,12 +10,12 @@ func (pcc *productCategoryUsecase) CreateProductCategory(productCategory *pe.Pro
 		return false, err
 	}
 
-	available, _ := pcc.productCategoryRepo.IsProductCategoryAvailable(productCategory, productCategory.Name)
+	available, _ := pcc.productCategoryRepo.IsProductCategoryAvailable(productCategory, productCategory.Category)
 	return available, pcc.productCategoryRepo.CreateProductCategory(productCategory)
 }
 
 func (pcc *productCategoryUsecase) UpdateProductCategory(productCategory *pe.ProductCategory, id int) (bool, error) {
-	available, _ := pcc.productCategoryRepo.IsProductCategoryAvailable(productCategory, productCategory.Name)
+	available, _ := pcc.productCategoryRepo.IsProductCategoryAvailable(productCategory, productCategory.Category)
 	return available, pcc.productCategoryRepo.UpdateProductCategory(productCategory, id)
 }
 
