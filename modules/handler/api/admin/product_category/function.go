@@ -1,7 +1,6 @@
 package productcategory
 
 import (
-	"database/sql"
 	"math"
 	"net/http"
 	"reflect"
@@ -79,12 +78,28 @@ func (pch *ProductCategoryHandler) CreateProductCategory(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": "Anda berhasil menambahkan kategori",
-		"Status":  http.StatusOK,
+		"Status":  http.StatusCreated,
 	})
 }
 
 func (pch *ProductCategoryHandler) UpdateProductCategory(c echo.Context) error {
 	var productCategory pe.ProductCategory
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "ID harus berupa angka",
+			"Status":  http.StatusBadRequest,
+		})
+	}
+
+	_, err = pch.productCategoryUsecase.GetProductCategoryById(id)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": err.Error(),
+			"Status":  http.StatusNotFound,
+		})
+	}
 
 	if err := c.Bind(&productCategory); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
@@ -97,28 +112,6 @@ func (pch *ProductCategoryHandler) UpdateProductCategory(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Masukkan kategori",
 			"Status":  http.StatusBadRequest,
-		})
-	}
-
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "ID harus berupa angka",
-			"Status":  http.StatusBadRequest,
-		})
-	}
-
-	_, err = pch.productCategoryUsecase.GetProductCategoryById(id)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return c.JSON(http.StatusNotFound, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusNotFound,
-			})
-		}
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": "Gagal mendapatkan kategori",
-			"Status":  http.StatusInternalServerError,
 		})
 	}
 
@@ -148,20 +141,17 @@ func (pch *ProductCategoryHandler) DeleteProductCategory(c echo.Context) error {
 
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "ID harus berupa angka",
+			"Status":  http.StatusBadRequest,
+		})
 	}
 
 	_, err = pch.productCategoryUsecase.GetProductCategoryById(id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return c.JSON(http.StatusNotFound, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusNotFound,
-			})
-		}
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": "Gagal mendapatkan kategori",
-			"Status":  http.StatusInternalServerError,
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": err.Error(),
+			"Status":  http.StatusNotFound,
 		})
 	}
 
@@ -179,11 +169,28 @@ func (pch *ProductCategoryHandler) DeleteProductCategory(c echo.Context) error {
 }
 
 func (pch *ProductCategoryHandler) SearchingProductCategoyByName(c echo.Context) error {
-	var productCategory []pe.ProductCategory
+	pageParam := c.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	pageSize := 10
+	offset := (page - 1) * pageSize
 
 	name := c.QueryParam("name")
 
-	available, err := pch.productCategoryUsecase.SearchingProductCategoryByName(&productCategory, name)
+	validParams := map[string]bool{"name": true, "page": true}
+	for param := range c.QueryParams() {
+		if !validParams[param] {
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"Message": "Masukkan parameter dengan benar",
+				"Status":  http.StatusBadRequest,
+			})
+		}
+	}
+
+	productCategory, total, err := pch.productCategoryUsecase.SearchingProductCategoryByName(name, offset, pageSize)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"Message": err.Error(),
@@ -191,15 +198,17 @@ func (pch *ProductCategoryHandler) SearchingProductCategoyByName(c echo.Context)
 		})
 	}
 
-	if !available {
-		return c.JSON(http.StatusOK, map[string]interface{}{
+	if len(*productCategory) == 0 {
+		return c.JSON(http.StatusNotFound, echo.Map{
 			"Message": "Kategori yang anda cari tidak ditemukan",
-			"Status":  http.StatusOK,
+			"Status":  http.StatusNotFound,
+		})
+	} else {
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"ProductCategory": &productCategory,
+			"Page":            page,
+			"TotalPage":       int(math.Ceil(float64(total) / float64(pageSize))),
+			"Status":          http.StatusOK,
 		})
 	}
-
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"ProductCategory": &productCategory,
-		"Status":          http.StatusOK,
-	})
 }
