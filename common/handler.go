@@ -13,5 +13,5 @@ type Handler struct {
 	InformationHandlerAdmin *aih.InformationHandler
 	InformationHandlerUser  *uih.InformationHandler
 	TransactionHandlerUser  *uth.TransactionHandler
-	RevierHandlerAdmin      *arh.ReviewHandler
+	ReviewHandlerAdmin      *arh.ReviewHandler
 }

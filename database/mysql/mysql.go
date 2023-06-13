@@ -6,6 +6,7 @@ import (
 	"github.com/berrylradianh/ecowave-go/config"
 	"github.com/berrylradianh/ecowave-go/database/seed"
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
+	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	er "github.com/berrylradianh/ecowave-go/modules/entity/review"
 	re "github.com/berrylradianh/ecowave-go/modules/entity/role"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
@@ -48,10 +49,15 @@ func InitialMigration() {
 		ue.User{},
 		ue.UserDetail{},
 		ie.Information{},
+		pe.ProductCategory{},
+		pe.Product{},
+		pe.ProductImage{},
 		et.Transaction{},
-		et.TransactionDetail{},
 		er.Review{},
+		et.TransactionDetail{},
 	)
 	DB.Migrator().HasConstraint(&ue.User{}, "UserDetail")
 	DB.Migrator().HasConstraint(&re.Role{}, "Users")
+	DB.Migrator().HasConstraint(&pe.Product{}, "TransactionDetail")
+	DB.Migrator().HasConstraint(&er.Review{}, "TransactionDetail")
 }

@@ -55,7 +55,7 @@ func StartApp() *echo.Echo {
 		InformationHandlerAdmin: informationHandlerAdmin,
 		InformationHandlerUser:  informationHandlerUser,
 		TransactionHandlerUser:  transactionHandlerUser,
-		RevierHandlerAdmin:      reviewHandlerAdmin,
+		ReviewHandlerAdmin:      reviewHandlerAdmin,
 	}
 
 	router := routes.StartRoute(handler)
