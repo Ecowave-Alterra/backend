@@ -17,12 +17,8 @@ type ProductRepo interface {
 	UpdateProductStock(productId string, stock uint) error
 	DeleteProduct(productId string, product *pe.Product) error
 	DeleteProductImage(productID string, productImages *[]pe.ProductImage) error
-	DeleteProductImageByID(ProductImageID string, productImage *pe.ProductImage) error
+	DeleteProductImageByID(ProductImageID uint, productImage *pe.ProductImage) error
 	SearchProduct(search, filter string, offset, pageSize int) (*[]pe.Product, int64, error)
-	// SearchProductByID(productID string, product *pe.Product) (pe.Product, error)
-	// SearchProductByName(name string, product *[]pe.Product) ([]pe.Product, error)
-	// SearchProductByCategory(category string, product *[]pe.Product) ([]pe.Product, error)
-	// FilterProductByStatus(status string, product *[]pe.Product) ([]pe.Product, error)
 }
 
 type productRepo struct {

@@ -3,6 +3,7 @@ package product
 import (
 	"fmt"
 	"math"
+	"mime/multipart"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -291,54 +292,73 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	productId := c.Param("id")
 	var req ep.ProductRequest
-
-	productCategoryIDstr := c.FormValue("ProductCategoryId")
-	productCategoryID, err := strconv.ParseUint(productCategoryIDstr, 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Invalid product category ID",
-			"Error":   err,
-		})
-	}
-	name := c.FormValue("Name")
-	stockStr := c.FormValue("Stock")
-	stock, err := strconv.ParseUint(stockStr, 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Invalid stock",
-			"Error":   err,
-		})
-	}
-	priceStr := c.FormValue("Price")
-	price, err := strconv.ParseFloat(priceStr, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Invalid price",
-			"Error":   err,
-		})
-	}
-	description := c.FormValue("Description")
-
-	status := "tersedia"
-	if stock == 0 {
-		status = "habis"
-	}
-
-	req = ep.ProductRequest{
-		ProductCategoryId: uint(productCategoryID),
-		Name:              name,
-		Price:             price,
-		Description:       description,
-		Status:            status,
-	}
-
 	var product ep.Product
-	product, err = h.productUseCase.GetProductByID(productId, &product)
+
+	productBefore, err := h.productUseCase.GetProductByID(productId, &product)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": "Failed to get product",
-			"Error":   err,
+			"Message": err,
+			"Status":  http.StatusInternalServerError,
 		})
+	}
+
+	productCategoryIDstr := c.FormValue("ProductCategoryId")
+	if productCategoryIDstr == "" {
+		req.ProductCategoryId = productBefore.ProductCategoryId
+	} else {
+		productCategoryID, err := strconv.ParseUint(productCategoryIDstr, 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": "Invalid product category ID",
+				"Error":   err,
+			})
+		}
+		req.ProductCategoryId = uint(productCategoryID)
+	}
+
+	name := c.FormValue("Name")
+	if name == "" {
+		req.Name = productBefore.Name
+	} else {
+		req.Name = name
+	}
+
+	stockStr := c.FormValue("Stock")
+	if stockStr == "" {
+		req.Stock = productBefore.Stock
+	} else {
+		stock, err := strconv.ParseUint(stockStr, 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": "Invalid stock",
+				"Error":   err,
+			})
+		}
+		req.Stock = uint(stock)
+		if stock == 0 {
+			req.Status = "habis"
+		}
+	}
+
+	priceStr := c.FormValue("Price")
+	if priceStr == "" {
+		req.Price = productBefore.Price
+	} else {
+		price, err := strconv.ParseFloat(priceStr, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": "Invalid price",
+				"Error":   err,
+			})
+		}
+		req.Price = float64(price)
+	}
+
+	description := c.FormValue("Description")
+	if description == "" {
+		req.Description = productBefore.Description
+	} else {
+		req.Description = description
 	}
 
 	err = h.productUseCase.UpdateProduct(productId, &req)
@@ -367,21 +387,10 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	}
 
 	cloudstorage.Folder = "img/products/"
+	var fileHeader *multipart.FileHeader
 	for i := 1; i <= 5; i++ {
-		fileHeader, err := c.FormFile(fmt.Sprintf("PhotoContentUrl%d", i))
+		fileHeader, _ = c.FormFile(fmt.Sprintf("PhotoContentUrl%d", i))
 		if fileHeader != nil {
-			filename := cloudstorage.GetFileName(fileHeader.Filename)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"Message": "Gagal mendapatkan nama file",
-				})
-			}
-			err = cloudstorage.DeleteImage(filename)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"Message": "Gagal menghapus file pada cloud storage",
-				})
-			}
 			PhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
 
 			productImage := ep.ProductImage{
@@ -391,11 +400,10 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 			err = h.productUseCase.CreateProductImage(&productImage)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-					"Message": "Failed to create product image",
-					"Error":   err,
+					"Message": err.Error(),
+					"Status":  http.StatusInternalServerError,
 				})
 			}
-
 		} else {
 			if err != nil {
 				i = 1000
@@ -403,8 +411,22 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		}
 	}
 
+	if fileHeader != nil {
+		for _, image := range productBefore.ProductImages {
+			filename := cloudstorage.GetFileName(image.ProductImageUrl)
+			err = cloudstorage.DeleteImage(filename)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, echo.Map{
+					"Message": "Gagal menghapus file pada cloud storage",
+					"Status":  http.StatusInternalServerError,
+				})
+			}
+		}
+	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": "Anda berhasil mengubah produk",
+		"Status":  http.StatusOK,
 	})
 }
 
@@ -415,32 +437,26 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 	product, err := h.productUseCase.GetProductByID(productId, &product)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": "Failed to get product",
-			"Error":   err,
+			"Message": err.Error(),
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
-	var productImage ep.ProductImage
-	productImages, _ := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
-
-	for _, image := range productImages {
+	for _, image := range product.ProductImages {
 		filename := cloudstorage.GetFileName(image.ProductImageUrl)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Gagal mendapatkan nama file",
-			})
-		}
 		err = cloudstorage.DeleteImage(filename)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"Message": "Gagal menghapus file pada cloud storage",
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
-		err = h.productUseCase.DeleteProductImageByID(strconv.Itoa(int(image.ID)), &productImage)
+		err = h.productUseCase.DeleteProductImageByID(image.ID, &image)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"Message": "Failed to delete product image",
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 	}
@@ -448,13 +464,14 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 	err = h.productUseCase.DeleteProduct(productId, &product)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": "Failed to delete product",
-			"Error":   err,
+			"Message": err.Error(),
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": "Anda berhasil menghapus produk",
+		"Status":  http.StatusOK,
 	})
 }
 

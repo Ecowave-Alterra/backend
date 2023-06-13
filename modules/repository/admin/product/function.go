@@ -110,7 +110,7 @@ func (pr *productRepo) DeleteProductImage(productID string, productImages *[]pe.
 	return nil
 }
 
-func (pr *productRepo) DeleteProductImageByID(ProductImageID string, productImage *pe.ProductImage) error {
+func (pr *productRepo) DeleteProductImageByID(ProductImageID uint, productImage *pe.ProductImage) error {
 	if err := pr.db.Where("id = ?", ProductImageID).Delete(productImage).Error; err != nil {
 		return err
 	}
@@ -147,41 +147,3 @@ func (pr *productRepo) SearchProduct(search, filter string, offset, pageSize int
 
 	return &products, count, nil
 }
-
-// func (pr *productRepo) SearchProductByID(productID string, product *pe.Product) (pe.Product, error) {
-// 	if err := pr.db.
-// 		Preload("ProductCategory").
-// 		Where("product_id = ?", productID).
-// 		First(&product).Error; err != nil {
-// 		return *product, err
-// 	}
-
-// 	return *product, nil
-// }
-
-// func (pr *productRepo) SearchProductByName(name string, product *[]pe.Product) ([]pe.Product, error) {
-// 	if err := pr.db.Where("name LIKE ?", "%"+name+"%").Preload("ProductCategory").
-// 		Find(&product).Error; err != nil {
-// 		return nil, err
-// 	}
-
-// 	return *product, nil
-// }
-
-// func (pr *productRepo) SearchProductByCategory(category string, product *[]pe.Product) ([]pe.Product, error) {
-// 	if err := pr.db.Preload("ProductCategory").
-// 		Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&product).Error; err != nil {
-// 		return nil, err
-// 	}
-
-// 	return *product, nil
-// }
-
-// func (pr *productRepo) FilterProductByStatus(status string, product *[]pe.Product) ([]pe.Product, error) {
-// 	if err := pr.db.Where("status = ?", status).Preload("ProductCategory").
-// 		Find(&product).Error; err != nil {
-// 		return nil, err
-// 	}
-
-// 	return *product, nil
-// }
