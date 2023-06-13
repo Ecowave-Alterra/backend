@@ -283,9 +283,9 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.JSON(http.StatusCreated, map[string]interface{}{
 		"Message": "Anda berhasil menambahkan produk",
-		"Status":  http.StatusOK,
+		"Status":  http.StatusCreated,
 	})
 }
 
