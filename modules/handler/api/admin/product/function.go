@@ -1,11 +1,9 @@
 package product
 
 import (
-	"encoding/csv"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -601,23 +599,10 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 		})
 	}
 
-	file, err := os.Create("product-data.csv")
-	defer file.Close()
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": "Failed to create csv file",
-			"Error":   err,
-		})
-	}
-
-	w := csv.NewWriter(file)
-	defer w.Flush()
-
 	csvHeader := []string{"Product_id", "Name", "Category", "Stock", "Price", "Status", "Rating", "Description", "ProductImageUrl"}
-	var csvData [][]string
-	csvData = append(csvData, csvHeader)
 
 	var productImage ep.ProductImage
+	records := make([][]string, 0)
 	for _, product := range products {
 		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 		if err != nil {
@@ -644,19 +629,13 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 			strings.Join(imageURLs, ", "),
 		}
 
-		csvData = append(csvData, record)
-	}
-
-	w.WriteAll(csvData)
-
-	if err := w.Error(); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Failed to write CSV file",
-			"Error":   err,
-		})
+		records = append(records, record)
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Successfully generate CSV file",
+		"Message": "Berhasil membuat file CSV",
+		"Status":  http.StatusOK,
+		"Header":  csvHeader,
+		"Records": records,
 	})
 }

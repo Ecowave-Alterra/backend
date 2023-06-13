@@ -8,7 +8,7 @@ import (
 func (productHandler *ProductHandler) RegisterRoutes(e *echo.Echo) {
 	// jwtMiddleware := echojwt.JWT([]byte(os.Getenv("SECRET_KEY")))
 
-	productGroup := e.Group("/products")
+	productGroup := e.Group("/admin/products")
 	productGroup.POST("/", productHandler.CreateProduct)
 	productGroup.GET("/", productHandler.GetAllProduct)
 	productGroup.GET("/:id", productHandler.GetProductByID)
