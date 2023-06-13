@@ -51,3 +51,52 @@ func (rh *ReviewHandler) GetAllReview(c echo.Context) error {
 		"Reviews": reviewResponses,
 	})
 }
+
+func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
+	productID := c.Param("id")
+
+	var transactionDetails []te.TransactionDetail
+	transactionDetails, err := rh.reviewUsecase.GetAllTransactionDetails(fmt.Sprint(productID), &transactionDetails)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"Message": "Gagal mengambil data transaksi detail produk",
+		})
+	}
+
+	var review re.Review
+	var reviewResponses []re.ReviewResponse
+	for _, td := range transactionDetails {
+		if fmt.Sprint(td.RatingProductId) != "" {
+			review, err = rh.reviewUsecase.GetAllReviewByID(fmt.Sprint(td.RatingProductId), &review)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"Message": "Gagal mengambil data ulasan produk",
+					"Status":  http.StatusInternalServerError,
+				})
+			}
+
+			reviewResponse := re.ReviewResponse{
+				TransactionID: td.TransactionId,
+				Rating:        review.Rating,
+				Comment:       review.Comment,
+				CommentAdmin:  review.CommentAdmin,
+				PhotoUrl:      review.PhotoUrl,
+				VideoUrl:      review.VideoUrl,
+			}
+
+			reviewResponses = append(reviewResponses, reviewResponse)
+		}
+	}
+
+	if reviewResponses == nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"Message": "Gagal mengambil data ulasan produk",
+			"Status":  http.StatusInternalServerError,
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"Message": "Berhasil mengambil data review produk",
+		"Reviews": reviewResponses,
+	})
+}

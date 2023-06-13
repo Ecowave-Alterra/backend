@@ -2,6 +2,7 @@ package review
 
 import (
 	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
+	re "github.com/berrylradianh/ecowave-go/modules/entity/review"
 	te "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 )
 
@@ -19,4 +20,12 @@ func (rr *reviewRepo) GetAllTransactionDetails(productID string, transactionDeta
 	}
 
 	return *transactionDetails, nil
+}
+
+func (rr *reviewRepo) GetAllReviewByID(reviewID string, review *re.Review) (re.Review, error) {
+	if err := rr.db.Where("id = ?", reviewID).Find(&review).Error; err != nil {
+		return *review, err
+	}
+
+	return *review, nil
 }
