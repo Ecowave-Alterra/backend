@@ -39,7 +39,7 @@ func (pr *productRepo) GetAllProduct(products *[]pe.Product, offset, pageSize in
 	}
 
 	if err := pr.db.
-		Preload("ProductCategory").
+		Preload("ProductCategory").Preload("ProductImages").
 		Offset(offset).
 		Limit(pageSize).
 		Find(&products).Error; err != nil {
@@ -61,7 +61,7 @@ func (pr *productRepo) GetAllProductNoPagination(products *[]pe.Product) ([]pe.P
 
 func (pr *productRepo) GetProductByID(productId string, product *pe.Product) (pe.Product, error) {
 	if err := pr.db.
-		Preload("ProductCategory").
+		Preload("ProductCategory").Preload("ProductImages").
 		Where("product_id = ?", productId).
 		First(&product).Error; err != nil {
 		return *product, err
@@ -118,40 +118,70 @@ func (pr *productRepo) DeleteProductImageByID(ProductImageID string, productImag
 	return nil
 }
 
-func (pr *productRepo) SearchProductByID(productID string, product *pe.Product) (pe.Product, error) {
-	if err := pr.db.
-		Preload("ProductCategory").
-		Where("product_id = ?", productID).
-		First(&product).Error; err != nil {
-		return *product, err
+func (pr *productRepo) SearchProduct(search, filter string, offset, pageSize int) (*[]pe.Product, int64, error) {
+	var products []pe.Product
+	var count int64
+
+	if err := pr.db.Model(&pe.Product{}).
+		Where("name LIKE ? OR product_id LIKE ? OR product_category_id IN (?)",
+			"%"+search+"%",
+			"%"+search+"%",
+			pr.db.Model(&pe.ProductCategory{}).Select("id").Where("category LIKE ?", "%"+search+"%")).
+		Where("status LIKE ?", "%"+filter+"%").
+		Preload("ProductCategory").Preload("ProductImages").
+		Count(&count).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(500, err)
 	}
 
-	return *product, nil
-}
-
-func (pr *productRepo) SearchProductByName(name string, product *[]pe.Product) ([]pe.Product, error) {
-	if err := pr.db.Where("name LIKE ?", "%"+name+"%").Preload("ProductCategory").
-		Find(&product).Error; err != nil {
-		return nil, err
+	if err := pr.db.Model(&pe.Product{}).
+		Where("name LIKE ? OR product_id LIKE ? OR product_category_id IN (?)",
+			"%"+search+"%",
+			"%"+search+"%",
+			pr.db.Model(&pe.ProductCategory{}).Select("id").Where("category LIKE ?", "%"+search+"%")).
+		Where("status LIKE ?", "%"+filter+"%").
+		Preload("ProductCategory").Preload("ProductImages").
+		Offset(offset).Limit(pageSize).
+		Find(&products).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(404, err)
 	}
 
-	return *product, nil
+	return &products, count, nil
 }
 
-func (pr *productRepo) SearchProductByCategory(category string, product *[]pe.Product) ([]pe.Product, error) {
-	if err := pr.db.Preload("ProductCategory").
-		Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&product).Error; err != nil {
-		return nil, err
-	}
+// func (pr *productRepo) SearchProductByID(productID string, product *pe.Product) (pe.Product, error) {
+// 	if err := pr.db.
+// 		Preload("ProductCategory").
+// 		Where("product_id = ?", productID).
+// 		First(&product).Error; err != nil {
+// 		return *product, err
+// 	}
 
-	return *product, nil
-}
+// 	return *product, nil
+// }
 
-func (pr *productRepo) FilterProductByStatus(status string, product *[]pe.Product) ([]pe.Product, error) {
-	if err := pr.db.Where("status = ?", status).Preload("ProductCategory").
-		Find(&product).Error; err != nil {
-		return nil, err
-	}
+// func (pr *productRepo) SearchProductByName(name string, product *[]pe.Product) ([]pe.Product, error) {
+// 	if err := pr.db.Where("name LIKE ?", "%"+name+"%").Preload("ProductCategory").
+// 		Find(&product).Error; err != nil {
+// 		return nil, err
+// 	}
 
-	return *product, nil
-}
+// 	return *product, nil
+// }
+
+// func (pr *productRepo) SearchProductByCategory(category string, product *[]pe.Product) ([]pe.Product, error) {
+// 	if err := pr.db.Preload("ProductCategory").
+// 		Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&product).Error; err != nil {
+// 		return nil, err
+// 	}
+
+// 	return *product, nil
+// }
+
+// func (pr *productRepo) FilterProductByStatus(status string, product *[]pe.Product) ([]pe.Product, error) {
+// 	if err := pr.db.Where("status = ?", status).Preload("ProductCategory").
+// 		Find(&product).Error; err != nil {
+// 		return nil, err
+// 	}
+
+// 	return *product, nil
+// }

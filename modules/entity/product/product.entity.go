@@ -13,6 +13,7 @@ type Product struct {
 	Description       string
 	ProductCategoryId uint            `json:"-"`
 	ProductCategory   ProductCategory `gorm:"foreignKey:ProductCategoryId" json:"-"`
+	ProductImages     []ProductImage  `gorm:"foreignKey:ProductId"`
 }
 
 type ProductRequest struct {

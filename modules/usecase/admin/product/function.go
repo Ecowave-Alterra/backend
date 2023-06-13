@@ -58,22 +58,30 @@ func (pc *productUseCase) DeleteProductImage(productID string, productImages *[]
 	return pc.productRepo.DeleteProductImage(productID, productImages)
 }
 
-func (pc productUseCase) DeleteProductImageByID(ProductImageID string, productImage *pe.ProductImage) error {
+func (pc *productUseCase) DeleteProductImageByID(ProductImageID string, productImage *pe.ProductImage) error {
 	return pc.productRepo.DeleteProductImageByID(ProductImageID, productImage)
 }
 
-func (pc *productUseCase) SearchProductByID(productID string, product *pe.Product) (pe.Product, error) {
-	return pc.productRepo.SearchProductByID(productID, product)
+func (pc *productUseCase) SearchProduct(search, filter string, offset, pageSize int) (*[]pe.Product, int64, error) {
+	products, count, err := pc.productRepo.SearchProduct(search, filter, offset, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+	return products, count, nil
 }
 
-func (pc *productUseCase) SearchProductByName(name string, product *[]pe.Product) ([]pe.Product, error) {
-	return pc.productRepo.SearchProductByName(name, product)
-}
+// func (pc *productUseCase) SearchProductByID(productID string, product *pe.Product) (pe.Product, error) {
+// 	return pc.productRepo.SearchProductByID(productID, product)
+// }
 
-func (pc *productUseCase) SearchProductByCategory(category string, product *[]pe.Product) ([]pe.Product, error) {
-	return pc.productRepo.SearchProductByCategory(category, product)
-}
+// func (pc *productUseCase) SearchProductByName(name string, product *[]pe.Product) ([]pe.Product, error) {
+// 	return pc.productRepo.SearchProductByName(name, product)
+// }
 
-func (pc *productUseCase) FilterProductByStatus(status string, product *[]pe.Product) ([]pe.Product, error) {
-	return pc.productRepo.FilterProductByStatus(status, product)
-}
+// func (pc *productUseCase) SearchProductByCategory(category string, product *[]pe.Product) ([]pe.Product, error) {
+// 	return pc.productRepo.SearchProductByCategory(category, product)
+// }
+
+// func (pc *productUseCase) FilterProductByStatus(status string, product *[]pe.Product) ([]pe.Product, error) {
+// 	return pc.productRepo.FilterProductByStatus(status, product)
+// }

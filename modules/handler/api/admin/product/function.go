@@ -43,18 +43,9 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 	}
 
 	var productResponses []ep.ProductResponse
-	var productImage ep.ProductImage
 	for _, product := range products {
-		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusInternalServerError,
-			})
-		}
-
 		var imageURLs []string
-		for _, image := range productImages {
+		for _, image := range product.ProductImages {
 			imageURLs = append(imageURLs, image.ProductImageUrl)
 		}
 
@@ -93,17 +84,8 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 		})
 	}
 
-	var productImage ep.ProductImage
-	productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": err.Error(),
-			"Status":  http.StatusInternalServerError,
-		})
-	}
-
 	var imageURLs []string
-	for _, image := range productImages {
+	for _, image := range product.ProductImages {
 		imageURLs = append(imageURLs, image.ProductImageUrl)
 	}
 
@@ -126,211 +108,282 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 }
 
 func (h *ProductHandler) SearchProduct(c echo.Context) error {
-	param := c.QueryParam("param")
+	var products *[]ep.Product
+	var err error
 
-	switch param {
-	case "id":
-		var product ep.Product
-		itemId := c.QueryParam("id")
-		product, err := h.productUseCase.SearchProductByID(itemId, &product)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Failed to get product",
-				"Error":   err,
-			})
-		}
-
-		var productImage ep.ProductImage
-		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Failed to get product images",
-				"Error":   err,
-			})
-		}
-
-		var imageURLs []string
-		for _, image := range productImages {
-			imageURLs = append(imageURLs, image.ProductImageUrl)
-		}
-
-		productResponse := ep.ProductResponse{
-			ProductID:       product.ProductID,
-			Name:            product.Name,
-			Category:        product.ProductCategory.Category,
-			Stock:           product.Stock,
-			Price:           product.Price,
-			Status:          product.Status,
-			Rating:          product.Rating,
-			Description:     product.Description,
-			ProductImageUrl: imageURLs,
-		}
-
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Message":  "Successfully get product data by id",
-			"Products": productResponse,
-		})
-	case "name":
-		var products []ep.Product
-		name := c.QueryParam("name")
-		products, err := h.productUseCase.SearchProductByName(name, &products)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Failed to get product",
-				"Error":   err,
-			})
-		}
-
-		var productResponses []ep.ProductResponse
-		var productImage ep.ProductImage
-		for _, product := range products {
-			productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"Message": "Failed to get product images",
-					"Error":   err,
-				})
-			}
-
-			var imageURLs []string
-			for _, image := range productImages {
-				imageURLs = append(imageURLs, image.ProductImageUrl)
-			}
-
-			productResponse := ep.ProductResponse{
-				ProductID:       product.ProductID,
-				Name:            product.Name,
-				Category:        product.ProductCategory.Category,
-				Stock:           product.Stock,
-				Price:           product.Price,
-				Status:          product.Status,
-				Rating:          product.Rating,
-				Description:     product.Description,
-				ProductImageUrl: imageURLs,
-			}
-
-			productResponses = append(productResponses, productResponse)
-		}
-
-		if len(productResponses) == 0 {
-			return c.JSON(http.StatusOK, map[string]interface{}{
-				"Message": "Product not found",
-				"Product": productResponses,
-			})
-		}
-
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Message":  "Successfully get product by name",
-			"Products": productResponses,
-		})
-	case "category":
-		var products []ep.Product
-		category := c.QueryParam("category")
-		products, err := h.productUseCase.SearchProductByCategory(category, &products)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Failed to get product by category",
-				"Error":   err,
-			})
-		}
-
-		var productResponses []ep.ProductResponse
-		var productImage ep.ProductImage
-		for _, product := range products {
-			productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"Message": "Failed to get product images",
-					"Error":   err,
-				})
-			}
-
-			var imageURLs []string
-			for _, image := range productImages {
-				imageURLs = append(imageURLs, image.ProductImageUrl)
-			}
-
-			productResponse := ep.ProductResponse{
-				ProductID:       product.ProductID,
-				Name:            product.Name,
-				Category:        product.ProductCategory.Category,
-				Stock:           product.Stock,
-				Price:           product.Price,
-				Status:          product.Status,
-				Rating:          product.Rating,
-				Description:     product.Description,
-				ProductImageUrl: imageURLs,
-			}
-
-			productResponses = append(productResponses, productResponse)
-		}
-
-		if len(productResponses) == 0 {
-			return c.JSON(http.StatusOK, map[string]interface{}{
-				"Message": "Product not found",
-				"Product": productResponses,
-			})
-		}
-
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Message":  "Successfully get product data by category",
-			"Products": productResponses,
-		})
+	pageParam := c.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil || page < 1 {
+		page = 1
 	}
 
-	return c.JSON(http.StatusBadRequest, map[string]interface{}{
-		"Message": "Invalid search parameter",
-	})
-}
+	pageSize := 10
+	offset := (page - 1) * pageSize
 
-func (h *ProductHandler) FilterProductByStatus(c echo.Context) error {
-	status := c.QueryParam("status")
+	search := c.QueryParam("search")
+	filter := c.QueryParam("filter")
 
-	var product []ep.Product
-	products, err := h.productUseCase.FilterProductByStatus(status, &product)
+	validParams := map[string]bool{"search": true, "filter": true, "page": true}
+	for param := range c.QueryParams() {
+		if !validParams[param] {
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"Message": "Masukkan parameter dengan benar",
+				"Status":  http.StatusBadRequest,
+			})
+		}
+	}
+
+	products, total, err := h.productUseCase.SearchProduct(search, filter, offset, pageSize)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": "Failed to filter product",
-			"Error":   err,
+			"Message": err.Error(),
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
-	var productResponses []ep.ProductResponse
-	var productImage ep.ProductImage
-	for _, product := range products {
-		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Failed to get product images",
-				"Error":   err,
-			})
+	if len(*products) == 0 {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Produk yang anda cari tidak ditemukan",
+			"Status":  http.StatusNotFound,
+		})
+	} else {
+		var productResponses []ep.ProductResponse
+		for _, product := range *products {
+			var imageURLs []string
+			for _, image := range product.ProductImages {
+				imageURLs = append(imageURLs, image.ProductImageUrl)
+			}
+
+			productResponse := ep.ProductResponse{
+				ProductID:       product.ProductID,
+				Name:            product.Name,
+				Category:        product.ProductCategory.Category,
+				Stock:           product.Stock,
+				Price:           product.Price,
+				Status:          product.Status,
+				Rating:          product.Rating,
+				Description:     product.Description,
+				ProductImageUrl: imageURLs,
+			}
+
+			productResponses = append(productResponses, productResponse)
 		}
 
-		var imageURLs []string
-		for _, image := range productImages {
-			imageURLs = append(imageURLs, image.ProductImageUrl)
-		}
-
-		productResponse := ep.ProductResponse{
-			ProductID:       product.ProductID,
-			Name:            product.Name,
-			Category:        product.ProductCategory.Category,
-			Stock:           product.Stock,
-			Price:           product.Price,
-			Status:          product.Status,
-			Rating:          product.Rating,
-			Description:     product.Description,
-			ProductImageUrl: imageURLs,
-		}
-
-		productResponses = append(productResponses, productResponse)
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Products":  productResponses,
+			"Page":      page,
+			"TotalPage": int(math.Ceil(float64(total) / float64(pageSize))),
+			"Status":    http.StatusOK,
+		})
 	}
-
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message":  "Successfully get product based on stock status",
-		"Products": productResponses,
-	})
 }
+
+// func (h *ProductHandler) SearchProduct(c echo.Context) error {
+// 	param := c.QueryParam("param")
+
+// 	switch param {
+// 	case "id":
+// 		var product ep.Product
+// 		itemId := c.QueryParam("id")
+// 		product, err := h.productUseCase.SearchProductByID(itemId, &product)
+// 		if err != nil {
+// 			return c.JSON(http.StatusInternalServerError, echo.Map{
+// 				"Message": "Failed to get product",
+// 				"Error":   err,
+// 			})
+// 		}
+
+// 		var productImage ep.ProductImage
+// 		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
+// 		if err != nil {
+// 			return c.JSON(http.StatusInternalServerError, echo.Map{
+// 				"Message": "Failed to get product images",
+// 				"Error":   err,
+// 			})
+// 		}
+
+// 		var imageURLs []string
+// 		for _, image := range productImages {
+// 			imageURLs = append(imageURLs, image.ProductImageUrl)
+// 		}
+
+// 		productResponse := ep.ProductResponse{
+// 			ProductID:       product.ProductID,
+// 			Name:            product.Name,
+// 			Category:        product.ProductCategory.Category,
+// 			Stock:           product.Stock,
+// 			Price:           product.Price,
+// 			Status:          product.Status,
+// 			Rating:          product.Rating,
+// 			Description:     product.Description,
+// 			ProductImageUrl: imageURLs,
+// 		}
+
+// 		return c.JSON(http.StatusOK, map[string]interface{}{
+// 			"Message":  "Successfully get product data by id",
+// 			"Products": productResponse,
+// 		})
+// 	case "name":
+// 		var products []ep.Product
+// 		name := c.QueryParam("name")
+// 		products, err := h.productUseCase.SearchProductByName(name, &products)
+// 		if err != nil {
+// 			return c.JSON(http.StatusInternalServerError, echo.Map{
+// 				"Message": "Failed to get product",
+// 				"Error":   err,
+// 			})
+// 		}
+
+// 		var productResponses []ep.ProductResponse
+// 		var productImage ep.ProductImage
+// 		for _, product := range products {
+// 			productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
+// 			if err != nil {
+// 				return c.JSON(http.StatusInternalServerError, echo.Map{
+// 					"Message": "Failed to get product images",
+// 					"Error":   err,
+// 				})
+// 			}
+
+// 			var imageURLs []string
+// 			for _, image := range productImages {
+// 				imageURLs = append(imageURLs, image.ProductImageUrl)
+// 			}
+
+// 			productResponse := ep.ProductResponse{
+// 				ProductID:       product.ProductID,
+// 				Name:            product.Name,
+// 				Category:        product.ProductCategory.Category,
+// 				Stock:           product.Stock,
+// 				Price:           product.Price,
+// 				Status:          product.Status,
+// 				Rating:          product.Rating,
+// 				Description:     product.Description,
+// 				ProductImageUrl: imageURLs,
+// 			}
+
+// 			productResponses = append(productResponses, productResponse)
+// 		}
+
+// 		if len(productResponses) == 0 {
+// 			return c.JSON(http.StatusOK, map[string]interface{}{
+// 				"Message": "Product not found",
+// 				"Product": productResponses,
+// 			})
+// 		}
+
+// 		return c.JSON(http.StatusOK, map[string]interface{}{
+// 			"Message":  "Successfully get product by name",
+// 			"Products": productResponses,
+// 		})
+// 	case "category":
+// 		var products []ep.Product
+// 		category := c.QueryParam("category")
+// 		products, err := h.productUseCase.SearchProductByCategory(category, &products)
+// 		if err != nil {
+// 			return c.JSON(http.StatusInternalServerError, echo.Map{
+// 				"Message": "Failed to get product by category",
+// 				"Error":   err,
+// 			})
+// 		}
+
+// 		var productResponses []ep.ProductResponse
+// 		var productImage ep.ProductImage
+// 		for _, product := range products {
+// 			productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
+// 			if err != nil {
+// 				return c.JSON(http.StatusInternalServerError, echo.Map{
+// 					"Message": "Failed to get product images",
+// 					"Error":   err,
+// 				})
+// 			}
+
+// 			var imageURLs []string
+// 			for _, image := range productImages {
+// 				imageURLs = append(imageURLs, image.ProductImageUrl)
+// 			}
+
+// 			productResponse := ep.ProductResponse{
+// 				ProductID:       product.ProductID,
+// 				Name:            product.Name,
+// 				Category:        product.ProductCategory.Category,
+// 				Stock:           product.Stock,
+// 				Price:           product.Price,
+// 				Status:          product.Status,
+// 				Rating:          product.Rating,
+// 				Description:     product.Description,
+// 				ProductImageUrl: imageURLs,
+// 			}
+
+// 			productResponses = append(productResponses, productResponse)
+// 		}
+
+// 		if len(productResponses) == 0 {
+// 			return c.JSON(http.StatusOK, map[string]interface{}{
+// 				"Message": "Product not found",
+// 				"Product": productResponses,
+// 			})
+// 		}
+
+// 		return c.JSON(http.StatusOK, map[string]interface{}{
+// 			"Message":  "Successfully get product data by category",
+// 			"Products": productResponses,
+// 		})
+// 	}
+
+// 	return c.JSON(http.StatusBadRequest, map[string]interface{}{
+// 		"Message": "Invalid search parameter",
+// 	})
+// }
+
+// func (h *ProductHandler) FilterProductByStatus(c echo.Context) error {
+// 	status := c.QueryParam("status")
+
+// 	var product []ep.Product
+// 	products, err := h.productUseCase.FilterProductByStatus(status, &product)
+// 	if err != nil {
+// 		return c.JSON(http.StatusInternalServerError, echo.Map{
+// 			"Message": "Failed to filter product",
+// 			"Error":   err,
+// 		})
+// 	}
+
+// 	var productResponses []ep.ProductResponse
+// 	var productImage ep.ProductImage
+// 	for _, product := range products {
+// 		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
+// 		if err != nil {
+// 			return c.JSON(http.StatusInternalServerError, echo.Map{
+// 				"Message": "Failed to get product images",
+// 				"Error":   err,
+// 			})
+// 		}
+
+// 		var imageURLs []string
+// 		for _, image := range productImages {
+// 			imageURLs = append(imageURLs, image.ProductImageUrl)
+// 		}
+
+// 		productResponse := ep.ProductResponse{
+// 			ProductID:       product.ProductID,
+// 			Name:            product.Name,
+// 			Category:        product.ProductCategory.Category,
+// 			Stock:           product.Stock,
+// 			Price:           product.Price,
+// 			Status:          product.Status,
+// 			Rating:          product.Rating,
+// 			Description:     product.Description,
+// 			ProductImageUrl: imageURLs,
+// 		}
+
+// 		productResponses = append(productResponses, productResponse)
+// 	}
+
+// 	return c.JSON(http.StatusOK, map[string]interface{}{
+// 		"Message":  "Successfully get product based on stock status",
+// 		"Products": productResponses,
+// 	})
+// }
 
 func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	productCategoryIDstr := c.FormValue("ProductCategoryId")
