@@ -21,7 +21,6 @@ func (rh *ReviewHandler) GetAllReview(c echo.Context) error {
 
 	count := 0
 	var transactionDetails []te.TransactionDetail
-	// var review re.Review
 	var reviewResponses []re.GetAllReviewResponse
 	for _, product := range products {
 		transactionDetails, err := rh.reviewUsecase.GetAllTransactionDetails(fmt.Sprint(product.ID), &transactionDetails)
@@ -105,5 +104,160 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": "Berhasil mengambil data review produk",
 		"Reviews": reviewResponses,
+	})
+}
+
+func (rh *ReviewHandler) SearchReview(c echo.Context) error {
+	param := c.QueryParam("param")
+
+	switch param {
+	case "id":
+		productID := c.QueryParam("id")
+
+		var product pe.Product
+		product, err := rh.reviewUsecase.GetProductByID(fmt.Sprint(productID), &product)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": "Gagal mengambil data produk",
+			})
+		}
+
+		var transactionDetails []te.TransactionDetail
+		transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetails(fmt.Sprint(productID), &transactionDetails)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": "Gagal mengambil data transaksi detail produk",
+			})
+		}
+
+		count := 0
+		for _, td := range transactionDetails {
+			if fmt.Sprint(td.RatingProductId) != "" {
+				count++
+			}
+		}
+
+		if count < 0 {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": "Ulasan yang anda cari tidak ditemukan",
+				"Status":  http.StatusOK,
+			})
+		}
+
+		reviewResponse := re.GetAllReviewResponse{
+			ProductID: product.ID,
+			Name:      product.Name,
+			Category:  product.ProductCategory.Category,
+			ReviewQty: uint(count),
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Message": "Berhasil mengambil data review produk",
+			"Reviews": reviewResponse,
+		})
+	case "name":
+		productName := c.QueryParam("name")
+		var products []pe.Product
+
+		products, err := rh.reviewUsecase.GetProductByName(productName, &products)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": "Gagal mengambil data produk",
+				"Status":  http.StatusInternalServerError,
+			})
+		}
+
+		count := 0
+		var transactionDetails []te.TransactionDetail
+		var reviewResponses []re.GetAllReviewResponse
+		for _, product := range products {
+			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetails(fmt.Sprint(product.ID), &transactionDetails)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"Message": "Gagal mengambil data transaksi detail produk",
+				})
+			}
+			for _, td := range transactionDetails {
+				if fmt.Sprint(td.RatingProductId) != "" {
+					count++
+				}
+			}
+
+			reviewResponse := re.GetAllReviewResponse{
+				ProductID: product.ID,
+				Name:      product.Name,
+				Category:  product.ProductCategory.Category,
+				ReviewQty: uint(count),
+			}
+
+			reviewResponses = append(reviewResponses, reviewResponse)
+
+			count = 0
+		}
+		if reviewResponses == nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": "Ulasan yang anda cari tidak ditemukan",
+				"Status":  http.StatusOK,
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Message": "Berhasil mengambil data review produk",
+			"Reviews": reviewResponses,
+		})
+	case "category":
+		productCategory := c.QueryParam("category")
+		var products []pe.Product
+
+		products, err := rh.reviewUsecase.GetAllProductByCategory(productCategory, &products)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": "Gagal mengambil data produk",
+				"Status":  http.StatusInternalServerError,
+			})
+		}
+
+		count := 0
+		var transactionDetails []te.TransactionDetail
+		var reviewResponses []re.GetAllReviewResponse
+		for _, product := range products {
+			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetails(fmt.Sprint(product.ID), &transactionDetails)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"Message": "Gagal mengambil data transaksi detail produk",
+				})
+			}
+			for _, td := range transactionDetails {
+				if fmt.Sprint(td.RatingProductId) != "" {
+					count++
+				}
+			}
+
+			reviewResponse := re.GetAllReviewResponse{
+				ProductID: product.ID,
+				Name:      product.Name,
+				Category:  product.ProductCategory.Category,
+				ReviewQty: uint(count),
+			}
+
+			reviewResponses = append(reviewResponses, reviewResponse)
+
+			count = 0
+		}
+		if reviewResponses == nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": "Ulasan yang anda cari tidak ditemukan",
+				"Status":  http.StatusOK,
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Message": "Berhasil mengambil data review produk",
+			"Reviews": reviewResponses,
+		})
+	}
+
+	return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		"Message": "Invalid search parameter",
 	})
 }

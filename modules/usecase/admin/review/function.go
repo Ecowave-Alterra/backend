@@ -10,6 +10,18 @@ func (rc *reviewUsecase) GetAllProducts(products *[]pe.Product) ([]pe.Product, e
 	return rc.reviewRepo.GetAllProducts(products)
 }
 
+func (rc *reviewUsecase) GetProductByID(productId string, product *pe.Product) (pe.Product, error) {
+	return rc.reviewRepo.GetProductByID(productId, product)
+}
+
+func (rc *reviewUsecase) GetProductByName(name string, product *[]pe.Product) ([]pe.Product, error) {
+	return rc.reviewRepo.GetProductByName(name, product)
+}
+
+func (rc *reviewUsecase) GetAllProductByCategory(category string, product *[]pe.Product) ([]pe.Product, error) {
+	return rc.reviewRepo.GetAllProductByCategory(category, product)
+}
+
 func (rc *reviewUsecase) GetAllTransactionDetails(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error) {
 	return rc.reviewRepo.GetAllTransactionDetails(productID, transactionDetails)
 }

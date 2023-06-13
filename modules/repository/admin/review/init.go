@@ -9,6 +9,9 @@ import (
 
 type ReviewRepo interface {
 	GetAllProducts(products *[]pe.Product) ([]pe.Product, error)
+	GetProductByID(productId string, product *pe.Product) (pe.Product, error)
+	GetProductByName(name string, product *[]pe.Product) ([]pe.Product, error)
+	GetAllProductByCategory(category string, product *[]pe.Product) ([]pe.Product, error)
 	GetAllTransactionDetails(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error)
 	GetAllReviewByID(reviewID string, review *re.Review) (re.Review, error)
 }
