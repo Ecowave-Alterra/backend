@@ -22,6 +22,15 @@ func (pcr *productCategoryRepo) UpdateProductCategory(productCategory *pe.Produc
 }
 
 func (pcr *productCategoryRepo) DeleteProductCategory(productCategory *pe.ProductCategory, id int) error {
+	var count int64
+	if err := pcr.db.Table("products").Where("product_category_id = ?", id).Count(&count).Error; err != nil {
+		return err
+	}
+
+	if count > 0 {
+		return echo.NewHTTPError(500, "Produk masih digunakan tabel lain")
+	}
+
 	if err := pcr.db.Where("id = ?", id).Delete(&productCategory).Error; err != nil {
 		return err
 	}

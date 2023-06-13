@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strconv"
 
+	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	"github.com/labstack/echo/v4"
 )
@@ -28,17 +29,17 @@ func (pch *ProductCategoryHandler) GetAllProductCategory(c echo.Context) error {
 		})
 	}
 
-	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
-	if page > totalPages {
-		return c.JSON(http.StatusNotFound, echo.Map{
-			"Message": "Halaman Tidak Ditemukan",
+	if productCategories == nil || len(*productCategories) == 0 {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"Message": "Belum ada list kategori",
 			"Status":  http.StatusNotFound,
 		})
 	}
 
-	if productCategories == nil || len(*productCategories) == 0 {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"Message": "Belum ada list kategori",
+	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+	if page > totalPages {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Halaman Tidak Ditemukan",
 			"Status":  http.StatusNotFound,
 		})
 	}
@@ -63,9 +64,10 @@ func (pch *ProductCategoryHandler) CreateProductCategory(c echo.Context) error {
 
 	available, err := pch.productCategoryUsecase.CreateProductCategory(&productCategory)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": err.Error(),
-			"Status":  http.StatusInternalServerError,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
@@ -117,9 +119,10 @@ func (pch *ProductCategoryHandler) UpdateProductCategory(c echo.Context) error {
 
 	available, err := pch.productCategoryUsecase.UpdateProductCategory(&productCategory, id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": err.Error(),
-			"Status":  http.StatusInternalServerError,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
@@ -156,9 +159,10 @@ func (pch *ProductCategoryHandler) DeleteProductCategory(c echo.Context) error {
 	}
 
 	if err := pch.productCategoryUsecase.DeleteProductCategory(&productCategory, id); err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": err.Error(),
-			"Status":  http.StatusInternalServerError,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
@@ -192,9 +196,10 @@ func (pch *ProductCategoryHandler) SearchingProductCategoyByName(c echo.Context)
 
 	productCategory, total, err := pch.productCategoryUsecase.SearchingProductCategoryByName(name, offset, pageSize)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": err.Error(),
-			"Status":  http.StatusInternalServerError,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
