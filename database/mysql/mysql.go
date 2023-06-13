@@ -5,6 +5,7 @@ import (
 
 	"github.com/berrylradianh/ecowave-go/config"
 	"github.com/berrylradianh/ecowave-go/database/seed"
+	er "github.com/berrylradianh/ecowave-go/modules/entity/review"
 	re "github.com/berrylradianh/ecowave-go/modules/entity/role"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
@@ -50,6 +51,7 @@ func InitialMigration() {
 		ue.User{},
 		ue.UserDetail{},
 		ie.Information{},
+		er.Review{},
 		et.Transaction{},
 		et.TransactionDetail{},
 		ep.Product{},

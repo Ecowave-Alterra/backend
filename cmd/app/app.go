@@ -21,6 +21,10 @@ import (
 	orderRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/order"
 	orderUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/order"
 
+	reviewHandlerUser "github.com/berrylradianh/ecowave-go/modules/handler/api/user/review"
+	reviewRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/review"
+	reviewUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/review"
+
 	authHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/auth"
 	authRepo "github.com/berrylradianh/ecowave-go/modules/repository/auth"
 	authUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/auth"
@@ -50,12 +54,17 @@ func StartApp() *echo.Echo {
 	orderUsecaseUser := orderUsecaseUser.New(orderRepoUser)
 	orderHandlerUser := orderHandlerUser.New(orderUsecaseUser)
 
+	reviewRepoUser := reviewRepoUser.New(mysql.DB)
+	reviewUsecaseUser := reviewUsecaseUser.New(reviewRepoUser)
+	reviewHandlerUser := reviewHandlerUser.New(reviewUsecaseUser)
+
 	handler := common.Handler{
 		AuthHandler:             authHandler,
 		InformationHandlerAdmin: informationHandlerAdmin,
 		InformationHandlerUser:  informationHandlerUser,
 		TransactionHandlerUser:  transactionHandlerUser,
 		OrderHandlerUser:        orderHandlerUser,
+		ReviewHandlerUser:       reviewHandlerUser,
 	}
 
 	router := routes.StartRoute(handler)
