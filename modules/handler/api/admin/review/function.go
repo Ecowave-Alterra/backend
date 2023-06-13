@@ -137,7 +137,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 			}
 		}
 
-		if count < 0 {
+		if count == 0 {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Ulasan yang anda cari tidak ditemukan",
 				"Status":  http.StatusOK,
