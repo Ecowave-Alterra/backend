@@ -46,6 +46,13 @@ func (rh *ReviewHandler) GetAllReview(c echo.Context) error {
 		count = 0
 	}
 
+	if reviewResponses == nil {
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Message": "Belum ada list ulasan",
+			"Status":  http.StatusOK,
+		})
+	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": "Berhasil mengambil data review produk",
 		"Reviews": reviewResponses,
