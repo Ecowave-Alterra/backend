@@ -295,7 +295,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	for i := 1; i <= 5; i++ {
 		fileHeader, err := c.FormFile(fmt.Sprintf("PhotoContentUrl%d", i))
 		if fileHeader != nil {
-			filename, _ := cloudstorage.GetFileName(fileHeader.Filename)
+			filename := cloudstorage.GetFileName(fileHeader.Filename)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, echo.Map{
 					"Message": "Gagal mendapatkan nama file",
@@ -349,7 +349,7 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 	productImages, _ := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 
 	for _, image := range productImages {
-		filename, err := cloudstorage.GetFileName(image.ProductImageUrl)
+		filename := cloudstorage.GetFileName(image.ProductImageUrl)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"Message": "Gagal mendapatkan nama file",
