@@ -12,7 +12,7 @@ func (pr *productRepo) CreateProduct(product *pe.Product) error {
 	return nil
 }
 
-func (pr *productRepo) CheckProductExist(productId uint) (bool, error) {
+func (pr *productRepo) CheckProductExist(productId string) (bool, error) {
 	var count int64
 	result := pr.db.Model(&pe.Product{}).Where("product_id = ?", productId).Count(&count)
 	if result.Error != nil {

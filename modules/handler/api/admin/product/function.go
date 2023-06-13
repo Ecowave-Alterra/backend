@@ -633,7 +633,7 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 		}
 
 		record := []string{
-			strconv.Itoa(int(product.ProductID)),
+			product.ProductID,
 			product.Name,
 			product.ProductCategory.Category,
 			strconv.Itoa(int(product.Stock)),

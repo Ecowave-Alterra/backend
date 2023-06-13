@@ -6,7 +6,12 @@ import (
 )
 
 type TransactionUsecase interface {
-	CreateTransaction(transaction *et.Transaction) (interface{}, error)
+	CreateTransaction(transaction *et.Transaction) error
+	GetPoint(id uint) (interface{}, error)
+	ClaimVoucher(idUser uint, idVoucher uint, shipCost float64, productCost float64) (float64, error)
+	GetVoucherUser(id uint, offset int, pageSize int) (interface{}, int64, error)
+	DetailVoucher(id uint) (interface{}, error)
+	// ShippingOptions(ship *et.ShippingRequest) (interface{}, error)
 }
 
 type transactionUsecase struct {

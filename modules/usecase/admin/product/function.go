@@ -7,7 +7,7 @@ import (
 
 func (pc *productUseCase) CreateProduct(product *pe.Product) error {
 	for {
-		productId := randomid.GenerateRandomNumber()
+		productId := randomid.GenerateRandomID()
 
 		exists, err := pc.productRepo.CheckProductExist(productId)
 		if err != nil {
