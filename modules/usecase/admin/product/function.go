@@ -25,8 +25,13 @@ func (pc *productUseCase) CreateProductImage(productImage *pe.ProductImage) erro
 	return pc.productRepo.CreateProductImage(productImage)
 }
 
-func (pc *productUseCase) GetAllProduct(products *[]pe.Product) ([]pe.Product, error) {
-	return pc.productRepo.GetAllProduct(products)
+func (pc *productUseCase) GetAllProduct(products *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error) {
+	product, count, err := pc.productRepo.GetAllProduct(products, offset, pageSize)
+	return product, count, err
+}
+
+func (pc *productUseCase) GetAllProductNoPagination(products *[]pe.Product) ([]pe.Product, error) {
+	return pc.productRepo.GetAllProductNoPagination(products)
 }
 
 func (pc *productUseCase) GetProductByID(productId string, product *pe.Product) (pe.Product, error) {

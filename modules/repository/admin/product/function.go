@@ -2,6 +2,7 @@ package product
 
 import (
 	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
+	"github.com/labstack/echo/v4"
 )
 
 func (pr *productRepo) CreateProduct(product *pe.Product) error {
@@ -31,7 +32,24 @@ func (pr *productRepo) CreateProductImage(productImage *pe.ProductImage) error {
 	return nil
 }
 
-func (pr *productRepo) GetAllProduct(products *[]pe.Product) ([]pe.Product, error) {
+func (pr *productRepo) GetAllProduct(products *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error) {
+	var count int64
+	if err := pr.db.Model(&pe.Product{}).Count(&count).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(500, err)
+	}
+
+	if err := pr.db.
+		Preload("ProductCategory").
+		Offset(offset).
+		Limit(pageSize).
+		Find(&products).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return *products, count, nil
+}
+
+func (pr *productRepo) GetAllProductNoPagination(products *[]pe.Product) ([]pe.Product, error) {
 	if err := pr.db.
 		Preload("ProductCategory").
 		Find(&products).Error; err != nil {

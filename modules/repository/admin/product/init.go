@@ -9,7 +9,8 @@ type ProductRepo interface {
 	CreateProduct(product *pe.Product) error
 	CheckProductExist(productId string) (bool, error)
 	CreateProductImage(productImage *pe.ProductImage) error
-	GetAllProduct(products *[]pe.Product) ([]pe.Product, error)
+	GetAllProduct(products *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error)
+	GetAllProductNoPagination(products *[]pe.Product) ([]pe.Product, error)
 	GetProductByID(productId string, product *pe.Product) (pe.Product, error)
 	GetProductImageURLById(productId string, productImage *pe.ProductImage) ([]pe.ProductImage, error)
 	UpdateProduct(productId string, productRequest *pe.ProductRequest) error
