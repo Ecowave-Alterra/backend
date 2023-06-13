@@ -4,14 +4,14 @@ import "gorm.io/gorm"
 
 type Product struct {
 	*gorm.Model       `json:"-"`
-	ProductID         string `json:"ProductId"`
-	Name              string `validate:"required,max=10"`
-	Stock             uint
-	Price             float64
-	Status            string
-	Rating            float64
-	Description       string
-	ProductCategoryId uint            `json:"-"`
+	ProductID         string          `json:"ProductId"`
+	Name              string          `validate:"required,max=10"`
+	Stock             uint            `validate:"required"`
+	Price             float64         `validate:"required"`
+	Status            string          `validate:"required"`
+	Rating            float64         `validate:"required"`
+	Description       string          `validate:"required"`
+	ProductCategoryId uint            `json:"-" validate:"required"`
 	ProductCategory   ProductCategory `gorm:"foreignKey:ProductCategoryId" json:"-"`
 	ProductImages     []ProductImage  `gorm:"foreignKey:ProductId"`
 }
