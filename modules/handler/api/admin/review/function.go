@@ -38,6 +38,7 @@ func (rh *ReviewHandler) GetAllReview(c echo.Context) error {
 		reviewResponse := re.GetAllReviewResponse{
 			ProductID: product.ID,
 			Name:      product.Name,
+			Category:  product.ProductCategory.Category,
 			ReviewQty: uint(count),
 		}
 
