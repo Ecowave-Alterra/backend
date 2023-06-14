@@ -5,6 +5,10 @@ import (
 	"github.com/berrylradianh/ecowave-go/common"
 
 	"github.com/berrylradianh/ecowave-go/database/mysql"
+	authHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/auth"
+	authRepo "github.com/berrylradianh/ecowave-go/modules/repository/auth"
+	authUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/auth"
+
 	informationHandlerAdmin "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/information"
 	informationRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/information"
 	informationUsecaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/information"
@@ -12,6 +16,10 @@ import (
 	productCategoryHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/product_category"
 	productCategoryRepo "github.com/berrylradianh/ecowave-go/modules/repository/admin/product_category"
 	productCategoryUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/admin/product_category"
+
+	productHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/product"
+	productRepo "github.com/berrylradianh/ecowave-go/modules/repository/admin/product"
+	productUseCase "github.com/berrylradianh/ecowave-go/modules/usecase/admin/product"
 
 	informationHandlerUser "github.com/berrylradianh/ecowave-go/modules/handler/api/user/information"
 	informationRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/information"
@@ -25,9 +33,6 @@ import (
 	orderRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/order"
 	orderUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/order"
 
-	authHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/auth"
-	authRepo "github.com/berrylradianh/ecowave-go/modules/repository/auth"
-	authUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/auth"
 	"github.com/labstack/echo/v4"
 )
 
@@ -45,6 +50,10 @@ func StartApp() *echo.Echo {
 	productCategoryRepo := productCategoryRepo.New(mysql.DB)
 	productCategoryUsecase := productCategoryUsecase.New(productCategoryRepo)
 	productCategoryHandler := productCategoryHandler.New(productCategoryUsecase)
+
+	productRepo := productRepo.New(mysql.DB)
+	productUsecase := productUseCase.New(productRepo)
+	productHandler := productHandler.New(productUsecase)
 
 	informationRepoUser := informationRepoUser.New(mysql.DB)
 	informationUsecaseUser := informationUsecaseUser.New(informationRepoUser)
@@ -65,8 +74,10 @@ func StartApp() *echo.Echo {
 		TransactionHandlerUser:  transactionHandlerUser,
 		OrderHandlerUser:        orderHandlerUser,
 		ProductCategoryHandler:  productCategoryHandler,
+		ProductHandler:          productHandler,
 	}
 
 	router := routes.StartRoute(handler)
+
 	return router
 }

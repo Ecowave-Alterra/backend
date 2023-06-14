@@ -25,7 +25,6 @@ func Init() {
 	InitialMigration()
 	seed.DBSeed(DB)
 }
-
 func InitDB() {
 	var err error
 
@@ -60,6 +59,8 @@ func InitialMigration() {
 		ve.VoucherType{},
 		ue.UserAddress{},
 		pe.ProductCategory{},
+		pe.Product{},
+		pe.ProductImage{},
 	)
 	DB.Migrator().HasConstraint(&ue.User{}, "UserDetail")
 	DB.Migrator().HasConstraint(&re.Role{}, "Users")

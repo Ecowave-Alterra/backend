@@ -4,15 +4,16 @@ import "gorm.io/gorm"
 
 type Product struct {
 	*gorm.Model       `json:"-"`
-	ProductID         uint            `json:"ProductId"`
-	Name              string          `json:"name" form:"name" validate:"required,max=10"`
-	Stock             uint            `json:"stock" form:"stock"`
-	Price             float64         `json:"price" form:"price"`
-	Status            string          `json:"status" form:"status"`
-	Rating            float64         `json:"rating" form:"rating"`
-	Description       string          `json:"description" form:"description"`
-	ProductCategoryId uint            `json:"productCategoryId" form:"productCategoryId"`
-	ProductCategory   ProductCategory `gorm:"foreignKey:ProductCategoryId"`
+	ProductID         string          `json:"ProductId"`
+	Name              string          `validate:"required,max=10"`
+	Stock             uint            `validate:"required"`
+	Price             float64         `validate:"required"`
+	Status            string          `validate:"required"`
+	Rating            float64         `validate:"required"`
+	Description       string          `validate:"required"`
+	ProductCategoryId uint            `json:"-" validate:"required"`
+	ProductCategory   ProductCategory `gorm:"foreignKey:ProductCategoryId" json:"-"`
+	ProductImages     []ProductImage  `gorm:"foreignKey:ProductId"`
 }
 
 type ProductRequest struct {
@@ -26,13 +27,13 @@ type ProductRequest struct {
 }
 
 type ProductResponse struct {
-	ProductID       uint     `json:"ProductId"`
-	Name            string   `json:"Name" form:"name"`
-	Category        string   `json:"Category" form:"category"`
-	Stock           uint     `json:"Stock" form:"stock"`
-	Price           float64  `json:"Price" form:"price"`
-	Status          string   `json:"Status" form:"status"`
-	Rating          float64  `json:"Rating" form:"rating"`
-	Description     string   `json:"Description" form:"description"`
-	ProductImageUrl []string `json:"ProductImageUrl" form:"productImageUrl"`
+	ProductID       string
+	Name            string
+	Category        string
+	Stock           uint
+	Price           float64
+	Status          string
+	Rating          float64
+	Description     string
+	ProductImageUrl []string
 }

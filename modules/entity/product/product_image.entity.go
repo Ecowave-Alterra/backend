@@ -3,8 +3,8 @@ package product
 import "gorm.io/gorm"
 
 type ProductImage struct {
-	*gorm.Model
-	ProductId       uint    `json:"productId" form:"productId"`
-	ProductImageUrl string  `json:"productImageUrl" form:"productImageUrl"`
-	Product         Product `gorm:"foreignKey:ProductId"`
+	*gorm.Model     `json:"-"`
+	ProductId       uint    `json:"-"`
+	ProductImageUrl string  `json:"ProductImageUrl" form:"ProductImageUrl"`
+	Product         Product `json:"-"`
 }
