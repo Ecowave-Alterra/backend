@@ -17,18 +17,26 @@ func (ar *authRepo) GetUserByEmail(email string) (*ue.User, error) {
 	return user, nil
 }
 
-func (ar *authRepo) CreateUser(user *ue.User) error {
-	existingUser := &ue.User{}
-	err := ar.db.Where("email = ?", user.Email).First(existingUser).Error
-	if err != nil {
-		err = ar.db.Create(&user).Error
-		if err != nil {
-			return err
-		}
-	} else {
+func (ar *authRepo) CreateUser(user *ue.RegisterRequest) error {
+	existingUser := ue.User{}
+	if err := ar.db.Where("email = ?", user.Email).First(&existingUser).Error; err == nil {
 		//lint:ignore ST1005 Reason for ignoring this linter
 		return errors.New("Email already exists")
 	}
 
+	userTable := ue.User{
+		RoleId:   2,
+		Email:    user.Email,
+		Username: user.Username,
+		Password: user.Password,
+		UserDetail: ue.UserDetail{
+			Name:  user.Name,
+			Phone: user.Phone,
+		},
+	}
+
+	if err := ar.db.Create(&userTable).Error; err != nil {
+		return err
+	}
 	return nil
 }

@@ -8,11 +8,11 @@ import (
 type InformationRepo interface {
 	GetAllInformationsNoPagination() (*[]ie.Information, error)
 	GetAllInformations(offset, pageSize int) (*[]ie.Information, int64, error)
-	GetInformationById(informationId int) (*ie.Information, error)
-	CreateInformation(information *ie.Information) error
-	CheckInformationExists(informationId uint) (bool, error)
-	UpdateInformation(informationId int, information *ie.Information) error
-	DeleteInformation(informationId int) error
+	GetInformationById(informationId string) (*ie.Information, error)
+	CreateInformation(information *ie.Information, informationDraft *ie.InformationDraftRequest) error
+	CheckInformationExists(informationId string) (bool, error)
+	UpdateInformation(informationId string, information *ie.Information) error
+	DeleteInformation(informationId string) error
 	SearchInformations(search, filter string, offset, pageSize int) (*[]ie.Information, int64, error)
 }
 
