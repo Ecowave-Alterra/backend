@@ -7,7 +7,7 @@ import (
 
 func (pr *productRepo) CreateProduct(product *pe.Product) error {
 	if err := pr.db.Save(&product).Error; err != nil {
-		return err
+		return echo.NewHTTPError(500, err)
 	}
 
 	return nil
@@ -17,7 +17,7 @@ func (pr *productRepo) CheckProductExist(productId string) (bool, error) {
 	var count int64
 	result := pr.db.Model(&pe.Product{}).Where("product_id = ?", productId).Count(&count)
 	if result.Error != nil {
-		return false, result.Error
+		return false, echo.NewHTTPError(500, result.Error)
 	}
 
 	exists := count > 0
@@ -26,7 +26,7 @@ func (pr *productRepo) CheckProductExist(productId string) (bool, error) {
 
 func (pr *productRepo) CreateProductImage(productImage *pe.ProductImage) error {
 	if err := pr.db.Save(&productImage).Error; err != nil {
-		return err
+		return echo.NewHTTPError(500, err)
 	}
 
 	return nil
@@ -43,7 +43,7 @@ func (pr *productRepo) GetAllProduct(products *[]pe.Product, offset, pageSize in
 		Offset(offset).
 		Limit(pageSize).
 		Find(&products).Error; err != nil {
-		return nil, 0, err
+		return nil, 0, echo.NewHTTPError(404, err)
 	}
 
 	return *products, count, nil
@@ -53,7 +53,7 @@ func (pr *productRepo) GetAllProductNoPagination(products *[]pe.Product) ([]pe.P
 	if err := pr.db.
 		Preload("ProductCategory").
 		Find(&products).Error; err != nil {
-		return nil, err
+		return nil, echo.NewHTTPError(404, err)
 	}
 
 	return *products, nil
@@ -64,7 +64,7 @@ func (pr *productRepo) GetProductByID(productId string, product *pe.Product) (pe
 		Preload("ProductCategory").Preload("ProductImages").
 		Where("product_id = ?", productId).
 		First(&product).Error; err != nil {
-		return *product, err
+		return *product, echo.NewHTTPError(404, err)
 	}
 
 	return *product, nil
@@ -73,14 +73,14 @@ func (pr *productRepo) GetProductByID(productId string, product *pe.Product) (pe
 func (pr *productRepo) GetProductImageURLById(productId string, productImage *pe.ProductImage) ([]pe.ProductImage, error) {
 	var productImages []pe.ProductImage
 	if err := pr.db.Model(&pe.ProductImage{}).Where("product_id = ?", productId).Find(&productImages).Error; err != nil {
-		return productImages, err
+		return productImages, echo.NewHTTPError(404, err)
 	}
 	return productImages, nil
 }
 
 func (pr *productRepo) UpdateProduct(productId string, req *pe.ProductRequest) error {
 	if err := pr.db.Model(&pe.Product{}).Where("product_id = ?", productId).Updates(pe.Product{ProductCategoryId: req.ProductCategoryId, Name: req.Name, Price: req.Price, Status: req.Status, Description: req.Description}).Error; err != nil {
-		return err
+		return echo.NewHTTPError(500, err)
 	}
 
 	return nil
@@ -88,7 +88,7 @@ func (pr *productRepo) UpdateProduct(productId string, req *pe.ProductRequest) e
 
 func (pr *productRepo) UpdateProductStock(productId string, stock uint) error {
 	if err := pr.db.Exec("UPDATE products SET stock = ? WHERE product_id = ?", stock, productId).Error; err != nil {
-		return err
+		return echo.NewHTTPError(500, err)
 	}
 
 	return nil
@@ -96,7 +96,7 @@ func (pr *productRepo) UpdateProductStock(productId string, stock uint) error {
 
 func (pr *productRepo) DeleteProduct(productId string, product *pe.Product) error {
 	if err := pr.db.Where("product_id = ?", productId).Delete(&product).Error; err != nil {
-		return err
+		return echo.NewHTTPError(500, err)
 	}
 
 	return nil
@@ -104,7 +104,7 @@ func (pr *productRepo) DeleteProduct(productId string, product *pe.Product) erro
 
 func (pr *productRepo) DeleteProductImage(productID string, productImages *[]pe.ProductImage) error {
 	if err := pr.db.Where("product_id = ?", productID).Delete(&productImages).Error; err != nil {
-		return err
+		return echo.NewHTTPError(500, err)
 	}
 
 	return nil
@@ -112,7 +112,7 @@ func (pr *productRepo) DeleteProductImage(productID string, productImages *[]pe.
 
 func (pr *productRepo) DeleteProductImageByID(ProductImageID uint, productImage *pe.ProductImage) error {
 	if err := pr.db.Where("id = ?", ProductImageID).Delete(productImage).Error; err != nil {
-		return err
+		return echo.NewHTTPError(500, err)
 	}
 
 	return nil

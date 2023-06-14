@@ -29,9 +29,17 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 
 	products, total, err := h.productUseCase.GetAllProduct(&products, offset, pageSize)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"Message": err,
-			"Status":  http.StatusInternalServerError,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
+		})
+	}
+
+	if len(products) == 0 {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Belum ada list produk",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
@@ -79,9 +87,10 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 
 	product, err := h.productUseCase.GetProductByID(productID, &product)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": err,
-			"Status":  http.StatusInternalServerError,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
@@ -136,9 +145,10 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 
 	products, total, err := h.productUseCase.SearchProduct(search, filter, offset, pageSize)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": err,
-			"Status":  http.StatusInternalServerError,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
@@ -180,49 +190,84 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 }
 
 func (h *ProductHandler) CreateProduct(c echo.Context) error {
+	var product ep.Product
 	productCategoryIDstr := c.FormValue("ProductCategoryId")
-	productCategoryID, err := strconv.ParseUint(productCategoryIDstr, 10, 64)
-	if err != nil {
+	if productCategoryIDstr == "" {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": err,
+			"Message": "Masukkan product category ID",
 			"Status":  http.StatusBadRequest,
 		})
+	} else {
+		productCategoryID, err := strconv.ParseUint(productCategoryIDstr, 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": "Invalid product category ID",
+				"Status":  http.StatusBadRequest,
+			})
+		}
+		product.ProductCategoryId = uint(productCategoryID)
 	}
+
 	name := c.FormValue("Name")
+	if name == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Masukkan name",
+			"Status":  http.StatusBadRequest,
+		})
+	} else {
+		product.Name = name
+	}
+
 	stockStr := c.FormValue("Stock")
-	stock, err := strconv.ParseUint(stockStr, 10, 64)
-	if err != nil {
+	if stockStr == "" {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": err,
+			"Message": "Masukkan stock",
 			"Status":  http.StatusBadRequest,
 		})
+	} else {
+		stock, err := strconv.ParseUint(stockStr, 10, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": err,
+				"Status":  http.StatusBadRequest,
+			})
+		}
+		product.Stock = uint(stock)
+		if stock == 0 {
+			product.Status = "habis"
+		} else {
+			product.Status = "tersedia"
+		}
 	}
+
 	priceStr := c.FormValue("Price")
-	price, err := strconv.ParseFloat(priceStr, 64)
-	if err != nil {
+	if priceStr == "" {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": err,
+			"Message": "Masukkan price",
 			"Status":  http.StatusBadRequest,
 		})
+	} else {
+		price, err := strconv.ParseFloat(priceStr, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": err,
+				"Status":  http.StatusBadRequest,
+			})
+		}
+		product.Price = float64(price)
 	}
+
 	description := c.FormValue("Description")
-
-	status := "tersedia"
-	if stock == 0 {
-		status = "habis"
+	if description == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Masukkan description",
+			"Status":  http.StatusBadRequest,
+		})
+	} else {
+		product.Description = description
 	}
 
-	product := ep.Product{
-		ProductCategoryId: uint(productCategoryID),
-		Name:              name,
-		Stock:             uint(stock),
-		Price:             price,
-		Status:            status,
-		Rating:            0.00,
-		Description:       description,
-	}
-
-	err = h.productUseCase.CreateProduct(&product)
+	err := h.productUseCase.CreateProduct(&product)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
@@ -232,15 +277,11 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	}
 
 	cloudstorage.Folder = "img/products/"
+	photoUploaded := false
 	for i := 1; i <= 5; i++ {
 		fileHeader, err := c.FormFile(fmt.Sprintf("PhotoContentUrl%d", i))
 		if fileHeader != nil {
-			if err != nil {
-				return c.JSON(http.StatusBadRequest, map[string]interface{}{
-					"Message": "Mohon maaf, Anda harus mengunggah foto",
-					"Status":  http.StatusBadRequest,
-				})
-			}
+			photoUploaded = true
 			fileExtension := filepath.Ext(fileHeader.Filename)
 			allowedExtensions := map[string]bool{
 				".png":  true,
@@ -270,9 +311,10 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 			}
 			err = h.productUseCase.CreateProductImage(&productImage)
 			if err != nil {
-				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-					"Message": err,
-					"Status":  http.StatusBadRequest,
+				code, msg := cs.CustomStatus(err.Error())
+				return c.JSON(code, echo.Map{
+					"Status":  code,
+					"Message": msg,
 				})
 			}
 
@@ -281,6 +323,13 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 				i = 1000
 			}
 		}
+	}
+
+	if !photoUploaded {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Mohon maaf anda harus mengunggah foto",
+			"Status":  http.StatusBadRequest,
+		})
 	}
 
 	return c.JSON(http.StatusCreated, map[string]interface{}{
@@ -296,9 +345,10 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 
 	productBefore, err := h.productUseCase.GetProductByID(productId, &product)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": err,
-			"Status":  http.StatusInternalServerError,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
@@ -310,7 +360,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
 				"Message": "Invalid product category ID",
-				"Error":   err,
+				"Status":  http.StatusBadRequest,
 			})
 		}
 		req.ProductCategoryId = uint(productCategoryID)
@@ -330,13 +380,15 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		stock, err := strconv.ParseUint(stockStr, 10, 64)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Invalid stock",
-				"Error":   err,
+				"Message": err,
+				"Status":  http.StatusBadRequest,
 			})
 		}
 		req.Stock = uint(stock)
 		if stock == 0 {
 			req.Status = "habis"
+		} else {
+			req.Status = "tersedia"
 		}
 	}
 
@@ -347,8 +399,8 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		price, err := strconv.ParseFloat(priceStr, 64)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Invalid price",
-				"Error":   err,
+				"Message": err,
+				"Status":  http.StatusBadRequest,
 			})
 		}
 		req.Price = float64(price)
@@ -363,26 +415,29 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 
 	err = h.productUseCase.UpdateProduct(productId, &req)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"Message": "Failed to update data",
-			"Error":   err,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
 	err = h.productUseCase.UpdateProductStock(productId, req.Stock)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"Message": "Failed to update product stock",
-			"Error":   err,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
 	var productImages []ep.ProductImage
 	err = h.productUseCase.DeleteProductImage(fmt.Sprint(product.ID), &productImages)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"Message": "Failed to delete product images",
-			"Error":   err,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
@@ -391,6 +446,27 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	for i := 1; i <= 5; i++ {
 		fileHeader, _ = c.FormFile(fmt.Sprintf("PhotoContentUrl%d", i))
 		if fileHeader != nil {
+			fileExtension := filepath.Ext(fileHeader.Filename)
+			allowedExtensions := map[string]bool{
+				".png":  true,
+				".jpeg": true,
+				".jpg":  true,
+			}
+			if !allowedExtensions[fileExtension] {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{
+					"Message": "Mohon maaf, format file yang Anda unggah tidak sesuai",
+					"Status":  http.StatusBadRequest,
+				})
+			}
+			maxFileSize := 4 * 1024 * 1024
+			fileSize := fileHeader.Size
+			if fileSize > int64(maxFileSize) {
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{
+					"Message": "Mohon maaf, ukuran file Anda melebihi batas maksimum 4MB",
+					"Status":  http.StatusBadRequest,
+				})
+			}
+
 			PhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
 
 			productImage := ep.ProductImage{
@@ -399,9 +475,10 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 			}
 			err = h.productUseCase.CreateProductImage(&productImage)
 			if err != nil {
-				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-					"Message": err.Error(),
-					"Status":  http.StatusInternalServerError,
+				code, msg := cs.CustomStatus(err.Error())
+				return c.JSON(code, echo.Map{
+					"Status":  code,
+					"Message": msg,
 				})
 			}
 		} else {
@@ -436,9 +513,10 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 	var product ep.Product
 	product, err := h.productUseCase.GetProductByID(productId, &product)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": err.Error(),
-			"Status":  http.StatusInternalServerError,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
@@ -454,18 +532,20 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 
 		err = h.productUseCase.DeleteProductImageByID(image.ID, &image)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Failed to delete product image",
-				"Status":  http.StatusInternalServerError,
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 	}
 
 	err = h.productUseCase.DeleteProduct(productId, &product)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": err.Error(),
-			"Status":  http.StatusInternalServerError,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
@@ -480,9 +560,10 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 
 	products, err := h.productUseCase.GetAllProductNoPagination(&products)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"Message": "Failed to get product datas",
-			"Error":   err,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
@@ -493,9 +574,10 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 	for _, product := range products {
 		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Failed to get product images",
-				"Error":   err,
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 

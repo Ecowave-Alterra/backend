@@ -152,9 +152,10 @@ func (pch *ProductCategoryHandler) DeleteProductCategory(c echo.Context) error {
 
 	_, err = pch.productCategoryUsecase.GetProductCategoryById(id)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{
-			"Message": err.Error(),
-			"Status":  http.StatusNotFound,
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
 		})
 	}
 
