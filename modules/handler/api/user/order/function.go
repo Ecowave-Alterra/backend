@@ -25,8 +25,8 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 
 		idUser, _ := h.GetIdUser(e)
 
-		id := e.QueryParam("filter")
-		order, total, err := oh.orderUsecase.GetOrder(id, idUser, offset, pageSize)
+		filter := e.QueryParam("filter")
+		order, total, err := oh.orderUsecase.GetOrder(filter, idUser, offset, pageSize)
 
 		if err != nil {
 			code, msg := cs.CustomStatus(err.Error())

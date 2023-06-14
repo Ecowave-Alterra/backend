@@ -11,8 +11,9 @@ type TransactionRepo interface {
 	GetPoint(id uint) (uint, error)
 	ClaimVoucher(id uint) (ev.Voucher, error)
 	CountVoucherUser(idUser uint, idVoucher uint) (uint, error)
-	GetVoucherUser(id uint, offset int, pageSize int) ([]ev.VoucherUserResponse, int64, error)
+	GetVoucherUser(id uint, offset int, pageSize int) ([]ev.Voucher, int64, error)
 	DetailVoucher(id uint) (ev.Voucher, error)
+	UpdateTransaction(transaction et.Transaction) error
 }
 
 type transactionRepo struct {

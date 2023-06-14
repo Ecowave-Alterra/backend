@@ -7,16 +7,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (or *orderRepo) GetOrder(id string, idUser uint, offset int, pageSize int) ([]et.Transaction, int64, error) {
+func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize int) ([]et.Transaction, int64, error) {
 	var transaction []et.Transaction
 	var count int64
 
-	err := or.db.Preload("TransactionDetails").Where("status_transaction = ? AND user_id = ?", id, idUser).Count(&count).Error
+	err := or.db.Preload("TransactionDetails").Where("status_transaction = ? AND user_id = ?", filter, idUser).Count(&count).Error
 	if err != nil {
 		return nil, 0, echo.NewHTTPError(404, err)
 	}
 
-	err = or.db.Offset(offset).Limit(pageSize).Preload("TransactionDetails").Where("status_transaction = ? AND user_id = ?", id, idUser).Find(&transaction).Error
+	err = or.db.Offset(offset).Limit(pageSize).Preload("TransactionDetails").Where("status_transaction = ? AND user_id = ?", filter, idUser).Find(&transaction).Error
 	if err != nil {
 		return nil, 0, echo.NewHTTPError(404, err)
 	}

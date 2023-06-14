@@ -8,6 +8,7 @@ import (
 
 type Voucher struct {
 	*gorm.Model `json:"-"`
+	ID          uint `json:"Id" gorm:"primary_key"`
 	// VoucherID       uint        `json:"voucherID"`
 	StartDate       time.Time   `json:"startDate" form:"startDate"`
 	EndDate         time.Time   `json:"endDate" form:"endDate"`

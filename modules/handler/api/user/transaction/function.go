@@ -1,12 +1,12 @@
 package transaction
 
 import (
-	"math"
 	"net/http"
 	"strconv"
 
 	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	h "github.com/berrylradianh/ecowave-go/helper/getIdUser"
+	em "github.com/berrylradianh/ecowave-go/modules/entity/midtrans"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	ut "github.com/berrylradianh/ecowave-go/modules/usecase/user/transaction"
 
@@ -22,7 +22,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		c.Bind(&transaction)
 		transaction.UserId = uint(id)
 
-		err := th.transactionUsecase.CreateTransaction(&transaction)
+		snapUrl, err := th.transactionUsecase.CreateTransaction(&transaction)
 		if err != nil {
 			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{
@@ -32,8 +32,32 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Status":  201,
-			"Message": "Success Create Transaction",
+			"Status":      201,
+			"Message":     "Success Create Transaction",
+			"Payment_url": snapUrl,
+		})
+	}
+
+}
+
+func (th *TransactionHandler) MidtransNotifications() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		request := em.MidtransRequest{}
+		c.Bind(&request)
+
+		err := th.transactionUsecase.MidtransNotifications(&request)
+		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Status":  200,
+			"Message": "Success Confirm Payment",
 		})
 	}
 
@@ -84,19 +108,21 @@ func (th *TransactionHandler) GetVoucherUser() echo.HandlerFunc {
 				"Message": msg,
 			})
 		}
-		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
-		if page > totalPages {
-			return c.JSON(http.StatusNotFound, echo.Map{
-				"Status":  404,
-				"Message": "Halaman Tidak Ditemukan",
-			})
-		}
+		// log.Println(res)
+		// log.Println(total)
+		// totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+		// if page > totalPages {
+		// 	return c.JSON(http.StatusNotFound, echo.Map{
+		// 		"Status":  404,
+		// 		"Message": "Halaman Tidak Ditemukan",
+		// 	})
+		// }
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"Status":    200,
 			"Message":   "Success Get Voucher User",
 			"Page":      page,
-			"TotalPage": totalPages,
+			"TotalPage": total,
 			"Voucher":   res,
 		})
 	}

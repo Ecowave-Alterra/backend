@@ -5,9 +5,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (oc *orderUsecase) GetOrder(id string, idUser uint, offset int, pageSize int) (interface{}, int64, error) {
+func (oc *orderUsecase) GetOrder(filter string, idUser uint, offset int, pageSize int) (interface{}, int64, error) {
 
-	res, count, err := oc.orderRepo.GetOrder(id, idUser, offset, pageSize)
+	res, count, err := oc.orderRepo.GetOrder(filter, idUser, offset, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}

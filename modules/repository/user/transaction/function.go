@@ -1,6 +1,9 @@
 package transaction
 
 import (
+	"errors"
+	"log"
+
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	eu "github.com/berrylradianh/ecowave-go/modules/entity/user"
@@ -31,6 +34,19 @@ func (tr *transactionRepo) CreateTransaction(transaction *et.Transaction) error 
 	}
 	return nil
 }
+func (tr *transactionRepo) UpdateTransaction(updateData et.Transaction) error {
+
+	result := tr.db.Model(&et.Transaction{}).Where("transaction_id = ?", updateData.TransactionId).Updates(&updateData)
+
+	if err := result.Error; err != nil {
+		return err
+	}
+
+	if result.RowsAffected < 1 {
+		return errors.New("err")
+	}
+	return nil
+}
 
 func (tr *transactionRepo) GetPoint(id uint) (uint, error) {
 	var userDetail eu.UserDetail
@@ -44,25 +60,48 @@ func (tr *transactionRepo) GetPoint(id uint) (uint, error) {
 
 }
 
-func (tr *transactionRepo) GetVoucherUser(id uint, offset int, pageSize int) ([]ev.VoucherUserResponse, int64, error) {
-	var result []ev.VoucherUserResponse
+func (tr *transactionRepo) GetVoucherUser(id uint, offset int, pageSize int) ([]ev.Voucher, int64, error) {
+	type IdVoucher struct {
+		Id int
+	}
+	var idVoucher []IdVoucher
+	// var result []ev.VoucherUserResponse
+	var voucher []ev.Voucher
 	var count int64
 
 	subquery := tr.db.Model(&ev.Voucher{}).Select(`vouchers.id, voucher_types.type, vouchers.end_date, voucher_types.photo_url,
-	vouchers.minimum_purchase,vouchers.max_claim_limit, count(*) user_claim`).Joins("left join transactions on transactions.voucher_id = vouchers.id").Joins("left join voucher_types on voucher_types.id = transactions.voucher_id").Where("transactions.user_id = ?", id).Group("transactions.voucher_id")
+	vouchers.minimum_purchase,vouchers.max_claim_limit, count(*) user_claim`).Joins("left join transactions on transactions.voucher_id = vouchers.id").Joins("left join voucher_types on voucher_types.id = transactions.voucher_id").Where("transactions.user_id = ?", id).Group("vouchers.id")
 
-	err := tr.db.Table("(?) as sub", subquery).Where("user_claim < max_claim_limit").Count(&count).Error
+	err := tr.db.Select(`id`).Table("(?) as sub", subquery).Where("user_claim > max_claim_limit").Scan(&idVoucher).Error
 	if err != nil {
 		return nil, 0, echo.NewHTTPError(404, err)
 	}
 
-	err = tr.db.Offset(offset).Limit(pageSize).Table("(?) as sub", subquery).Where("user_claim < max_claim_limit").Scan(&result).Error
+	err = tr.db.Not(idVoucher).Find(&voucher).Count(&count).Error
 
+	// subquery2 := tr.db.Select(`id`).Table("(?) as sub", subquery).Where("user_claim > max_claim_limit")
+
+	log.Println(idVoucher)
+
+	// db.Not(map[string]interface{}{"name": []string{"jinzhu", "jinzhu 2"}}).Find(&voucher)
+	// SELECT * FROM users WHERE name NOT IN ("jinzhu", "jinzhu 2");
+
+	// SELECT * FROM vouchers WHERE id NOT IN
+	// (SELECT ProductName FROM Supplier WHERE SupplierName = "ABC");
+
+	//
+	// err := tr.db.Table("(?) as sub", subquery).Where("user_claim < max_claim_limit").Count(&count).Error
 	if err != nil {
-		return result, 0, echo.NewHTTPError(404, err)
+		return nil, 0, echo.NewHTTPError(404, err)
 	}
 
-	return result, count, nil
+	err = tr.db.Preload("VoucherType").Offset(offset).Limit(pageSize).Not(idVoucher).Find(&voucher).Error
+
+	if err != nil {
+		return voucher, 0, echo.NewHTTPError(404, err)
+	}
+
+	return voucher, count, nil
 
 }
 func (tr *transactionRepo) CountVoucherUser(idUser uint, idVoucher uint) (uint, error) {

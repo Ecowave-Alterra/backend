@@ -20,6 +20,11 @@ require (
 )
 
 require (
+	github.com/midtrans/midtrans-go v1.3.6
+	gorm.io/driver/mysql v1.5.1
+)
+
+require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
@@ -52,5 +57,4 @@ require (
 	google.golang.org/grpc v1.55.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
-	gorm.io/driver/mysql v1.5.1 // indirect
 )
