@@ -3,12 +3,15 @@ package review
 import (
 	"mime/multipart"
 
-	er "github.com/berrylradianh/ecowave-go/modules/entity/review"
+	// et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	ur "github.com/berrylradianh/ecowave-go/modules/repository/user/review"
 )
 
 type ReviewUsecase interface {
-	CreateReview(review *er.Review, fileHeader, videoHeader *multipart.FileHeader) error
+	CreateReview(ratingService float64, transactionId string) error
+	CreateReviewDetail(ratingProduct float64, comment string, fileHeader, videoHeader *multipart.FileHeader, transactionId string) error
+	CountTransactionDetail(transactionId string) (int, error)
+	UpdatePoint(id int) error
 }
 
 type reviewUsecase struct {

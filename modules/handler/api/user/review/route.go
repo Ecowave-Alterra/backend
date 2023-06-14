@@ -7,5 +7,5 @@ func (rh *ReviewHandler) RegisterRoutes(e *echo.Echo) {
 
 	reviewGroup := e.Group("/user/review")
 	// reviewGroup.Use(jwtMiddleware)
-	reviewGroup.POST("", rh.CreateReview)
+	reviewGroup.POST("/:id", rh.CreateReview)
 }
