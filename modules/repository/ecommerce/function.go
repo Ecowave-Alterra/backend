@@ -33,6 +33,7 @@ func (er *ecommerceRepo) GetProductByID(productId string) ([]ee.QueryResponse, e
 
 func (er *ecommerceRepo) GetProductImageURLById(productId string, productImage *ep.ProductImage) ([]ep.ProductImage, error) {
 	var productImages []ep.ProductImage
+
 	if err := er.db.Model(&ep.ProductImage{}).Where("product_id = ?", productId).Find(&productImages).Error; err != nil {
 		return productImages, echo.NewHTTPError(404, err)
 	}

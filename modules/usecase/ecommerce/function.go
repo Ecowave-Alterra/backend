@@ -2,6 +2,7 @@ package ecommerce
 
 import (
 	"fmt"
+	"math"
 
 	ee "github.com/berrylradianh/ecowave-go/modules/entity/ecommerce"
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
@@ -88,7 +89,7 @@ func (ec *ecommerceUseCase) GetProductByID(productId string) (ee.ProductDetailRe
 		Status:          queryResponse[0].Status,
 		Description:     queryResponse[0].Description,
 		ProductImageUrl: productImageURLs,
-		AvgRating:       avgRating,
+		AvgRating:       math.Round(avgRating*10) / 10,
 		Review:          reviews,
 	}
 
