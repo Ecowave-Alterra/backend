@@ -51,8 +51,7 @@ func InitialMigration() {
 		ue.User{},
 		ue.UserDetail{},
 		ie.Information{},
-		er.Review{},
-		er.ReviewDetail{},
+		er.RatingProduct{},
 		et.Transaction{},
 		et.TransactionDetail{},
 		ep.Product{},
@@ -64,5 +63,4 @@ func InitialMigration() {
 	)
 	DB.Migrator().HasConstraint(&ue.User{}, "UserDetail")
 	DB.Migrator().HasConstraint(&re.Role{}, "Users")
-	// DB.Migrator().HasConstraint(&er.Review{}, "Users")
 }

@@ -2,7 +2,6 @@ package review
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
@@ -15,17 +14,6 @@ func (rh *ReviewHandler) CreateReview(c echo.Context) error {
 
 	transactionId := c.Param("id")
 
-	ratingService, err := strconv.ParseFloat(c.FormValue("RatingService"), 64)
-	if err != nil {
-		return err
-	}
-
-	if err := rh.reviewUsecase.CreateReview(ratingService, transactionId); err != nil {
-		return c.JSON(500, echo.Map{
-			"Message": err,
-		})
-	}
-
 	countTransactionDetail, err := rh.reviewUsecase.CountTransactionDetail(transactionId)
 	if err != nil {
 		return c.JSON(500, echo.Map{
@@ -33,7 +21,12 @@ func (rh *ReviewHandler) CreateReview(c echo.Context) error {
 		})
 	}
 
-	log.Println(countTransactionDetail)
+	idTransactionDetails, err := rh.reviewUsecase.GetIdTransactionDetail(transactionId)
+	if err != nil {
+		return c.JSON(500, echo.Map{
+			"Message": err,
+		})
+	}
 
 	var ratingProduct float64
 	for i := 1; i <= countTransactionDetail; i++ {
@@ -45,15 +38,26 @@ func (rh *ReviewHandler) CreateReview(c echo.Context) error {
 		fileHeader, _ := c.FormFile(fmt.Sprintf("PhotoUrl%d", i))
 		videoHeader, _ := c.FormFile(fmt.Sprintf("VideoUrl%d", i))
 
-		if err := rh.reviewUsecase.CreateReviewDetail(ratingProduct, comment, fileHeader, videoHeader, transactionId); err != nil {
+		if err := rh.reviewUsecase.CreateRatingProduct(ratingProduct, comment, fileHeader, videoHeader, idTransactionDetails[i-1]); err != nil {
 			return c.JSON(500, echo.Map{
 				"Message": err,
 			})
 		}
 	}
 
+	ratingExpedition, err := strconv.ParseFloat(c.FormValue("ExpeditionRating"), 32)
+	if err != nil {
+		return err
+	}
+
+	if err := rh.reviewUsecase.UpdateExpeditionRating(float32(ratingExpedition), transactionId); err != nil {
+		return c.JSON(500, echo.Map{
+			"Message": err,
+		})
+	}
+
 	idUserTemp := 2
-	if ratingService != 0 && ratingProduct != 0 {
+	if ratingExpedition != 0 && ratingProduct != 0 {
 		if err := rh.reviewUsecase.UpdatePoint(idUserTemp); err != nil {
 			return err
 		}

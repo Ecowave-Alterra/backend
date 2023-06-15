@@ -6,30 +6,14 @@ import (
 	eu "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
-func (rr *reviewRepo) CreateReview(review *er.Review) error {
-	if err := rr.db.Create(&review).Error; err != nil {
-		return err
-	}
+func (rr *reviewRepo) CountTransactionDetail(transactionId string) (int, error) {
+	var count int
 
-	return nil
-}
-
-func (rr *reviewRepo) CreateReviewDetail(reviewDetail *er.ReviewDetail) error {
-	if err := rr.db.Create(&reviewDetail).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (rr *reviewRepo) GetIdReview(idTransaction int) (int, error) {
-	var review *er.Review
-
-	if err := rr.db.Where("transaction_id = ?", idTransaction).Find(&review).Error; err != nil {
+	if err := rr.db.Raw("SELECT COUNT(td.product_id) FROM transaction_details td WHERE td.transaction_id = (SELECT id FROM transactions WHERE transaction_id = ?)", transactionId).Scan(&count).Error; err != nil {
 		return 0, err
 	}
 
-	return int(review.ID), nil
+	return count, nil
 }
 
 func (rr *reviewRepo) GetIdTransaction(transactionId string) (int, error) {
@@ -42,23 +26,43 @@ func (rr *reviewRepo) GetIdTransaction(transactionId string) (int, error) {
 	return int(transaction.ID), nil
 }
 
-func (rr *reviewRepo) CountTransactionDetail(transactionId string) (int, error) {
-	// var transaction *et.Transaction
-	// var transactionDetail *et.TransactionDetail
-	// subQuery := rr.db.Model(&transaction).Where("transaction_id = ?", transactionId).Select("id")
-	// result := rr.db.Model(&transactionDetail).Where("transaction_id = ?", subQuery)
-	// if result.Error != nil {
-	// 	return 0, result.Error
-	// }
-	// count := result.RowsAffected
+func (rr *reviewRepo) GetProductId(transactionId string) ([]string, error) {
+	var productId []string
 
-	var count int
+	if err := rr.db.Raw("SELECT td.product_id FROM transaction_details td WHERE td.transaction_id = (SELECT id FROM transactions WHERE transaction_id = ?)", transactionId).Scan(&productId).Error; err != nil {
+		return nil, err
+	}
 
-	if err := rr.db.Raw("SELECT COUNT(td.product_id) FROM transaction_details td WHERE td.transaction_id = (SELECT id FROM transactions WHERE transaction_id = ?)", transactionId).Scan(&count).Error; err != nil {
+	return productId, nil
+}
+
+func (rr *reviewRepo) GetIdTransactionDetail(idTransaction, productId int) (int, error) {
+	var id int
+
+	if err := rr.db.Raw("SELECT id FROM transaction_details WHERE transaction_id = ? AND product_id = ?", idTransaction, productId).Scan(&id).Error; err != nil {
 		return 0, err
 	}
 
-	return count, nil
+	return id, nil
+}
+
+func (rr *reviewRepo) CreateRatingProduct(ratingProduct *er.RatingProduct) error {
+	if err := rr.db.Create(&ratingProduct).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (rr *reviewRepo) UpdateExpeditionRating(ratingExpedition float32, transactionId string) error {
+	var transaction *et.Transaction
+
+	err := rr.db.Model(transaction).Where("transaction_id = ?", transactionId).Update("expedition_rating", ratingExpedition).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (rr *reviewRepo) GetPoint(id int) (int, error) {
@@ -71,10 +75,10 @@ func (rr *reviewRepo) GetPoint(id int) (int, error) {
 	return int(userDetail.Point), nil
 }
 
-func (rr *reviewRepo) UpdatePoint(id int, point int) error {
+func (rr *reviewRepo) UpdatePoint(idUser int, point int) error {
 	var userDetail *eu.UserDetail
 
-	err := rr.db.Model(userDetail).Where("id = ?", id).Update("point", point).Error
+	err := rr.db.Model(userDetail).Where("id = ?", idUser).Update("point", point).Error
 	if err != nil {
 		return err
 	}

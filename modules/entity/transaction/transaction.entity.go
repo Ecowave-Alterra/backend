@@ -1,7 +1,6 @@
 package transaction
 
 import (
-	er "github.com/berrylradianh/ecowave-go/modules/entity/review"
 	"gorm.io/gorm"
 )
 
@@ -26,7 +25,6 @@ type Transaction struct {
 	Discount           float64 `json:"Discount" form:"Discount"`
 	TotalPrice         float64
 	TransactionDetails []TransactionDetail `json:"TransactionDetails" form:"TransactionDetails" gorm:"foreignKey:TransactionId"`
-	Review             er.Review           `gorm:"foreignKey:TransactionId"`
 }
 
 type CanceledReason struct {
