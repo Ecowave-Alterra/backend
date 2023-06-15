@@ -9,7 +9,7 @@ type ProductResponse struct {
 
 type QueryResponse struct {
 	Id              int     `json:"Id"`
-	ProductId       int     `json:"ProductId"`
+	ProductId       string  `json:"ProductId"`
 	Name            string  `json:"Name"`
 	Category        string  `json:"Category"`
 	Stock           int     `json:"Stock"`
@@ -36,7 +36,7 @@ type ReviewResponse struct {
 }
 
 type ProductDetailResponse struct {
-	ProductId       int              `json:"ProductId"`
+	ProductId       string           `json:"ProductId"`
 	Name            string           `json:"Name"`
 	Category        string           `json:"Category"`
 	Stock           int              `json:"Stock"`
