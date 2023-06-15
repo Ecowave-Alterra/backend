@@ -23,7 +23,7 @@ func (er *ecommerceRepo) GetAllProduct(products *[]ep.Product, offset, pageSize 
 func (er *ecommerceRepo) GetProductByID(productId string) ([]ee.QueryResponse, error) {
 	var queryResponse *[]ee.QueryResponse
 
-	result := er.db.Raw("SELECT p.id, p.name, pc.category, p.stock, p.price, p.status, p.description, ud.full_name, rp.rating, rp.comment, rp.comment_admin, rp.photo_url, rp.video_url FROM rating_products rp JOIN transaction_details td ON(rp.id = td.rating_product_id) JOIN transactions t ON(td.transaction_id = t.id) JOIN users u ON(t.user_id = u.id) JOIN user_details ud ON(u.id = ud.user_id) JOIN products p ON(td.producttt_id = p.id) JOIN product_categories pc ON(p.product_category_id = pc.id) WHERE p.product_id = ?", productId).Scan(&queryResponse)
+	result := er.db.Raw("SELECT p.id, p.product_id, p.name, pc.category, p.stock, p.price, p.status, p.description, ud.full_name, ud.profile_photo_url, rp.rating, rp.comment, rp.comment_admin, rp.photo_url, rp.video_url FROM rating_products rp JOIN transaction_details td ON(rp.transaction_detail_id = td.id) JOIN transactions t ON(td.transaction_id = t.id) JOIN users u ON(t.user_id = u.id) JOIN user_details ud ON(u.id = ud.user_id) JOIN products p ON(td.product_id = p.id) JOIN product_categories pc ON(p.product_category_id = pc.id) WHERE p.product_id = ?", productId).Scan(&queryResponse)
 	if result.Error != nil {
 		return *queryResponse, echo.NewHTTPError(404, result.Error)
 	}
@@ -36,7 +36,19 @@ func (er *ecommerceRepo) GetProductImageURLById(productId string, productImage *
 	if err := er.db.Model(&ep.ProductImage{}).Where("product_id = ?", productId).Find(&productImages).Error; err != nil {
 		return productImages, echo.NewHTTPError(404, err)
 	}
+
 	return productImages, nil
+}
+
+func (er *ecommerceRepo) AvgRating(productId string) (float64, error) {
+	var avgRating float64
+
+	result := er.db.Raw("SELECT AVG(rp.rating) AS rata22 FROM rating_products rp JOIN transaction_details td ON(rp.transaction_detail_id = td.id) JOIN products p ON(td.product_id = p.id) WHERE p.product_id = ?", productId).Scan(&avgRating)
+	if result.Error != nil {
+		return 0, echo.NewHTTPError(404, result.Error)
+	}
+
+	return avgRating, nil
 }
 
 func (er *ecommerceRepo) FilterProductByCategory(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error) {

@@ -53,12 +53,13 @@ func (ec *ecommerceUseCase) GetProductByID(productId string) (ee.ProductDetailRe
 
 	for _, value := range queryResponse {
 		review := ee.ReviewResponse{
-			FullName:     value.FullName,
-			Rating:       float32(value.Rating),
-			Comment:      value.Comment,
-			CommentAdmin: value.CommentAdmin,
-			PhotoURL:     value.PhotoURL,
-			VideoURL:     value.VideoURL,
+			FullName:        value.FullName,
+			ProfilePhotoUrl: value.ProfilePhotoUrl,
+			Rating:          value.Rating,
+			Comment:         value.Comment,
+			CommentAdmin:    value.CommentAdmin,
+			PhotoURL:        value.PhotoURL,
+			VideoURL:        value.VideoURL,
 		}
 		reviews = append(reviews, review)
 	}
@@ -73,7 +74,13 @@ func (ec *ecommerceUseCase) GetProductByID(productId string) (ee.ProductDetailRe
 		productImageURLs = append(productImageURLs, image.ProductImageUrl)
 	}
 
+	avgRating, err := ec.ecommerceRepo.AvgRating(productId)
+	if err != nil {
+		return productDetailResponse, err
+	}
+
 	productDetailResponse = ee.ProductDetailResponse{
+		ProductId:       queryResponse[0].ProductId,
 		Name:            queryResponse[0].Name,
 		Category:        queryResponse[0].Category,
 		Stock:           queryResponse[0].Stock,
@@ -81,6 +88,7 @@ func (ec *ecommerceUseCase) GetProductByID(productId string) (ee.ProductDetailRe
 		Status:          queryResponse[0].Status,
 		Description:     queryResponse[0].Description,
 		ProductImageUrl: productImageURLs,
+		AvgRating:       avgRating,
 		Review:          reviews,
 	}
 
