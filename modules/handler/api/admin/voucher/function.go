@@ -38,11 +38,11 @@ func (vh *VoucherHandler) GetAllVoucher(c echo.Context) error {
 		endDate := voucher.EndDate.Format(outputDateFormat)
 
 		voucherResponse := ve.VoucherResponse{
-			VoucherId:      voucher.VoucherId,
-			Type:           voucher.VoucherType.Type,
-			ClaimableCount: voucher.ClaimableCount,
-			StartDate:      startDate,
-			EndDate:        endDate,
+			VoucherId:          voucher.VoucherId,
+			Type:               voucher.VoucherType.Type,
+			ClaimableUserCount: voucher.ClaimableUserCount,
+			StartDate:          startDate,
+			EndDate:            endDate,
 		}
 
 		voucherResponses = append(voucherResponses, voucherResponse)
@@ -88,15 +88,15 @@ func (vh *VoucherHandler) GetVoucherById(c echo.Context) error {
 	endDate := voucher.EndDate.Format(outputDateFormat)
 
 	voucherResponse = ve.VoucherResponse{
-		VoucherId:       voucher.VoucherId,
-		Type:            voucher.VoucherType.Type,
-		StartDate:       startDate,
-		EndDate:         endDate,
-		MinimumPurchase: voucher.MinimumPurchase,
-		MaximumDiscount: voucher.MaximumDiscount,
-		DiscountPercent: voucher.DiscountPercent,
-		ClaimableCount:  voucher.ClaimableCount,
-		MaxClaimLimit:   voucher.MaxClaimLimit,
+		VoucherId:          voucher.VoucherId,
+		Type:               voucher.VoucherType.Type,
+		StartDate:          startDate,
+		EndDate:            endDate,
+		MinimumPurchase:    voucher.MinimumPurchase,
+		MaximumDiscount:    voucher.MaximumDiscount,
+		DiscountPercent:    voucher.DiscountPercent,
+		ClaimableUserCount: voucher.ClaimableUserCount,
+		MaxClaimLimit:      voucher.MaxClaimLimit,
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
@@ -106,90 +106,33 @@ func (vh *VoucherHandler) GetVoucherById(c echo.Context) error {
 }
 
 func (vh *VoucherHandler) CreateVoucher(c echo.Context) error {
-	voucherTypeIDstr := c.FormValue("voucherTypeID")
-	voucherTypeID, err := strconv.ParseUint(voucherTypeIDstr, 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "VoucherTypeID harus berupa angka",
+	var voucher *ve.VoucherRequest
+	if err := c.Bind(&voucher); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"Message": err.Error(),
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
-	startDateStr := c.FormValue("startDate")
-	startDate, err := time.Parse("02 January 2006", startDateStr)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Tanggal mulai tidak valid",
+	validVoucherTypeId := map[int]bool{1: true, 2: true}
+	if voucher.VoucherId != "" || !validVoucherTypeId[int(voucher.VoucherTypeID)] {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Anda gagal membuat voucher",
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
-	endDateStr := c.FormValue("endDate")
-	endDate, err := time.Parse("02 January 2006", endDateStr)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Tanggal berakhir tidak valid",
-		})
-	}
-
-	minimumPurchaseStr := c.FormValue("minimumPurchase")
-	minimumPurchase, err := strconv.ParseFloat(minimumPurchaseStr, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Minimum belanja harus berupa angka. Contoh : 100500",
-		})
-	}
-
-	maximumDiscountStr := c.FormValue("maximumDiscount")
-	maximumDiscount, err := strconv.ParseFloat(maximumDiscountStr, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Maksimum potongan harga harus berupa angka. Contoh 100500",
-		})
-	}
-
-	discountPercentStr := c.FormValue("discountPercent")
-	discountPercent, err := strconv.ParseFloat(discountPercentStr, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Diskon harus berupa angka dari 5 - 100. Contoh : 50",
-		})
-	}
-
-	claimableCountStr := c.FormValue("claimableCount")
-	claimableCount, err := strconv.ParseUint(claimableCountStr, 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Jumlah voucher harus berupa angka. Contoh 100500",
-		})
-	}
-
-	maxClaimLimitStr := c.FormValue("maxClaimLimit")
-	maxClaimLimit, err := strconv.ParseUint(maxClaimLimitStr, 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Maksimum klaim voucher harus berupa angka. Contoh 100500",
-		})
-	}
-
-	voucher := ve.Voucher{
-		VoucherTypeID:   uint(voucherTypeID),
-		StartDate:       startDate,
-		EndDate:         endDate,
-		MinimumPurchase: minimumPurchase,
-		MaximumDiscount: maximumDiscount,
-		DiscountPercent: discountPercent,
-		ClaimableCount:  uint(claimableCount),
-		MaxClaimLimit:   uint(maxClaimLimit),
-	}
-
-	err = vh.voucherUsecase.CreateVoucher(&voucher)
+	err := vh.voucherUsecase.CreateVoucher(voucher)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"Message": "Gagal membuat voucher baru",
+			"Message": err.Error(),
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message": "Anda berhasil menambahkan voucher",
+		"Message": "Anda berhasil membuat voucher",
+		"Status":  http.StatusOK,
 	})
 }
 
@@ -221,8 +164,8 @@ func (vh *VoucherHandler) UpdateVoucher(c echo.Context) error {
 			})
 		}
 
-		claimableCountStr := c.FormValue("claimableCount")
-		claimableCount, err := strconv.ParseUint(claimableCountStr, 10, 64)
+		claimableUserCountStr := c.FormValue("claimableCount")
+		claimableUserCount, err := strconv.ParseUint(claimableUserCountStr, 10, 64)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
 				"Message": "Jumlah voucher harus berupa angka. Contoh 100500",
@@ -238,11 +181,11 @@ func (vh *VoucherHandler) UpdateVoucher(c echo.Context) error {
 		}
 
 		voucher := ve.Voucher{
-			VoucherTypeID:  uint(voucherTypeID),
-			StartDate:      startDate,
-			EndDate:        endDate,
-			ClaimableCount: uint(claimableCount),
-			MaxClaimLimit:  uint(maxClaimLimit),
+			VoucherTypeID:      uint(voucherTypeID),
+			StartDate:          startDate,
+			EndDate:            endDate,
+			ClaimableUserCount: uint(claimableUserCount),
+			MaxClaimLimit:      uint(maxClaimLimit),
 		}
 
 		err = vh.voucherUsecase.UpdateVoucher(voucherID, &voucher)
@@ -292,8 +235,8 @@ func (vh *VoucherHandler) UpdateVoucher(c echo.Context) error {
 			})
 		}
 
-		claimableCountStr := c.FormValue("claimableCount")
-		claimableCount, err := strconv.ParseUint(claimableCountStr, 10, 64)
+		claimableUserCountStr := c.FormValue("claimableCount")
+		claimableUserCount, err := strconv.ParseUint(claimableUserCountStr, 10, 64)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
 				"Message": "Jumlah voucher harus berupa angka. Contoh 100500",
@@ -309,14 +252,14 @@ func (vh *VoucherHandler) UpdateVoucher(c echo.Context) error {
 		}
 
 		voucher := ve.Voucher{
-			VoucherTypeID:   uint(voucherTypeID),
-			StartDate:       startDate,
-			EndDate:         endDate,
-			MinimumPurchase: minimumPurchase,
-			MaximumDiscount: maximumDiscount,
-			DiscountPercent: discountPercent,
-			ClaimableCount:  uint(claimableCount),
-			MaxClaimLimit:   uint(maxClaimLimit),
+			VoucherTypeID:      uint(voucherTypeID),
+			StartDate:          startDate,
+			EndDate:            endDate,
+			MinimumPurchase:    minimumPurchase,
+			MaximumDiscount:    maximumDiscount,
+			DiscountPercent:    discountPercent,
+			ClaimableUserCount: uint(claimableUserCount),
+			MaxClaimLimit:      uint(maxClaimLimit),
 		}
 
 		err = vh.voucherUsecase.UpdateVoucher(voucherID, &voucher)
@@ -370,10 +313,10 @@ func (vh *VoucherHandler) FilterVouchersByType(c echo.Context) error {
 		endDate := voucher.EndDate.Format(outputDateFormat)
 
 		voucherResponse := ve.VoucherResponse{
-			Type:           voucher.VoucherType.Type,
-			ClaimableCount: voucher.ClaimableCount,
-			StartDate:      startDate,
-			EndDate:        endDate,
+			Type:               voucher.VoucherType.Type,
+			ClaimableUserCount: voucher.ClaimableUserCount,
+			StartDate:          startDate,
+			EndDate:            endDate,
 		}
 
 		voucherResponses = append(voucherResponses, voucherResponse)

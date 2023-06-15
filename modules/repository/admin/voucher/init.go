@@ -6,9 +6,10 @@ import (
 )
 
 type VoucherRepo interface {
-	CreateVoucher(voucher *ve.Voucher) error
+	CreateVoucher(voucher *ve.VoucherRequest) error
 	GetAllVoucher(offset, pageSize int) (*[]ve.Voucher, int64, error)
 	GetVoucherById(voucherId string) (*ve.Voucher, error)
+	CheckVoucherExists(voucherId string) (bool, error)
 	UpdateVoucher(voucherID string, voucher *ve.Voucher) error
 	DeleteVoucher(voucherID string, voucher *ve.Voucher) error
 	FilterVouchersByType(voucherType string, vouchers *[]ve.Voucher) ([]ve.Voucher, error)

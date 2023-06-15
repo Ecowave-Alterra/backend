@@ -99,7 +99,7 @@ func (tu *transactionUsecase) ClaimVoucher(idUser uint, idVoucher uint, shipCost
 	if err != nil {
 		return 0, err
 	}
-	if res.ClaimableCount > userClaim {
+	if res.ClaimableUserCount > userClaim {
 		return 0, echo.NewHTTPError(400, "User telah melebihi batas penggunaan voucher")
 	}
 	// validasi limit voucher

@@ -4,12 +4,23 @@ import (
 	ve "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
 )
 
-func (vr *voucherRepo) CreateVoucher(voucher *ve.Voucher) error {
+func (vr *voucherRepo) CreateVoucher(voucher *ve.VoucherRequest) error {
 	if err := vr.db.Create(voucher).Error; err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (vr *voucherRepo) CheckVoucherExists(voucherId string) (bool, error) {
+	var count int64
+	result := vr.db.Model(&ve.Voucher{}).Where("voucher_id = ?", voucherId).Count(&count)
+	if result.Error != nil {
+		return false, result.Error
+	}
+
+	exists := count > 0
+	return exists, nil
 }
 
 func (vr *voucherRepo) GetAllVoucher(offset, pageSize int) (*[]ve.Voucher, int64, error) {
