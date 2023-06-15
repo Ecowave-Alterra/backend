@@ -6,8 +6,9 @@ func (vc *voucherUsecase) CreateVoucher(voucher *ve.Voucher) error {
 	return vc.voucherRepo.CreateVoucher(voucher)
 }
 
-func (vc *voucherUsecase) GetAllVoucher(vouchers *[]ve.Voucher) ([]ve.Voucher, error) {
-	return vc.voucherRepo.GetAllVoucher(vouchers)
+func (vc *voucherUsecase) GetAllVoucher(offset, pageSize int) (*[]ve.Voucher, int64, error) {
+	vouchers, count, err := vc.voucherRepo.GetAllVoucher(offset, pageSize)
+	return vouchers, count, err
 }
 
 func (vc *voucherUsecase) UpdateVoucher(voucherID string, voucher *ve.Voucher) error {

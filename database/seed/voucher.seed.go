@@ -3,15 +3,75 @@ package seed
 import (
 	"time"
 
+	"github.com/berrylradianh/ecowave-go/helper/randomid"
 	ve "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
 )
 
 func CreateVoucher() []*ve.Voucher {
+	now := time.Now().UTC()
+	endDate := now.AddDate(0, 1, 0)
+
 	voucher := []*ve.Voucher{
 		{
 			VoucherTypeID:   2,
-			StartDate:       time.Date(2023, time.June, 04, 0, 0, 0, 0, time.UTC),
-			EndDate:         time.Date(2023, time.July, 04, 0, 0, 0, 0, time.UTC),
+			VoucherId:       randomid.GenerateRandomID(),
+			StartDate:       now,
+			EndDate:         endDate,
+			MinimumPurchase: 50000,
+			MaximumDiscount: 15000,
+			DiscountPercent: 10,
+			ClaimableCount:  1000,
+			MaxClaimLimit:   2,
+		},
+		{
+			VoucherTypeID:   2,
+			VoucherId:       randomid.GenerateRandomID(),
+			StartDate:       now,
+			EndDate:         endDate,
+			MinimumPurchase: 50000,
+			MaximumDiscount: 15000,
+			DiscountPercent: 10,
+			ClaimableCount:  1000,
+			MaxClaimLimit:   2,
+		},
+		{
+			VoucherTypeID:   2,
+			VoucherId:       randomid.GenerateRandomID(),
+			StartDate:       now,
+			EndDate:         endDate,
+			MinimumPurchase: 50000,
+			MaximumDiscount: 15000,
+			DiscountPercent: 10,
+			ClaimableCount:  1000,
+			MaxClaimLimit:   2,
+		},
+		{
+			VoucherTypeID:   2,
+			VoucherId:       randomid.GenerateRandomID(),
+			StartDate:       now,
+			EndDate:         endDate,
+			MinimumPurchase: 50000,
+			MaximumDiscount: 15000,
+			DiscountPercent: 10,
+			ClaimableCount:  1000,
+			MaxClaimLimit:   2,
+		},
+		{
+			VoucherTypeID:   2,
+			VoucherId:       randomid.GenerateRandomID(),
+			StartDate:       now,
+			EndDate:         endDate,
+			MinimumPurchase: 50000,
+			MaximumDiscount: 15000,
+			DiscountPercent: 10,
+			ClaimableCount:  1000,
+			MaxClaimLimit:   2,
+		},
+		{
+			VoucherTypeID:   2,
+			VoucherId:       randomid.GenerateRandomID(),
+			StartDate:       now,
+			EndDate:         endDate,
 			MinimumPurchase: 50000,
 			MaximumDiscount: 15000,
 			DiscountPercent: 10,
@@ -20,8 +80,49 @@ func CreateVoucher() []*ve.Voucher {
 		},
 		{
 			VoucherTypeID:  1,
-			StartDate:      time.Date(2023, time.June, 21, 0, 0, 0, 0, time.UTC),
-			EndDate:        time.Date(2023, time.July, 21, 0, 0, 0, 0, time.UTC),
+			VoucherId:      randomid.GenerateRandomID(),
+			StartDate:      now,
+			EndDate:        endDate,
+			ClaimableCount: 1000,
+			MaxClaimLimit:  3,
+		},
+		{
+			VoucherTypeID:  1,
+			VoucherId:      randomid.GenerateRandomID(),
+			StartDate:      now,
+			EndDate:        endDate,
+			ClaimableCount: 1000,
+			MaxClaimLimit:  3,
+		},
+		{
+			VoucherTypeID:  1,
+			VoucherId:      randomid.GenerateRandomID(),
+			StartDate:      now,
+			EndDate:        endDate,
+			ClaimableCount: 1000,
+			MaxClaimLimit:  3,
+		},
+		{
+			VoucherTypeID:  1,
+			VoucherId:      randomid.GenerateRandomID(),
+			StartDate:      now,
+			EndDate:        endDate,
+			ClaimableCount: 1000,
+			MaxClaimLimit:  3,
+		},
+		{
+			VoucherTypeID:  1,
+			VoucherId:      randomid.GenerateRandomID(),
+			StartDate:      now,
+			EndDate:        endDate,
+			ClaimableCount: 1000,
+			MaxClaimLimit:  3,
+		},
+		{
+			VoucherTypeID:  1,
+			VoucherId:      randomid.GenerateRandomID(),
+			StartDate:      now,
+			EndDate:        endDate,
 			ClaimableCount: 1000,
 			MaxClaimLimit:  3,
 		},

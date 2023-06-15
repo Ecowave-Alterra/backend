@@ -1,14 +1,75 @@
 package voucher
 
 import (
+	"math"
 	"net/http"
 	"strconv"
 	"time"
 
+	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	ve "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
 
 	"github.com/labstack/echo/v4"
 )
+
+func (vh *VoucherHandler) GetAllVoucher(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	pageSize := 10
+	offset := (page - 1) * pageSize
+
+	vouchers, total, err := vh.voucherUsecase.GetAllVoucher(offset, pageSize)
+	if err != nil {
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
+		})
+	}
+
+	var voucherResponses []ve.VoucherResponse
+	for _, voucher := range *vouchers {
+		outputDateFormat := "02 January 2006"
+		startDate := voucher.StartDate.Format(outputDateFormat)
+		endDate := voucher.EndDate.Format(outputDateFormat)
+
+		voucherResponse := ve.VoucherResponse{
+			VoucherId:      voucher.VoucherId,
+			Type:           voucher.VoucherType.Type,
+			ClaimableCount: voucher.ClaimableCount,
+			StartDate:      startDate,
+			EndDate:        endDate,
+		}
+
+		voucherResponses = append(voucherResponses, voucherResponse)
+	}
+
+	if len(voucherResponses) == 0 {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Belum ada list voucher",
+			"Status":  http.StatusNotFound,
+		})
+	} else {
+		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+		if page > totalPages {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Message": "Halaman Tidak Ditemukan",
+				"Status":  http.StatusNotFound,
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Vouchers":  voucherResponses,
+			"Page":      page,
+			"TotalPage": totalPages,
+			"Status":    http.StatusOK,
+		})
+	}
+}
 
 func (vh *VoucherHandler) CreateVoucher(c echo.Context) error {
 	voucherTypeIDstr := c.FormValue("voucherTypeID")
@@ -95,38 +156,6 @@ func (vh *VoucherHandler) CreateVoucher(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": "Anda berhasil menambahkan voucher",
-	})
-}
-
-func (vh *VoucherHandler) GetAllVoucher(c echo.Context) error {
-	var vouchers []ve.Voucher
-
-	vouchers, err := vh.voucherUsecase.GetAllVoucher(&vouchers)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"Message": "Gagal mengambil data voucher",
-		})
-	}
-
-	var voucherResponses []ve.VoucherResponse
-	for _, voucher := range vouchers {
-		outputDateFormat := "02 January 2006"
-		startDate := voucher.StartDate.Format(outputDateFormat)
-		endDate := voucher.EndDate.Format(outputDateFormat)
-
-		voucherResponse := ve.VoucherResponse{
-			Type:           voucher.VoucherType.Type,
-			ClaimableCount: voucher.ClaimableCount,
-			StartDate:      startDate,
-			EndDate:        endDate,
-		}
-
-		voucherResponses = append(voucherResponses, voucherResponse)
-	}
-
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message":  "Berhasil mengambil data voucher",
-		"Vouchers": voucherResponses,
 	})
 }
 

@@ -7,8 +7,9 @@ import (
 )
 
 type Voucher struct {
-	*gorm.Model `json:"-"`
-	// VoucherID       uint        `json:"voucherID"`
+	*gorm.Model     `json:"-"`
+	ID              uint `json:"Id" gorm:"primary_key"`
+	VoucherId       string
 	StartDate       time.Time   `json:"startDate" form:"startDate"`
 	EndDate         time.Time   `json:"endDate" form:"endDate"`
 	MinimumPurchase float64     `json:"minimumPurchase" form:"minimumPurchase"`
@@ -21,7 +22,7 @@ type Voucher struct {
 }
 
 type VoucherResponse struct {
-	// VoucherID uint
+	VoucherId      string
 	Type           string
 	ClaimableCount uint
 	StartDate      string

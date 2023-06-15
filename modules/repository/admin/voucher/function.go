@@ -1,6 +1,8 @@
 package voucher
 
-import ve "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
+import (
+	ve "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
+)
 
 func (vr *voucherRepo) CreateVoucher(voucher *ve.Voucher) error {
 	if err := vr.db.Create(voucher).Error; err != nil {
@@ -10,12 +12,18 @@ func (vr *voucherRepo) CreateVoucher(voucher *ve.Voucher) error {
 	return nil
 }
 
-func (vr *voucherRepo) GetAllVoucher(vouchers *[]ve.Voucher) ([]ve.Voucher, error) {
-	if err := vr.db.Preload("VoucherType").Find(&vouchers).Error; err != nil {
-		return nil, err
+func (vr *voucherRepo) GetAllVoucher(offset, pageSize int) (*[]ve.Voucher, int64, error) {
+	var vouchers []ve.Voucher
+	var count int64
+	if err := vr.db.Model(&ve.Voucher{}).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return *vouchers, nil
+	if err := vr.db.Offset(offset).Limit(pageSize).Preload("VoucherType").Find(&vouchers).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return &vouchers, count, nil
 }
 
 func (vr *voucherRepo) UpdateVoucher(voucherID string, voucher *ve.Voucher) error {
