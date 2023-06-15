@@ -26,7 +26,7 @@ type QueryResponse struct {
 }
 
 type ReviewResponse struct {
-	FullName        string  `json:"Full_name"`
+	FullName        string  `json:"FullName"`
 	ProfilePhotoUrl string  `json:"ProfilePhotoUrl"`
 	Rating          float64 `json:"Rating"`
 	Comment         string  `json:"Comment"`
