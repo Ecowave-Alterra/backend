@@ -3,7 +3,6 @@ package review
 import (
 	"context"
 	"mime/multipart"
-	"strconv"
 
 	er "github.com/berrylradianh/ecowave-go/modules/entity/review"
 	// et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
@@ -28,12 +27,7 @@ func (rc *reviewUsecase) GetIdTransactionDetail(transactionId string) ([]int, er
 	}
 
 	var idTransactionDetails []int
-	for _, value := range productIds {
-		productId, err := strconv.Atoi(value)
-		if err != nil {
-			return nil, err
-		}
-
+	for _, productId := range productIds {
 		idTransactionDetail, err := rc.reviewRepo.GetIdTransactionDetail(idTransaction, productId)
 		if err != nil {
 			return nil, err

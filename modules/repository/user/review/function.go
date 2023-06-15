@@ -26,8 +26,8 @@ func (rr *reviewRepo) GetIdTransaction(transactionId string) (int, error) {
 	return int(transaction.ID), nil
 }
 
-func (rr *reviewRepo) GetProductId(transactionId string) ([]string, error) {
-	var productId []string
+func (rr *reviewRepo) GetProductId(transactionId string) ([]int, error) {
+	var productId []int
 
 	if err := rr.db.Raw("SELECT td.product_id FROM transaction_details td WHERE td.transaction_id = (SELECT id FROM transactions WHERE transaction_id = ?)", transactionId).Scan(&productId).Error; err != nil {
 		return nil, err
