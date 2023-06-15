@@ -26,6 +26,15 @@ func (vr *voucherRepo) GetAllVoucher(offset, pageSize int) (*[]ve.Voucher, int64
 	return &vouchers, count, nil
 }
 
+func (vr *voucherRepo) GetVoucherById(voucherId string) (*ve.Voucher, error) {
+	var voucher ve.Voucher
+	if err := vr.db.Where("voucher_id = ?", voucherId).Preload("VoucherType").First(&voucher).Error; err != nil {
+		return nil, err
+	}
+
+	return &voucher, nil
+}
+
 func (vr *voucherRepo) UpdateVoucher(voucherID string, voucher *ve.Voucher) error {
 	if err := vr.db.Model(&ve.Voucher{}).Where("id = ?", voucherID).Updates(&voucher).Error; err != nil {
 		return err

@@ -71,6 +71,40 @@ func (vh *VoucherHandler) GetAllVoucher(c echo.Context) error {
 	}
 }
 
+func (vh *VoucherHandler) GetVoucherById(c echo.Context) error {
+	var voucherResponse ve.VoucherResponse
+	id := c.Param("id")
+
+	voucher, err := vh.voucherUsecase.GetVoucherById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"Message": err.Error(),
+			"Status":  http.StatusInternalServerError,
+		})
+	}
+
+	outputDateFormat := "02 January 2006"
+	startDate := voucher.StartDate.Format(outputDateFormat)
+	endDate := voucher.EndDate.Format(outputDateFormat)
+
+	voucherResponse = ve.VoucherResponse{
+		VoucherId:       voucher.VoucherId,
+		Type:            voucher.VoucherType.Type,
+		StartDate:       startDate,
+		EndDate:         endDate,
+		MinimumPurchase: voucher.MinimumPurchase,
+		MaximumDiscount: voucher.MaximumDiscount,
+		DiscountPercent: voucher.DiscountPercent,
+		ClaimableCount:  voucher.ClaimableCount,
+		MaxClaimLimit:   voucher.MaxClaimLimit,
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"Voucher": voucherResponse,
+		"Status":  http.StatusOK,
+	})
+}
+
 func (vh *VoucherHandler) CreateVoucher(c echo.Context) error {
 	voucherTypeIDstr := c.FormValue("voucherTypeID")
 	voucherTypeID, err := strconv.ParseUint(voucherTypeIDstr, 10, 64)

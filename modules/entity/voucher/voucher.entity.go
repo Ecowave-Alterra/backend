@@ -21,12 +21,24 @@ type Voucher struct {
 	VoucherType     VoucherType `gorm:"foreignKey:VoucherTypeID"`
 }
 
+// type VoucherResponse struct {
+// 	VoucherId      string
+// 	Type           string
+// 	ClaimableCount uint
+// 	StartDate      string
+// 	EndDate        string
+// }
+
 type VoucherResponse struct {
-	VoucherId      string
-	Type           string
-	ClaimableCount uint
-	StartDate      string
-	EndDate        string
+	VoucherId       string  `json:"VoucherId,omitempty"`
+	Type            string  `json:"Type,omitempty"`
+	StartDate       string  `json:"StartDate,omitempty"`
+	EndDate         string  `json:"EndDate,omitempty"`
+	MinimumPurchase float64 `json:"MinimumPurchase,omitempty"`
+	MaximumDiscount float64 `json:"MaximumDiscount,omitempty"`
+	DiscountPercent float64 `json:"DiscountPercent,omitempty"`
+	ClaimableCount  uint    `json:"ClaimableCount,omitempty"`
+	MaxClaimLimit   uint    `json:"MaxClaimLimit,omitempty"`
 }
 
 type VoucherUserResponse struct {

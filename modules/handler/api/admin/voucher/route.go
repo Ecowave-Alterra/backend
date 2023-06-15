@@ -13,6 +13,7 @@ func (voucherHandler *VoucherHandler) RegisterRoutes(e *echo.Echo) {
 	voucherGroup := e.Group("/admin/vouchers")
 	voucherGroup.Use(jwtMiddleware)
 	voucherGroup.POST("", voucherHandler.CreateVoucher)
+	voucherGroup.GET("/:id", voucherHandler.GetVoucherById)
 	voucherGroup.GET("", voucherHandler.GetAllVoucher)
 	voucherGroup.PUT("/:id", voucherHandler.UpdateVoucher)
 	voucherGroup.DELETE("/:id", voucherHandler.DeleteVoucher)

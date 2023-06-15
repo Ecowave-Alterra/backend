@@ -11,6 +11,11 @@ func (vc *voucherUsecase) GetAllVoucher(offset, pageSize int) (*[]ve.Voucher, in
 	return vouchers, count, err
 }
 
+func (vc *voucherUsecase) GetVoucherById(voucherId string) (*ve.Voucher, error) {
+	voucher, err := vc.voucherRepo.GetVoucherById(voucherId)
+	return voucher, err
+}
+
 func (vc *voucherUsecase) UpdateVoucher(voucherID string, voucher *ve.Voucher) error {
 	return vc.voucherRepo.UpdateVoucher(voucherID, voucher)
 }

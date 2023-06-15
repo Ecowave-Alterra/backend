@@ -8,6 +8,7 @@ import (
 type VoucherUseCase interface {
 	CreateVoucher(voucher *ve.Voucher) error
 	GetAllVoucher(offset, pageSize int) (*[]ve.Voucher, int64, error)
+	GetVoucherById(voucherId string) (*ve.Voucher, error)
 	UpdateVoucher(voucherID string, voucher *ve.Voucher) error
 	DeleteVoucher(voucherID string, voucher *ve.Voucher) error
 	FilterVouchersByType(voucherType string, vouchers *[]ve.Voucher) ([]ve.Voucher, error)
