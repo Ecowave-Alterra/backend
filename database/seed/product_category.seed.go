@@ -2,17 +2,15 @@ package seed
 
 import (
 	pct "github.com/berrylradianh/ecowave-go/modules/entity/product"
-
-	"gorm.io/gorm"
 )
 
-func CreateProductCategory(db *gorm.DB) *[]pct.ProductCategory {
+func CreateProductCategory() *[]pct.ProductCategory {
 	return &[]pct.ProductCategory{
 		{
-			Name: "perabot",
+			Category: "perabot",
 		},
 		{
-			Name: "kantong",
+			Category: "kantong",
 		},
 	}
 }

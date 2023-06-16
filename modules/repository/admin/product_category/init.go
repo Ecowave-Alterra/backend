@@ -12,7 +12,7 @@ type ProductCategoryRepo interface {
 	GetAllProductCategory(offset, pageSize int) (*[]pe.ProductCategory, int64, error)
 	GetProductCategoryById(id int) (*pe.ProductCategory, error)
 	GetAllProductCategoryNoPagination() (*[]pe.ProductCategory, error)
-	SearchingProductCategoryByName(productCategory *[]pe.ProductCategory, name string) (bool, error)
+	SearchingProductCategoryByName(name string, offset, pageSize int) (*[]pe.ProductCategory, int64, error)
 	IsProductCategoryAvailable(productCategory *pe.ProductCategory, name string) (bool, error)
 }
 

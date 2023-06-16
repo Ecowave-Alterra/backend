@@ -10,12 +10,12 @@ func (pcc *productCategoryUsecase) CreateProductCategory(productCategory *pe.Pro
 		return false, err
 	}
 
-	available, _ := pcc.productCategoryRepo.IsProductCategoryAvailable(productCategory, productCategory.Name)
+	available, _ := pcc.productCategoryRepo.IsProductCategoryAvailable(productCategory, productCategory.Category)
 	return available, pcc.productCategoryRepo.CreateProductCategory(productCategory)
 }
 
 func (pcc *productCategoryUsecase) UpdateProductCategory(productCategory *pe.ProductCategory, id int) (bool, error) {
-	available, _ := pcc.productCategoryRepo.IsProductCategoryAvailable(productCategory, productCategory.Name)
+	available, _ := pcc.productCategoryRepo.IsProductCategoryAvailable(productCategory, productCategory.Category)
 	return available, pcc.productCategoryRepo.UpdateProductCategory(productCategory, id)
 }
 
@@ -38,6 +38,10 @@ func (pcc *productCategoryUsecase) GetAllProductCategory(offset, pageSize int) (
 	return productCategories, count, err
 }
 
-func (pcc *productCategoryUsecase) SearchingProductCategoryByName(productCategory *[]pe.ProductCategory, name string) (bool, error) {
-	return pcc.productCategoryRepo.SearchingProductCategoryByName(productCategory, name)
+func (pcc *productCategoryUsecase) SearchingProductCategoryByName(name string, offset, pageSize int) (*[]pe.ProductCategory, int64, error) {
+	productCategories, count, err := pcc.productCategoryRepo.SearchingProductCategoryByName(name, offset, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+	return productCategories, count, nil
 }
