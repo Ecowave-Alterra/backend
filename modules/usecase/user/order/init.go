@@ -5,10 +5,11 @@ import (
 )
 
 type OderUsecase interface {
-	GetOrder(id string, idUser uint, offset int, pageSize int) (interface{}, int64, error)
-	OrderDetail(id uint) (interface{}, error)
-	ConfirmOrder(id uint) error
-	CancelOrder(id uint, canceledReason string) error
+	GetOrder(filter string, idUser uint, offset int, pageSize int) (interface{}, int64, error)
+	// OrderDetail(id uint) (interface{}, error)
+	Tracking(resi string, courier string) (interface{}, error)
+	ConfirmOrder(id string) error
+	CancelOrder(id string, canceledReason string) error
 }
 
 type orderUsecase struct {
