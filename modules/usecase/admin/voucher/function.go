@@ -13,6 +13,11 @@ func (vc *voucherUsecase) CreateVoucher(voucher *ve.VoucherRequest) error {
 		voucher.MinimumPurchase = 0
 		voucher.MaximumDiscount = 0
 		voucher.DiscountPercent = 100
+	} else if voucher.VoucherTypeID == 2 {
+		if voucher.MinimumPurchase == 0 || voucher.MaximumDiscount == 0 || voucher.DiscountPercent == 0 {
+			//lint:ignore ST1005 Reason for ignoring this linter
+			return errors.New("Anda gagal membuat voucher")
+		}
 	}
 
 	for {
