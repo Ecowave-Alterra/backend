@@ -24,7 +24,7 @@ func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize i
 		for _, td := range val.TransactionDetails {
 			var pImg ep.ProductImage
 			var product ep.Product
-			//INI HARUS DIGANTI DENGAN UUID
+
 			err = or.db.Select("id").Where("product_id", td.ProductId).First(&product).Error
 			if err != nil {
 				return nil, 0, err
