@@ -183,8 +183,6 @@ func ShippingOptions(ship *et.ShippingRequest) (interface{}, error) {
 	for _, val := range courier {
 		url := "https://api.rajaongkir.com/starter/cost"
 
-		log.Println(val)
-
 		payloadStrings := fmt.Sprintf("origin=%s&destination=%s&weight=%s&courier=%s",
 			alamatPengirim,
 			destination,

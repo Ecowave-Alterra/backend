@@ -16,4 +16,5 @@ func (orderHandler *OrderHandler) RegisterRoutes(e *echo.Echo) {
 	// orderGroup.GET("/:id", orderHandler.OrderDetail())
 	orderGroup.GET("/confirm/:id", orderHandler.ConfirmOrder())
 	orderGroup.POST("/cancel/:id", orderHandler.CancelOrder())
+	orderGroup.GET("/tracking", orderHandler.Tracking())
 }

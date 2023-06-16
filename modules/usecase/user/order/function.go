@@ -3,6 +3,8 @@ package order
 import (
 	"strings"
 
+	b "github.com/berrylradianh/ecowave-go/helper/binderbyte"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -16,38 +18,6 @@ func (oc *orderUsecase) GetOrder(filter string, idUser uint, offset int, pageSiz
 	if count == 0 {
 		return "Belum ada pesanan", 0, nil
 	}
-
-	// var OrderResponse []o.OrderResponse
-	// var idProduct, totalProduct, productPrice, productQty uint
-
-	// for _, val := range res {
-	// 	for i, td := range val.TransactionDetails {
-	// 		if i == 0 {
-	// 			idProduct = td.ProductId
-	// 			productPrice = uint(td.SubTotalPrice)
-	// 			productQty = td.Qty
-	// 		}
-	// 		totalProduct += td.Qty
-	// 	}
-
-	// 	nameProduct, imageUrl, err := oc.orderRepo.GetNameProductandImageUrl(idProduct)
-	// 	if err != nil {
-	// 		return nil, 0, err
-	// 	}
-	// 	order := o.OrderResponse{
-	// 		TransactionId:   val.ID,
-	// 		ProductImageUrl: imageUrl,
-	// 		PaymentStatus:   val.StatusTransaction,
-	// 		ProductName:     nameProduct,
-	// 		ProductQty:      productQty,
-	// 		ProductPrice:    float64(productPrice),
-	// 		TotalQty:        totalProduct,
-	// 		Total:           val.TotalPrice,
-	// 	}
-
-	// 	OrderResponse = append(OrderResponse, order)
-
-	// }
 
 	return res, count, nil
 }
@@ -107,6 +77,15 @@ func (oc *orderUsecase) GetOrder(filter string, idUser uint, offset int, pageSiz
 
 //		return order, nil
 //	}
+func (oc *orderUsecase) Tracking(resi string, courier string) (interface{}, error) {
+
+	res, err := b.Tracking(resi, courier)
+	if err != nil {
+		return "", err
+	}
+
+	return res, nil
+}
 func (oc *orderUsecase) ConfirmOrder(id string) error {
 
 	statusTransaction, err := oc.orderRepo.GetStatusOrder(id)

@@ -78,6 +78,27 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 // 	}
 // }
 
+func (oh *OrderHandler) Tracking() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		resi := c.QueryParam("no")
+		courier := c.QueryParam("cou")
+		res, err := oh.orderUsecase.Tracking(resi, courier)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"Status":  400,
+				"Message": err,
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Status":   200,
+			"Message":  "Success",
+			"Tracking": res,
+		})
+	}
+
+}
 func (oh *OrderHandler) ConfirmOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
