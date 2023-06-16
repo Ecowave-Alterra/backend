@@ -1,18 +1,17 @@
 package order
 
 import (
-	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	"gorm.io/gorm"
 )
 
 type OrderRepo interface {
-	GetOrder(id string, idUser uint, offset int, pageSize int) ([]et.Transaction, int64, error)
-	OrderDetail(id uint) (et.Transaction, error)
-	GetNameProductandImageUrl(id uint) (string, string, error)
-	GetPromoName(id uint) (string, error)
-	ConfirmOrder(id uint) error
-	GetStatusOrder(id uint) (string, error)
-	CancelOrder(id uint, canceledReason string) error
+	GetOrder(filter string, idUser uint, offset int, pageSize int) (interface{}, int64, error)
+	// OrderDetail(id uint) (et.Transaction, error)
+	// GetNameProductandImageUrl(id uint) (string, string, error)
+	// GetPromoName(id uint) (string, error)
+	ConfirmOrder(id string) error
+	GetStatusOrder(id string) (string, error)
+	CancelOrder(id string, canceledReason string) error
 }
 
 type orderRepo struct {

@@ -13,7 +13,8 @@ func (orderHandler *OrderHandler) RegisterRoutes(e *echo.Echo) {
 	orderGroup := e.Group("/user/order")
 	orderGroup.Use(jwtMiddleware)
 	orderGroup.GET("", orderHandler.GetOrder())
-	orderGroup.GET("/:id", orderHandler.OrderDetail())
-	orderGroup.GET("/confirm", orderHandler.ConfirmOrder())
-	orderGroup.GET("/cancel", orderHandler.CancelOrder())
+	// orderGroup.GET("/:id", orderHandler.OrderDetail())
+	orderGroup.GET("/confirm/:id", orderHandler.ConfirmOrder())
+	orderGroup.POST("/cancel/:id", orderHandler.CancelOrder())
+	orderGroup.GET("/tracking", orderHandler.Tracking())
 }

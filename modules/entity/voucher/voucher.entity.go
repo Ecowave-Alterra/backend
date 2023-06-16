@@ -8,6 +8,7 @@ import (
 
 type Voucher struct {
 	*gorm.Model `json:"-"`
+	ID          uint `json:"Id" gorm:"primary_key"`
 	// VoucherID       uint        `json:"voucherID"`
 	StartDate       time.Time   `json:"startDate" form:"startDate"`
 	EndDate         time.Time   `json:"endDate" form:"endDate"`
@@ -38,10 +39,3 @@ type VoucherUserResponse struct {
 	MaximumDiscount float64 `json:"MaximumDiscount,omitempty"`
 	DiscountPercent float64 `json:"DiscountPercent,omitempty"`
 }
-
-// type DetailVoucherResponse struct {
-// 	Type            string
-// 	EndDate         time.Time
-// 	PhotoUrl        string
-// 	MinimumPurchase float64 `json:"omitempty"`
-// }
