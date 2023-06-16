@@ -1,6 +1,8 @@
 package voucher
 
 import (
+	"errors"
+
 	"github.com/berrylradianh/ecowave-go/helper/randomid"
 	vld "github.com/berrylradianh/ecowave-go/helper/validator"
 	ve "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
@@ -43,12 +45,23 @@ func (vc *voucherUsecase) GetVoucherById(voucherId string) (*ve.Voucher, error) 
 	return voucher, err
 }
 
-func (vc *voucherUsecase) UpdateVoucher(voucherID string, voucher *ve.Voucher) error {
-	return vc.voucherRepo.UpdateVoucher(voucherID, voucher)
+func (vc *voucherUsecase) UpdateVoucher(voucherId string, voucher *ve.Voucher) error {
+	if voucher.VoucherTypeID == 1 {
+		voucher.MinimumPurchase = 0
+		voucher.MaximumDiscount = 0
+		voucher.DiscountPercent = 100
+	} else if voucher.VoucherTypeID == 2 {
+		if voucher.MinimumPurchase == 0 || voucher.MaximumDiscount == 0 || voucher.DiscountPercent == 0 {
+			//lint:ignore ST1005 Reason for ignoring this linter
+			return errors.New("Anda gagal mengubah voucher")
+		}
+	}
+
+	return vc.voucherRepo.UpdateVoucher(voucherId, voucher)
 }
 
-func (vc *voucherUsecase) DeleteVoucher(voucherID string, voucher *ve.Voucher) error {
-	return vc.voucherRepo.DeleteVoucher(voucherID, voucher)
+func (vc *voucherUsecase) DeleteVoucher(voucherId string, voucher *ve.Voucher) error {
+	return vc.voucherRepo.DeleteVoucher(voucherId, voucher)
 }
 
 func (vc *voucherUsecase) FilterVouchersByType(voucherType string, vouchers *[]ve.Voucher) ([]ve.Voucher, error) {

@@ -9,8 +9,8 @@ type VoucherUseCase interface {
 	CreateVoucher(voucher *ve.VoucherRequest) error
 	GetAllVoucher(offset, pageSize int) (*[]ve.Voucher, int64, error)
 	GetVoucherById(voucherId string) (*ve.Voucher, error)
-	UpdateVoucher(voucherID string, voucher *ve.Voucher) error
-	DeleteVoucher(voucherID string, voucher *ve.Voucher) error
+	UpdateVoucher(voucherId string, voucher *ve.Voucher) error
+	DeleteVoucher(voucherId string, voucher *ve.Voucher) error
 	FilterVouchersByType(voucherType string, vouchers *[]ve.Voucher) ([]ve.Voucher, error)
 }
 

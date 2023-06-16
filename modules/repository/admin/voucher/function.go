@@ -46,16 +46,16 @@ func (vr *voucherRepo) GetVoucherById(voucherId string) (*ve.Voucher, error) {
 	return &voucher, nil
 }
 
-func (vr *voucherRepo) UpdateVoucher(voucherID string, voucher *ve.Voucher) error {
-	if err := vr.db.Model(&ve.Voucher{}).Where("id = ?", voucherID).Updates(&voucher).Error; err != nil {
+func (vr *voucherRepo) UpdateVoucher(voucherId string, voucher *ve.Voucher) error {
+	if err := vr.db.Model(&ve.Voucher{}).Where("voucher_id = ?", voucherId).Updates(&voucher).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (vr *voucherRepo) DeleteVoucher(voucherID string, voucher *ve.Voucher) error {
-	if err := vr.db.Where("id = ?", voucherID).Delete(&voucher).Error; err != nil {
+func (vr *voucherRepo) DeleteVoucher(voucherId string, voucher *ve.Voucher) error {
+	if err := vr.db.Where("id = ?", voucherId).Delete(&voucher).Error; err != nil {
 		return err
 	}
 

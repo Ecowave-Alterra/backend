@@ -20,6 +20,7 @@ type Information struct {
 }
 
 type InformationDraftRequest struct {
+	*gorm.Model
 	InformationId   string    `json:"InformationiId"`
 	Title           string    `json:"Title," form:"Title" validate:"max=65"`
 	PhotoContentUrl string    `json:"PhotoContentUrl," form:"PhotoContentUrl"`

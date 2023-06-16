@@ -22,6 +22,7 @@ type Voucher struct {
 }
 
 type VoucherRequest struct {
+	*gorm.Model
 	VoucherId          string `validate:"required"`
 	StartDate          string `validate:"required"`
 	EndDate            string `validate:"required"`

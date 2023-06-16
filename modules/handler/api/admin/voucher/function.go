@@ -4,7 +4,6 @@ import (
 	"math"
 	"net/http"
 	"strconv"
-	"time"
 
 	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	ve "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
@@ -137,140 +136,37 @@ func (vh *VoucherHandler) CreateVoucher(c echo.Context) error {
 }
 
 func (vh *VoucherHandler) UpdateVoucher(c echo.Context) error {
+	var voucher ve.Voucher
 	voucherID := c.Param("id")
-	voucherTypeIDstr := c.FormValue("voucherTypeID")
-	voucherTypeID, err := strconv.ParseUint(voucherTypeIDstr, 10, 64)
+
+	voucherBefore, err := vh.voucherUsecase.GetVoucherById(voucherID)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "VoucherTypeID harus berupa angka",
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": err.Error(),
+			"Status":  http.StatusNotFound,
 		})
 	}
 
-	switch voucherTypeID {
-	case 1:
-		startDateStr := c.FormValue("startDate")
-		startDate, err := time.Parse("02 January 2006", startDateStr)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Tanggal mulai tidak valid",
-			})
-		}
+	if err := c.Bind(&voucher); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"Message": err.Error(),
+			"Status":  http.StatusBadRequest,
+		})
+	}
 
-		endDateStr := c.FormValue("endDate")
-		endDate, err := time.Parse("02 January 2006", endDateStr)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Tanggal berakhir tidak valid",
-			})
-		}
+	validVoucherTypeId := map[int]bool{1: true, 2: true}
+	if voucher.VoucherId != "" && (voucher.VoucherTypeID != voucherBefore.VoucherTypeID || (voucher.VoucherId != "" && !validVoucherTypeId[int(voucher.VoucherTypeID)])) {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Anda gagal mengubah voucher",
+			"Status":  http.StatusBadRequest,
+		})
+	}
 
-		claimableUserCountStr := c.FormValue("claimableCount")
-		claimableUserCount, err := strconv.ParseUint(claimableUserCountStr, 10, 64)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Jumlah voucher harus berupa angka. Contoh 100500",
-			})
-		}
-
-		maxClaimLimitStr := c.FormValue("maxClaimLimit")
-		maxClaimLimit, err := strconv.ParseUint(maxClaimLimitStr, 10, 64)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Maksimum klaim voucher harus berupa angka. Contoh 100500",
-			})
-		}
-
-		voucher := ve.Voucher{
-			VoucherTypeID:      uint(voucherTypeID),
-			StartDate:          startDate,
-			EndDate:            endDate,
-			ClaimableUserCount: uint(claimableUserCount),
-			MaxClaimLimit:      uint(maxClaimLimit),
-		}
-
-		err = vh.voucherUsecase.UpdateVoucher(voucherID, &voucher)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"Message": "Gagal mengubah voucher",
-			})
-		}
-	case 2:
-		startDateStr := c.FormValue("startDate")
-		startDate, err := time.Parse("02 January 2006", startDateStr)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Tanggal mulai tidak valid",
-			})
-		}
-
-		endDateStr := c.FormValue("endDate")
-		endDate, err := time.Parse("02 January 2006", endDateStr)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Tanggal berakhir tidak valid",
-			})
-		}
-
-		minimumPurchaseStr := c.FormValue("minimumPurchase")
-		minimumPurchase, err := strconv.ParseFloat(minimumPurchaseStr, 64)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Minimum belanja harus berupa angka. Contoh : 100500",
-			})
-		}
-
-		maximumDiscountStr := c.FormValue("maximumDiscount")
-		maximumDiscount, err := strconv.ParseFloat(maximumDiscountStr, 64)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Maksimum potongan harga harus berupa angka. Contoh 100500",
-			})
-		}
-
-		discountPercentStr := c.FormValue("discountPercent")
-		discountPercent, err := strconv.ParseFloat(discountPercentStr, 64)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Diskon harus berupa angka dari 5 - 100. Contoh : 50",
-			})
-		}
-
-		claimableUserCountStr := c.FormValue("claimableCount")
-		claimableUserCount, err := strconv.ParseUint(claimableUserCountStr, 10, 64)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Jumlah voucher harus berupa angka. Contoh 100500",
-			})
-		}
-
-		maxClaimLimitStr := c.FormValue("maxClaimLimit")
-		maxClaimLimit, err := strconv.ParseUint(maxClaimLimitStr, 10, 64)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Maksimum klaim voucher harus berupa angka. Contoh 100500",
-			})
-		}
-
-		voucher := ve.Voucher{
-			VoucherTypeID:      uint(voucherTypeID),
-			StartDate:          startDate,
-			EndDate:            endDate,
-			MinimumPurchase:    minimumPurchase,
-			MaximumDiscount:    maximumDiscount,
-			DiscountPercent:    discountPercent,
-			ClaimableUserCount: uint(claimableUserCount),
-			MaxClaimLimit:      uint(maxClaimLimit),
-		}
-
-		err = vh.voucherUsecase.UpdateVoucher(voucherID, &voucher)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"Message": "Gagal mengubah voucher",
-			})
-		}
-	default:
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Voucher type id tidak valid",
+	err = vh.voucherUsecase.UpdateVoucher(voucherID, &voucher)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"Message": err.Error(),
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
