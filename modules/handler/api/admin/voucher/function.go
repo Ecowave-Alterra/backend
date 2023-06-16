@@ -129,9 +129,9 @@ func (vh *VoucherHandler) CreateVoucher(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.JSON(http.StatusCreated, map[string]interface{}{
 		"Message": "Anda berhasil membuat voucher",
-		"Status":  http.StatusOK,
+		"Status":  http.StatusCreated,
 	})
 }
 
@@ -172,6 +172,7 @@ func (vh *VoucherHandler) UpdateVoucher(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": "Anda berhasil mengubah voucher",
+		"Status":  http.StatusOK,
 	})
 }
 
@@ -182,12 +183,14 @@ func (vh *VoucherHandler) DeleteVoucher(c echo.Context) error {
 	err := vh.voucherUsecase.DeleteVoucher(voucherID, &voucher)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"Message": "Gagal menghapus voucher",
+			"Message": err,
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": "Anda berhasil menghapus voucher",
+		"Status":  http.StatusOK,
 	})
 }
 
@@ -221,5 +224,6 @@ func (vh *VoucherHandler) FilterVouchersByType(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message":  "Berhasil memfilter data voucher",
 		"Vouchers": voucherResponses,
+		"Status":   http.StatusOK,
 	})
 }

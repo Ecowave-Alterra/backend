@@ -55,7 +55,7 @@ func (vr *voucherRepo) UpdateVoucher(voucherId string, voucher *ve.Voucher) erro
 }
 
 func (vr *voucherRepo) DeleteVoucher(voucherId string, voucher *ve.Voucher) error {
-	if err := vr.db.Where("id = ?", voucherId).Delete(&voucher).Error; err != nil {
+	if err := vr.db.Where("voucher_id = ?", voucherId).Delete(&voucher).Error; err != nil {
 		return err
 	}
 
