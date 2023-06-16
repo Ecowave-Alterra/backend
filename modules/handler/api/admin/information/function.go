@@ -204,8 +204,8 @@ func (ih *InformationHandler) DeleteInformation() echo.HandlerFunc {
 		}
 
 		err = ih.informationUsecase.DeleteInformation(information.InformationId)
-		code, msg := cs.CustomStatus(err.Error())
 		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{
 				"Status":  code,
 				"Message": msg,

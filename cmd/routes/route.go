@@ -19,6 +19,7 @@ func StartRoute(handler common.Handler) *echo.Echo {
 	handler.TransactionHandlerUser.RegisterRoutes(e)
 	handler.OrderHandlerUser.RegisterRoutes(e)
 	handler.ProductCategoryHandler.RegisterRoutes(e)
+	handler.ProductHandler.RegisterRoutes(e)
 
 	return e
 }
