@@ -337,14 +337,18 @@ func (ph *ProfileHandler) GetAllAddressProfile(c echo.Context) error {
 
 	for _, address := range addresses {
 		addressResponse := ut.UserAddressResponse{
-			UserAddress: int(address.ID),
-			Recipient:   address.Recipient,
-			PhoneNumber: address.PhoneNumber,
-			Address:     address.Address,
-			Note:        address.Note,
-			Mark:        address.Mark,
-			IsPrimary:   address.IsPrimary,
-			UserId:      int(address.UserId),
+			Id:           int(address.ID),
+			Recipient:    address.Recipient,
+			PhoneNumber:  address.PhoneNumber,
+			Address:      address.Address,
+			ProvinceId:   address.ProvinceId,
+			ProvinceName: address.ProvinceName,
+			CityId:       address.CityId,
+			CityName:     address.CityName,
+			Note:         address.Note,
+			Mark:         address.Mark,
+			IsPrimary:    address.IsPrimary,
+			UserId:       int(address.UserId),
 		}
 
 		addressResponses = append(addressResponses, addressResponse)
@@ -475,6 +479,32 @@ func (ph *ProfileHandler) UpdatePasswordProfile(c echo.Context) error {
 	})
 }
 
-func (ph *ProfileHandler) LogoutProfile(c echo.Context) error {
-	return c.JSON(http.StatusOK, "ok")
+func (ph *ProfileHandler) GetAllProvince(c echo.Context) error {
+	provinces, err := ph.profileUsecase.GetAllProvince()
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"Message": "not found",
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"Message":  "success",
+		"Province": provinces,
+	})
+}
+
+func (ph *ProfileHandler) GetAllCityByProvince(c echo.Context) error {
+	provinceId := c.QueryParam("province")
+
+	cities, err := ph.profileUsecase.GetAllCityByProvince(provinceId)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"Message": "not found",
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"Message":  "success",
+		"Province": cities,
+	})
 }

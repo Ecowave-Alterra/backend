@@ -1,6 +1,10 @@
 package profile
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+
 	p "github.com/berrylradianh/ecowave-go/helper/password"
 	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
@@ -61,4 +65,60 @@ func (pc *profileUsecase) UpdatePasswordProfile(user *ut.User, oldPassword strin
 	}
 
 	return "", pc.profileRepo.UpdatePasswordProfile(string(hashNewPassword), id)
+}
+
+func (pc *profileUsecase) GetAllProvince() ([]ut.Province, error) {
+	apiKey := "8bb5248063ed493d90aac0311f8a3edb"
+	url := "https://api.rajaongkir.com/starter/province"
+
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("key", apiKey)
+
+	res, _ := http.DefaultClient.Do(req)
+	body, _ := ioutil.ReadAll(res.Body)
+
+	var provinceResponse ut.ProvinceResponse
+	if err := json.Unmarshal(body, &provinceResponse); err != nil {
+		return nil, err
+	}
+
+	var provinces []ut.Province
+	for _, prov := range provinceResponse.RajaOngkir.Results {
+		province := ut.Province{
+			ProvinceId:   prov.ProvinceId,
+			ProvinceName: prov.Province,
+		}
+
+		provinces = append(provinces, province)
+	}
+
+	return provinces, nil
+}
+
+func (pc *profileUsecase) GetAllCityByProvince(provinceId string) ([]ut.City, error) {
+	apiKey := "8bb5248063ed493d90aac0311f8a3edb"
+	url := "https://api.rajaongkir.com/starter/city?province=" + provinceId
+
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("key", apiKey)
+
+	res, _ := http.DefaultClient.Do(req)
+	body, _ := ioutil.ReadAll(res.Body)
+
+	var cityResponse ut.CityResponse
+	if err := json.Unmarshal(body, &cityResponse); err != nil {
+		return nil, err
+	}
+
+	var cities []ut.City
+	for _, city := range cityResponse.RajaOngkir.Results {
+		province := ut.City{
+			CityId:   city.CityId,
+			CityName: city.CityName,
+		}
+
+		cities = append(cities, province)
+	}
+
+	return cities, nil
 }

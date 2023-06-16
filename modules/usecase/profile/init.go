@@ -23,6 +23,9 @@ type ProfileUsecase interface {
 	UpdateAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error
 
 	UpdatePasswordProfile(user *ut.User, oldPassword string, newPassword string, id int) (string, error)
+
+	GetAllProvince() ([]ut.Province, error)
+	GetAllCityByProvince(provinceId string) ([]ut.City, error)
 }
 
 type profileUsecase struct {

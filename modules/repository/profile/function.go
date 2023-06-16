@@ -1,8 +1,6 @@
 package profile
 
 import (
-	"log"
-
 	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
@@ -92,12 +90,6 @@ func (pr *profileRepo) UpdateAddressPrimaryProfile(address *ut.UserAddress, idUs
 		return err
 	}
 
-	if err := pr.db.Raw("UPDATE user_addresses SET is_primary = false WHERE user_id = ?", idUser).Scan(&address).Error; err != nil {
-		return err
-	}
-
-	log.Println(address.IsPrimary)
-
 	return nil
 }
 
@@ -117,3 +109,8 @@ func (pr *profileRepo) UpdatePasswordProfile(newPassword string, id int) error {
 
 	return nil
 }
+
+// func (pr *profileRepo) GetAllProvince() error {
+// 	pr.db.Raw("")
+// 	return nil
+// }

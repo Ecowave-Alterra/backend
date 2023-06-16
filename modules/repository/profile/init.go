@@ -21,6 +21,8 @@ type ProfileRepo interface {
 	UpdateAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error
 
 	UpdatePasswordProfile(newPassword string, id int) error
+
+	// GetAllProvince() error
 }
 
 type profileRepo struct {
