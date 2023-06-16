@@ -9,10 +9,11 @@ import (
 type TransactionUsecase interface {
 	CreateTransaction(transaction *et.Transaction) (string, error)
 	GetPoint(id uint) (interface{}, error)
-	ClaimVoucher(idUser uint, idVoucher uint, shipCost float64, productCost float64) (float64, error)
+	// ClaimVoucher(idUser uint, idVoucher uint, shipCost float64, productCost float64) (float64, error)
 	GetVoucherUser(id uint, offset int, pageSize int) (interface{}, int64, error)
-	DetailVoucher(id uint) (interface{}, error)
+	// DetailVoucher(id uint) (interface{}, error)
 	MidtransNotifications(midtransRequest *em.MidtransRequest) error
+	GetPaymentStatus(id string) (string, error)
 }
 
 type transactionUsecase struct {

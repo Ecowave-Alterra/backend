@@ -1,8 +1,6 @@
 package midtrans
 
 import (
-	"strconv"
-
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	"github.com/labstack/echo/v4"
 	"github.com/midtrans/midtrans-go"
@@ -15,7 +13,7 @@ func CreateMidtransUrl(transaction *et.Transaction) (string, error) {
 	var iDetails []midtrans.ItemDetails
 	for _, val := range transaction.TransactionDetails {
 		item := midtrans.ItemDetails{
-			ID:    strconv.FormatUint(uint64(val.ProductId), 10),
+			ID:    val.ProductId,
 			Name:  val.ProductName,
 			Qty:   int32(val.Qty),
 			Price: int64(val.SubTotalPrice) / int64(val.Qty),

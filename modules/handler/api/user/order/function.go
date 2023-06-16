@@ -16,8 +16,11 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 	return func(e echo.Context) error {
 		pageParam := e.QueryParam("page")
 		page, err := strconv.Atoi(pageParam)
-		if err != nil || page < 1 {
-			page = 1
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, echo.Map{
+				"Status":  400,
+				"Message": err,
+			})
 		}
 
 		pageSize := 10
@@ -36,12 +39,6 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 			})
 		}
 		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
-		if page > totalPages {
-			return e.JSON(http.StatusNotFound, echo.Map{
-				"Status":  404,
-				"Message": "Halaman Tidak Ditemukan",
-			})
-		}
 
 		return e.JSON(http.StatusOK, map[string]interface{}{
 			"Status":    200,
@@ -53,46 +50,39 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 	}
 }
 
-func (oh *OrderHandler) OrderDetail() echo.HandlerFunc {
-	return func(e echo.Context) error {
+// func (oh *OrderHandler) OrderDetail() echo.HandlerFunc {
+// 	return func(e echo.Context) error {
 
-		id, err := strconv.Atoi(e.Param("id"))
-		if err != nil {
-			e.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Status":  400,
-				"Message": "Invalid Id",
-			})
-		}
+// 		id, err := strconv.Atoi(e.Param("id"))
+// 		if err != nil {
+// 			e.JSON(http.StatusBadRequest, map[string]interface{}{
+// 				"Status":  400,
+// 				"Message": "Invalid Id",
+// 			})
+// 		}
 
-		OrderDetail, err := oh.orderUsecase.OrderDetail(uint(id))
-		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return e.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
-			})
-		}
+// 		OrderDetail, err := oh.orderUsecase.OrderDetail(uint(id))
+// 		if err != nil {
+// 			code, msg := cs.CustomStatus(err.Error())
+// 			return e.JSON(code, echo.Map{
+// 				"Status":  code,
+// 				"Message": msg,
+// 			})
+// 		}
 
-		return e.JSON(http.StatusOK, map[string]interface{}{
-			"Status":      200,
-			"Message":     "Succes get order detail",
-			"OrderDetail": OrderDetail,
-		})
-	}
-}
+// 		return e.JSON(http.StatusOK, map[string]interface{}{
+// 			"Status":      200,
+// 			"Message":     "Succes get order detail",
+// 			"OrderDetail": OrderDetail,
+// 		})
+// 	}
+// }
 
 func (oh *OrderHandler) ConfirmOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
-				"Status":  400,
-				"Message": "Invalid id",
-			})
-		}
-
-		err = oh.orderUsecase.ConfirmOrder(uint(id))
+		id := c.Param("id")
+		err := oh.orderUsecase.ConfirmOrder(id)
 		if err != nil {
 			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{
@@ -111,22 +101,17 @@ func (oh *OrderHandler) ConfirmOrder() echo.HandlerFunc {
 func (oh *OrderHandler) CancelOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		id, err := strconv.Atoi(c.Param("id"))
+		id := c.Param("id")
 		cr := et.CanceledReason{}
 		c.Bind(&cr)
 		canceledReason := cr.CanceledReason
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
-				"Status":  400,
-				"Message": "Invalid param",
-			})
-		}
 
-		err = oh.orderUsecase.CancelOrder(uint(id), canceledReason)
+		err := oh.orderUsecase.CancelOrder(id, canceledReason)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
-				"Status":  400,
-				"Message": err,
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 

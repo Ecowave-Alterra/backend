@@ -8,19 +8,11 @@ func CreateProductImage() []*productEntity.ProductImage {
 	product_images := []*productEntity.ProductImage{
 		{
 			ProductId:       1,
-			ProductImageUrl: "https://picsum.photos/200/300",
-		},
-		{
-			ProductId:       1,
-			ProductImageUrl: "https://picsum.photos/200/300",
+			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 		{
 			ProductId:       2,
-			ProductImageUrl: "https://picsum.photos/200/300",
-		},
-		{
-			ProductId:       2,
-			ProductImageUrl: "https://picsum.photos/200/300",
+			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 	}
 

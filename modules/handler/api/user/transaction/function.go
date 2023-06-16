@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"math"
 	"net/http"
 	"strconv"
 
@@ -86,6 +87,27 @@ func (th *TransactionHandler) GetPoint() echo.HandlerFunc {
 	}
 
 }
+func (th *TransactionHandler) GetPaymentStatus() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id := c.QueryParam("id")
+
+		res, err := th.transactionUsecase.GetPaymentStatus(id)
+
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"Status":  400,
+				"Message": err,
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Status":         200,
+			"Message":        "Success Get Payment Status",
+			"Payment Status": res,
+		})
+	}
+
+}
 
 func (th *TransactionHandler) GetVoucherUser() echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -108,98 +130,97 @@ func (th *TransactionHandler) GetVoucherUser() echo.HandlerFunc {
 				"Message": msg,
 			})
 		}
-		// log.Println(res)
-		// log.Println(total)
-		// totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
-		// if page > totalPages {
-		// 	return c.JSON(http.StatusNotFound, echo.Map{
-		// 		"Status":  404,
-		// 		"Message": "Halaman Tidak Ditemukan",
-		// 	})
-		// }
+		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+		if page > totalPages {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Status":  404,
+				"Message": "Halaman Tidak Ditemukan",
+			})
+		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"Status":    200,
 			"Message":   "Success Get Voucher User",
 			"Page":      page,
-			"TotalPage": total,
+			"TotalPage": totalPages,
 			"Voucher":   res,
 		})
 	}
 
 }
-func (th *TransactionHandler) DetailVoucher() echo.HandlerFunc {
-	return func(c echo.Context) error {
 
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
-				"Status":  400,
-				"Message": "Invalid Id",
-			})
-		}
+// func (th *TransactionHandler) DetailVoucher() echo.HandlerFunc {
+// 	return func(c echo.Context) error {
 
-		res, err := th.transactionUsecase.DetailVoucher(uint(id))
-		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
-			})
-		}
+// 		id, err := strconv.Atoi(c.Param("id"))
+// 		if err != nil {
+// 			return c.JSON(http.StatusBadRequest, echo.Map{
+// 				"Status":  400,
+// 				"Message": "Invalid Id",
+// 			})
+// 		}
 
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Status":        200,
-			"Message":       "Success Get Detail Voucher",
-			"DetailVoucher": res,
-		})
-	}
+// 		res, err := th.transactionUsecase.DetailVoucher(uint(id))
+// 		if err != nil {
+// 			code, msg := cs.CustomStatus(err.Error())
+// 			return c.JSON(code, echo.Map{
+// 				"Status":  code,
+// 				"Message": msg,
+// 			})
+// 		}
 
-}
+// 		return c.JSON(http.StatusOK, map[string]interface{}{
+// 			"Status":        200,
+// 			"Message":       "Success Get Detail Voucher",
+// 			"DetailVoucher": res,
+// 		})
+// 	}
 
-func (th *TransactionHandler) ClaimVoucher() echo.HandlerFunc {
-	return func(c echo.Context) error {
+// }
 
-		idUser, _ := h.GetIdUser(c)
+// func (th *TransactionHandler) ClaimVoucher() echo.HandlerFunc {
+// 	return func(c echo.Context) error {
 
-		idVoucher, err := strconv.Atoi(c.QueryParam("id"))
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Status":  400,
-				"Message": "Invalid Id",
-			})
-		}
-		shipCost, err := strconv.Atoi(c.QueryParam("ship-cost"))
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Status":  400,
-				"Message": "Invalid param ship cost",
-			})
-		}
-		productCost, err := strconv.Atoi(c.QueryParam("procut-cost"))
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Status":  400,
-				"Message": "Invalid param product cost",
-			})
-		}
+// 		idUser, _ := h.GetIdUser(c)
 
-		res, err := th.transactionUsecase.ClaimVoucher(idUser, uint(idVoucher), float64(shipCost), float64(productCost))
-		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
-			})
-		}
+// 		idVoucher, err := strconv.Atoi(c.Param("id"))
+// 		if err != nil {
+// 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+// 				"Status":  400,
+// 				"Message": "Invalid Id",
+// 			})
+// 		}
+// 		shipCost, err := strconv.Atoi(c.QueryParam("ship-cost"))
+// 		if err != nil {
+// 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+// 				"Status":  400,
+// 				"Message": "Invalid param ship cost",
+// 			})
+// 		}
+// 		productCost, err := strconv.Atoi(c.QueryParam("procut-cost"))
+// 		if err != nil {
+// 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+// 				"Status":  400,
+// 				"Message": "Invalid param product cost",
+// 			})
+// 		}
 
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Status":  200,
-			"Message": "Success Get Point",
-			"Point":   res,
-		})
-	}
-}
+// 		res, err := th.transactionUsecase.ClaimVoucher(idUser, uint(idVoucher), float64(shipCost), float64(productCost))
+// 		if err != nil {
+// 			code, msg := cs.CustomStatus(err.Error())
+// 			return c.JSON(code, echo.Map{
+// 				"Status":  code,
+// 				"Message": msg,
+// 			})
+// 		}
+
+// 		return c.JSON(http.StatusOK, map[string]interface{}{
+// 			"Status":  200,
+// 			"Message": "Success Get Point",
+// 			"Point":   res,
+// 		})
+// 	}
+// }
 
 func ShippingOptions() echo.HandlerFunc {
 	return func(c echo.Context) error {
