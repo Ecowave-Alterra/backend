@@ -5,7 +5,7 @@ import "gorm.io/gorm"
 type UserAddress struct {
 	*gorm.Model  `json:"-"`
 	Recipient    string `json:"Recipient" form:"Recipient" validate:"required"`
-	PhoneNumber  string `json:"PhoneNumber" form:"PhoneNumber" validate:"required,min=10,max=13"`
+	Phone        string `json:"Phone" form:"Phone" validate:"required,min=10,max=13"`
 	Address      string `json:"Address" form:"Address" validate:"required"`
 	ProvinceId   string `json:"ProvinceId" form:"ProvinceId"`
 	ProvinceName string `json:"ProvinceName" form:"ProvinceName"`
@@ -20,16 +20,15 @@ type UserAddress struct {
 type UserAddressResponse struct {
 	Id           int
 	Recipient    string
-	PhoneNumber  string
-	Address      string
+	Phone        string
 	ProvinceId   string
 	ProvinceName string
 	CityId       string
 	CityName     string
+	Address      string
 	Note         string
 	Mark         string
 	IsPrimary    bool
-	UserId       int
 }
 
 type ProvinceResponse struct {

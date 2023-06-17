@@ -46,15 +46,11 @@ func (pr *profileRepo) UpdateUserProfile(user *ut.User, id int) error {
 		return err
 	}
 
-	// if err := pr.db.Where("id = ?", id).Updates(&user).Error; err != nil {
-	// 	return err
-	// }
-
 	return nil
 }
 
 func (pr *profileRepo) UpdateUserDetailProfile(userDetail *ut.UserDetail, id int) error {
-	if err := pr.db.Raw("UPDATE user_details SET full_name = ?, profile_photo_url = ? WHERE user_id = ?", userDetail.FullName, userDetail.ProfilePhotoUrl, id).Scan(&userDetail).Error; err != nil {
+	if err := pr.db.Raw("UPDATE user_details SET full_name = ?, profile_photo_url = ? WHERE user_id = ?", userDetail.Name, userDetail.ProfilePhotoUrl, id).Scan(&userDetail).Error; err != nil {
 		return err
 	}
 
@@ -109,8 +105,3 @@ func (pr *profileRepo) UpdatePasswordProfile(newPassword string, id int) error {
 
 	return nil
 }
-
-// func (pr *profileRepo) GetAllProvince() error {
-// 	pr.db.Raw("")
-// 	return nil
-// }

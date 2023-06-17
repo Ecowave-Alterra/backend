@@ -15,6 +15,8 @@ import (
 func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	var user ut.User
 	var userDetail ut.UserDetail
+	var addresses []ut.UserAddress
+	var addressResponses []ut.UserAddressResponse
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
@@ -36,65 +38,50 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	}
 
 	if !available {
-		userDetail.FullName = ""
-		userDetail.EcoPoint = 0
+		userDetail.Name = ""
+		userDetail.ProfilePhotoUrl = ""
+	}
+
+	if err := ph.profileUsecase.GetAllAddressProfile(&addresses, idUserSementara); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Gagal mendapatkan alamat",
+		})
+	}
+
+	for _, address := range addresses {
+		addressResponse := ut.UserAddressResponse{
+			Id:           int(address.ID),
+			Recipient:    address.Recipient,
+			Phone:        address.Phone,
+			ProvinceId:   address.ProvinceId,
+			ProvinceName: address.ProvinceName,
+			CityId:       address.CityId,
+			CityName:     address.CityName,
+			Address:      address.Address,
+			Note:         address.Note,
+			Mark:         address.Mark,
+			IsPrimary:    address.IsPrimary,
+		}
+
+		addressResponses = append(addressResponses, addressResponse)
 	}
 
 	userResponse := ut.UserResponse{
-		UserId:       int(user.ID),
-		FullName:     userDetail.FullName,
-		Username:     user.Username,
-		Email:        user.Email,
-		PhoneNumber:  user.PhoneNumber,
-		EcoPoint:     userDetail.EcoPoint,
-		UserDetailId: int(userDetail.ID),
+		Id:        int(user.ID),
+		GoogleId:  user.GoogleId,
+		RoleId:    int(user.RoleId),
+		Name:      userDetail.Name,
+		Username:  user.Username,
+		Email:     user.Email,
+		Phone:     user.Phone,
+		Point:     userDetail.Point,
+		Addresses: addressResponses,
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": "Profil berhasil didapatkan",
 		"Data":    userResponse,
-	})
-}
-
-func (ph *ProfileHandler) GetUser2Profile(c echo.Context) error {
-	var user ut.User
-	var userDetail ut.UserDetail
-
-	// var claims = midjwt.GetClaims2(c)
-	// var userId = claims["user_id"].(float64)
-	idUserSementara := 1
-
-	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Gagal mendapatkan profil",
-		})
-	}
-
-	available, err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Gagal mendapatkan profil",
-		})
-	}
-
-	if !available {
-		userDetail.FullName = ""
-		userDetail.ProfilePhotoUrl = ""
-	}
-
-	user2Response := ut.User2Response{
-		UserId:          int(user.ID),
-		FullName:        userDetail.FullName,
-		Username:        user.Username,
-		Email:           user.Email,
-		PhoneNumber:     user.PhoneNumber,
-		ProfilePhotoUrl: userDetail.ProfilePhotoUrl,
-		UserDetailId:    int(userDetail.ID),
-	}
-
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message": "Profil berhasil didapatkan",
-		"Data":    user2Response,
+		"Status":  http.StatusOK,
 	})
 }
 
@@ -137,14 +124,14 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 		})
 	}
 
-	fullName := c.FormValue("FullName")
+	name := c.FormValue("Name")
 	email := c.FormValue("Email")
 	username := c.FormValue("Username")
-	phoneNumber := c.FormValue("PhoneNumber")
+	phone := c.FormValue("Phone")
 	fileHeader, err := c.FormFile("ProfilePhotoUrl")
 
-	if fullName != "" {
-		userDetail.FullName = fullName
+	if name != "" {
+		userDetail.Name = name
 	}
 	if email != "" {
 		user.Email = email
@@ -152,8 +139,8 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	if username != "" {
 		user.Username = username
 	}
-	if phoneNumber != "" {
-		user.PhoneNumber = phoneNumber
+	if phone != "" {
+		user.Phone = phone
 	}
 
 	if fileHeader != nil {
@@ -219,7 +206,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 
 	if !available && !availableBefore {
 		userDetail = ut.UserDetail{
-			FullName:        userDetail.FullName,
+			Name:            userDetail.Name,
 			ProfilePhotoUrl: userDetail.ProfilePhotoUrl,
 			UserId:          uint(idUserSementara),
 		}
@@ -239,7 +226,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 		message = "Yey! Profil kamu berhasil diubah"
 	}
 
-	if fullName == "" && email == "" && username == "" && phoneNumber == "" {
+	if name == "" && email == "" && username == "" && phone == "" {
 		message = messagePhoto
 	}
 
@@ -268,7 +255,7 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 				if e.Tag() == "required" && e.Field() == "Recipient" {
 					message = "Nama penerima wajib diisi"
 				}
-				if e.Tag() == "required" && e.Field() == "PhoneNumber" {
+				if e.Tag() == "required" && e.Field() == "Phone" {
 					message = "Nomor telepon wajib diisi"
 				}
 				if e.Tag() == "required" && e.Field() == "Address" {
@@ -285,15 +272,15 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 		}
 	}
 
-	checkPhoneNumber := ""
-	for i := 0; i < len(address.PhoneNumber); i++ {
+	checkPhone := ""
+	for i := 0; i < len(address.Phone); i++ {
 		if i == 2 {
 			break
 		}
-		checkPhoneNumber += string(address.PhoneNumber[i])
+		checkPhone += string(address.Phone[i])
 	}
 
-	if checkPhoneNumber != "08" {
+	if checkPhone != "08" {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Pastikan nomor kamu dimulai dengan '08'",
 		})
@@ -339,16 +326,15 @@ func (ph *ProfileHandler) GetAllAddressProfile(c echo.Context) error {
 		addressResponse := ut.UserAddressResponse{
 			Id:           int(address.ID),
 			Recipient:    address.Recipient,
-			PhoneNumber:  address.PhoneNumber,
-			Address:      address.Address,
+			Phone:        address.Phone,
 			ProvinceId:   address.ProvinceId,
 			ProvinceName: address.ProvinceName,
 			CityId:       address.CityId,
 			CityName:     address.CityName,
+			Address:      address.Address,
 			Note:         address.Note,
 			Mark:         address.Mark,
 			IsPrimary:    address.IsPrimary,
-			UserId:       int(address.UserId),
 		}
 
 		addressResponses = append(addressResponses, addressResponse)
@@ -399,15 +385,15 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 		}
 	}
 
-	checkPhoneNumber := ""
-	for i := 0; i < len(address.PhoneNumber); i++ {
+	checkPhone := ""
+	for i := 0; i < len(address.Phone); i++ {
 		if i == 2 {
 			break
 		}
-		checkPhoneNumber += string(address.PhoneNumber[i])
+		checkPhone += string(address.Phone[i])
 	}
 
-	if checkPhoneNumber != "08" {
+	if checkPhone != "08" {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Pastikan nomor kamu dimulai dengan '08'",
 		})

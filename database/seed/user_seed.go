@@ -11,20 +11,20 @@ func CreateUser() []*ut.User {
 
 	user := []*ut.User{
 		{
-			RoleId:      2,
-			Email:       "user1@gmail.com",
-			GoogleId:    "qwertyuiop",
-			Username:    "user1",
-			PhoneNumber: "085123456789",
-			Password:    string(hashPasswordUser1),
+			RoleId:   2,
+			Email:    "user1@gmail.com",
+			GoogleId: "qwertyuiop",
+			Username: "user1",
+			Phone:    "085123456789",
+			Password: string(hashPasswordUser1),
 		},
 		{
-			RoleId:      2,
-			Email:       "user2@gmail.com",
-			GoogleId:    "asdfghjkl",
-			Username:    "user2",
-			PhoneNumber: "085123456789",
-			Password:    string(hashPasswordUser2),
+			RoleId:   2,
+			Email:    "user2@gmail.com",
+			GoogleId: "asdfghjkl",
+			Username: "user2",
+			Phone:    "085123456789",
+			Password: string(hashPasswordUser2),
 		},
 	}
 

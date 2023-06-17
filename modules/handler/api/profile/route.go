@@ -11,7 +11,6 @@ func (ph *ProfileHandler) RegisterRoute(e *echo.Echo) {
 	profileGroup := e.Group("/user")
 	// profileGroup.Use(jwtMiddleware)
 	profileGroup.GET("", ph.GetUserProfile)
-	profileGroup.GET("/profile", ph.GetUser2Profile)
 	profileGroup.PUT("/profile", ph.UpdateUserProfile)
 	profileGroup.PUT("/add/profile", ph.UpdateUserProfile)
 	profileGroup.POST("/address", ph.CreateAddressProfile)

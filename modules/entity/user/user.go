@@ -8,7 +8,7 @@ type User struct {
 	Email         string     `json:"Email" form:"Email" validate:"required,email"`
 	GoogleId      string     `json:"GoogleId" form:"GoogleId"`
 	Username      string     `json:"Username" form:"Username" validate:"required"`
-	PhoneNumber   string     `json:"PhoneNumber" form:"PhoneNumber" validate:"required,min=10,max=15"`
+	Phone         string     `json:"Phone" form:"Phone" validate:"required,min=10,max=15"`
 	Password      string     `json:"Password" form:"Password" validate:"required,min=8"`
 	UserDetail    UserDetail `gorm:"foreignKey:UserId"`
 	UserAddresses []UserAddress
@@ -26,13 +26,16 @@ type UserResponseLogin struct {
 }
 
 type UserResponse struct {
-	UserId       int
-	FullName     string
-	Username     string
-	Email        string
-	PhoneNumber  string
-	EcoPoint     int
-	UserDetailId int
+	Id              int    `json:"Id"`
+	GoogleId        string `json:"GoogleId"`
+	RoleId          int    `json:"RoleId"`
+	Name            string `json:"Name"`
+	Username        string `json:"Username"`
+	Email           string `json:"Email"`
+	Phone           string `json:"Phone"`
+	Point           int    `json:"Point"`
+	ProfilePhotoUrl string `json:"ProfilePhotoUrl"`
+	Addresses       []UserAddressResponse
 }
 
 type UserPasswordRequest struct {
