@@ -42,7 +42,7 @@ func (pr *profileRepo) CreateUserDetailProfile(userDetail *ut.UserDetail) error 
 }
 
 func (pr *profileRepo) UpdateUserProfile(user *ut.User, id int) error {
-	if err := pr.db.Raw("UPDATE users SET email = ?, username = ?, phone_number = ? WHERE id = ?", user.Email, user.Username, user.PhoneNumber, id).Scan(&user).Error; err != nil {
+	if err := pr.db.Raw("UPDATE users SET email = ?, username = ?, phone_number = ? WHERE id = ?", user.Email, user.Username, user.Phone, id).Scan(&user).Error; err != nil {
 		return err
 	}
 
