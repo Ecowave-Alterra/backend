@@ -25,6 +25,10 @@ import (
 	informationRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/information"
 	informationUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/information"
 
+	voucherHandlerAdmin "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/voucher"
+	voucherRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/voucher"
+	voucherUsecaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/voucher"
+
 	transactionHandlerUser "github.com/berrylradianh/ecowave-go/modules/handler/api/user/transaction"
 	transactionRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/transaction"
 	transactionUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/transaction"
@@ -59,6 +63,10 @@ func StartApp() *echo.Echo {
 	informationUsecaseUser := informationUsecaseUser.New(informationRepoUser)
 	informationHandlerUser := informationHandlerUser.New(informationUsecaseUser)
 
+	voucherRepoAdmin := voucherRepoAdmin.New(mysql.DB)
+	voucherUsecaseAdmin := voucherUsecaseAdmin.New(voucherRepoAdmin)
+	voucherHandlerAdmin := voucherHandlerAdmin.New(voucherUsecaseAdmin)
+
 	transactionRepoUser := transactionRepoUser.New(mysql.DB)
 	transactionUsecaseUser := transactionUsecaseUser.New(transactionRepoUser)
 	transactionHandlerUser := transactionHandlerUser.New(transactionUsecaseUser)
@@ -71,6 +79,7 @@ func StartApp() *echo.Echo {
 		AuthHandler:             authHandler,
 		InformationHandlerAdmin: informationHandlerAdmin,
 		InformationHandlerUser:  informationHandlerUser,
+		VoucherHandlerAdmin:     voucherHandlerAdmin,
 		TransactionHandlerUser:  transactionHandlerUser,
 		OrderHandlerUser:        orderHandlerUser,
 		ProductCategoryHandler:  productCategoryHandler,

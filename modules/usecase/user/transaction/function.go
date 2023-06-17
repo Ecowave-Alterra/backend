@@ -62,6 +62,7 @@ func (tu *transactionUsecase) MidtransNotifications(midtransRequest *em.Midtrans
 	}
 	err := tu.transactionRepo.UpdateTransaction(transaction)
 	if err != nil {
+		//lint:ignore ST1005 Reason for ignoring this linter
 		return errors.New("Invalid Transaction")
 	}
 
