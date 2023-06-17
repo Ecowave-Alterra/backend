@@ -84,13 +84,24 @@ func (ir *informationRepo) SearchInformations(search, filter string, offset, pag
 	var informations []ie.Information
 	var count int64
 
-	countQuery := "SELECT COUNT(*) FROM information WHERE (title LIKE ? OR information_id LIKE ?) AND status LIKE ?"
-	if err := ir.db.Raw(countQuery, "%"+search+"%", "%"+search+"%", "%"+filter+"%").Count(&count).Error; err != nil {
+	if err := ir.db.Model(&ie.Information{}).
+		Where("title LIKE ? OR information_id LIKE ?",
+			"%"+search+"%",
+			"%"+search+"%",
+		).
+		Where("status LIKE ?", "%"+filter+"%").
+		Count(&count).Error; err != nil {
 		return nil, 0, echo.NewHTTPError(500, err)
 	}
 
-	selectQuery := "SELECT * FROM information WHERE (title LIKE ? OR information_id LIKE ?) AND status LIKE ? LIMIT ? OFFSET ?"
-	if err := ir.db.Raw(selectQuery, "%"+search+"%", "%"+search+"%", "%"+filter+"%", pageSize, offset).Scan(&informations).Error; err != nil {
+	if err := ir.db.Model(&ie.Information{}).
+		Where("title LIKE ? OR information_id LIKE ?",
+			"%"+search+"%",
+			"%"+search+"%",
+		).
+		Where("status LIKE ?", "%"+filter+"%").
+		Offset(offset).Limit(pageSize).
+		Find(&informations).Error; err != nil {
 		return nil, 0, echo.NewHTTPError(404, err)
 	}
 
