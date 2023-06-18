@@ -29,10 +29,6 @@ func (pc *profileUsecase) UpdateUserDetailProfile(userDetailRequest *ut.UserDeta
 	return pc.profileRepo.UpdateUserDetailProfile(userDetailRequest, id)
 }
 
-func (pc *profileUsecase) CreateUserDetailProfile(userDetail *ut.UserDetail) error {
-	return pc.profileRepo.CreateUserDetailProfile(userDetail)
-}
-
 func (pc *profileUsecase) CreateAddressProfile(address *ut.UserAddress) error {
 	return pc.profileRepo.CreateAddressProfile(address)
 }

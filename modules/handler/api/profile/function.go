@@ -27,20 +27,23 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	idUserSementara := 3
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "Gagal mendapatkan profil",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
 	if err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "Gagal mendapatkan profil",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
 	if err := ph.profileUsecase.GetAllAddressProfileNoPagination(&addresses, idUserSementara); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "Gagal mendapatkan alamat",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
@@ -96,26 +99,30 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	idUserSementara := 3
 
 	if err := ph.profileUsecase.GetAllUserProfile(&allUser); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "Gagal mendapatkan profil",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "Gagal mendapatkan profil",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
 	if err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "Gagal mendapatkan profil",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
 	if err := ph.profileUsecase.GetUserDetailProfile(&userDetailBefore, idUserSementara); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "Gagal mendapatkan profil",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
@@ -169,9 +176,9 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 
 	for _, value := range allUser {
 		if value.Username == username {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Username sudah digunakan sebelumnya",
-				"Status":  http.StatusBadRequest,
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 	}
@@ -196,16 +203,18 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	}
 
 	if err := ph.profileUsecase.UpdateUserProfile(&userRequest, idUserSementara); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": "Ups! Ada kendala saat mengubah profil kamu. Coba lagi ya",
+			"Status":  http.StatusInternalServerError,
 		})
 	} else {
 		message = "Yey! Profil kamu berhasil diubah"
 	}
 
 	if err := ph.profileUsecase.UpdateUserDetailProfile(&userDetailRequest, idUserSementara); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": "Ups! Ada kendala saat mengubah profil kamu. Coba lagi ya",
+			"Status":  http.StatusInternalServerError,
 		})
 	} else {
 		message = "Yey! Profil kamu berhasil diubah"
@@ -231,6 +240,7 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 	if err := c.Bind(&address); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Gagal",
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
@@ -255,8 +265,9 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 
 	if address.IsPrimary {
 		if err := ph.profileUsecase.UpdateAddressPrimaryProfile(&address, int(address.UserId)); err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Gagal mengubah alamat utama",
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 		address.IsPrimary = true
@@ -265,8 +276,9 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 	}
 
 	if err := ph.profileUsecase.CreateAddressProfile(&address); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": "Gagal membuat alamat",
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
@@ -295,8 +307,9 @@ func (ph *ProfileHandler) GetAllAddressProfile(c echo.Context) error {
 
 	addresses, total, err := ph.profileUsecase.GetAllAddressProfile(addresses, idUserSementara, offset, pageSize)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "Gagal mendapatkan alamat",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
@@ -352,7 +365,10 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 
 	idAddress, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Gagal",
+			"Status":  http.StatusBadRequest,
+		})
 	}
 
 	if err := ph.profileUsecase.GetAddressByIdProfile(&address, int(address.UserId), idAddress); err != nil {
@@ -426,36 +442,38 @@ func (ph *ProfileHandler) UpdatePasswordProfile(c echo.Context) error {
 	idUserSementara := 3
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "Gagal mendapatkan profil",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
 	if err := c.Bind(&userPassword); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Gagal",
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
 	if len(userPassword.Password) < 8 {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": "Password harus mengandung minimal 8 karakter",
-			"Status":  http.StatusBadRequest,
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
 	if userPassword.Password != userPassword.ConfirmNewPassword {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": "Password tidak cocok",
-			"Status":  http.StatusBadRequest,
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
 	message, err := ph.profileUsecase.UpdatePasswordProfile(&user, userPassword.OldPassword, userPassword.Password, idUserSementara)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": message,
-			"Status":  http.StatusBadRequest,
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
@@ -470,11 +488,12 @@ func (ph *ProfileHandler) GetAllProvince(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "not found",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message":  "success",
+		"Message":  "Success get all province",
 		"Province": provinces,
 	})
 }
@@ -486,11 +505,12 @@ func (ph *ProfileHandler) GetAllCityByProvince(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "not found",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message":  "success",
+		"Message":  "Success get all city by id province",
 		"Province": cities,
 	})
 }

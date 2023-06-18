@@ -28,14 +28,6 @@ func (pr *profileRepo) GetUserDetailProfile(userDetail *ut.UserDetail, id int) e
 	return nil
 }
 
-func (pr *profileRepo) CreateUserDetailProfile(userDetail *ut.UserDetail) error {
-	if err := pr.db.Save(&userDetail).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (pr *profileRepo) UpdateUserProfile(userRequest *ut.UserRequest, id int) error {
 	if err := pr.db.Raw("UPDATE users SET email = ?, username = ? WHERE id = ?", userRequest.Email, userRequest.Username, id).Scan(&userRequest).Error; err != nil {
 		return err
