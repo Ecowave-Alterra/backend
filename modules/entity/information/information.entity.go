@@ -39,11 +39,6 @@ type UserInformationResponse struct {
 	InformationId   string
 	Title           string
 	PhotoContentUrl string
-	Date            time.Time
-}
-type UserInformationDetailResponse struct {
-	Title           string
-	PhotoContentUrl string
 	Content         string
 	Date            time.Time
 }

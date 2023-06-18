@@ -1,8 +1,11 @@
 package information
 
 import (
+	"math"
 	"net/http"
 	"strconv"
+
+	h "github.com/berrylradianh/ecowave-go/helper/getIdUser"
 
 	"github.com/labstack/echo/v4"
 )
@@ -10,36 +13,32 @@ import (
 func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 	return func(e echo.Context) error {
 
-		informations, err := ih.informationUsecase.GetAllInformations()
+		pageParam := e.QueryParam("page")
+		page, err := strconv.Atoi(pageParam)
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, echo.Map{
+				"Status":  400,
+				"Message": err,
+			})
+		}
+
+		pageSize := 10
+		offset := (page - 1) * pageSize
+
+		informations, total, err := ih.informationUsecase.GetAllInformations(offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
 				"Message": err.Error(),
 				"Status":  http.StatusInternalServerError,
 			})
 		}
+		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
 
 		return e.JSON(http.StatusOK, map[string]interface{}{
+			"Status":       http.StatusOK,
+			"Page":         page,
+			"TotalPage":    totalPages,
 			"Informations": informations,
-			"Status":       http.StatusOK,
-		})
-	}
-}
-
-func (ih *InformationHandler) GetDetailInformations() echo.HandlerFunc {
-	return func(e echo.Context) error {
-
-		id := e.Param("id")
-		informationDetail, err := ih.informationUsecase.GetDetailInformations(id)
-		if err != nil {
-			return e.JSON(http.StatusBadRequest, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusBadRequest,
-			})
-		}
-
-		return e.JSON(http.StatusOK, map[string]interface{}{
-			"Informations": informationDetail,
-			"Status":       http.StatusOK,
 		})
 	}
 }
@@ -47,21 +46,9 @@ func (ih *InformationHandler) GetDetailInformations() echo.HandlerFunc {
 func (ih *InformationHandler) UpdatePoint() echo.HandlerFunc {
 	return func(e echo.Context) error {
 
-		// user := e.Get("user").(*jwt.Token)
-		// log.Println(user)
-		// claims := user.Claims.(jwt.MapClaims)
-		// claimsID := fmt.Sprint(claims["user_id"])
-		// convClaimsID, err := strconv.Atoi(claimsID)
+		id, _ := h.GetIdUser(e)
 
-		id, err := strconv.Atoi(e.Param("id"))
-		if err != nil {
-			return e.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Id harus berupa angka",
-				"Status":  http.StatusBadRequest,
-			})
-		}
-
-		err = ih.informationUsecase.UpdatePoint(uint(id))
+		err := ih.informationUsecase.UpdatePoint(uint(id))
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  http.StatusBadRequest,
