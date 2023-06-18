@@ -5,9 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	h "github.com/berrylradianh/ecowave-go/helper/getIdUser"
-	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
+	eo "github.com/berrylradianh/ecowave-go/modules/entity/order"
 
 	"github.com/labstack/echo/v4"
 )
@@ -32,10 +31,10 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 		order, total, err := oh.orderUsecase.GetOrder(filter, idUser, offset, pageSize)
 
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return e.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+
+			return e.JSON(http.StatusBadRequest, echo.Map{
+				"Status":  400,
+				"Message": err,
 			})
 		}
 		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
@@ -49,34 +48,6 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 		})
 	}
 }
-
-// func (oh *OrderHandler) OrderDetail() echo.HandlerFunc {
-// 	return func(e echo.Context) error {
-
-// 		id, err := strconv.Atoi(e.Param("id"))
-// 		if err != nil {
-// 			e.JSON(http.StatusBadRequest, map[string]interface{}{
-// 				"Status":  400,
-// 				"Message": "Invalid Id",
-// 			})
-// 		}
-
-// 		OrderDetail, err := oh.orderUsecase.OrderDetail(uint(id))
-// 		if err != nil {
-// 			code, msg := cs.CustomStatus(err.Error())
-// 			return e.JSON(code, echo.Map{
-// 				"Status":  code,
-// 				"Message": msg,
-// 			})
-// 		}
-
-// 		return e.JSON(http.StatusOK, map[string]interface{}{
-// 			"Status":      200,
-// 			"Message":     "Succes get order detail",
-// 			"OrderDetail": OrderDetail,
-// 		})
-// 	}
-// }
 
 func (oh *OrderHandler) Tracking() echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -102,13 +73,16 @@ func (oh *OrderHandler) Tracking() echo.HandlerFunc {
 func (oh *OrderHandler) ConfirmOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		id := c.Param("id")
+		co := eo.ConfirmOrder{}
+		c.Bind(&co)
+
+		id := co.TransactionId
 		err := oh.orderUsecase.ConfirmOrder(id)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"Status":  400,
+				"Message": err,
 			})
 		}
 
@@ -122,17 +96,15 @@ func (oh *OrderHandler) ConfirmOrder() echo.HandlerFunc {
 func (oh *OrderHandler) CancelOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		id := c.Param("id")
-		cr := et.CanceledReason{}
-		c.Bind(&cr)
-		canceledReason := cr.CanceledReason
+		cancelOrder := eo.CanceledOrder{}
+		c.Bind(&cancelOrder)
 
-		err := oh.orderUsecase.CancelOrder(id, canceledReason)
+		err := oh.orderUsecase.CancelOrder(cancelOrder)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"Status":  400,
+				"Message": err,
 			})
 		}
 

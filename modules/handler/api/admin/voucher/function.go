@@ -53,18 +53,10 @@ func (vh *VoucherHandler) GetAllVoucher(c echo.Context) error {
 			"Status":  http.StatusNotFound,
 		})
 	} else {
-		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
-		if page > totalPages {
-			return c.JSON(http.StatusNotFound, echo.Map{
-				"Message": "Halaman Tidak Ditemukan",
-				"Status":  http.StatusNotFound,
-			})
-		}
-
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"Vouchers":  voucherResponses,
 			"Page":      page,
-			"TotalPage": totalPages,
+			"TotalPage": int(math.Ceil(float64(total) / float64(pageSize))),
 			"Status":    http.StatusOK,
 		})
 	}
@@ -194,36 +186,55 @@ func (vh *VoucherHandler) DeleteVoucher(c echo.Context) error {
 	})
 }
 
-func (vh *VoucherHandler) FilterVouchersByType(c echo.Context) error {
+func (vh *VoucherHandler) FilterVoucher(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	pageSize := 10
+	offset := (page - 1) * pageSize
+
 	voucherType := c.QueryParam("type")
 
-	var voucher []ve.Voucher
-	vouchers, err := vh.voucherUsecase.FilterVouchersByType(voucherType, &voucher)
+	var vouchers *[]ve.Voucher
+	vouchers, total, err := vh.voucherUsecase.FilterVoucher(voucherType, offset, pageSize)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"Message": "Gagal memfilter voucher",
+			"Message": err,
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
-	var voucherResponses []ve.VoucherResponse
-	for _, voucher := range vouchers {
-		outputDateFormat := "02 January 2006"
-		startDate := voucher.StartDate.Format(outputDateFormat)
-		endDate := voucher.EndDate.Format(outputDateFormat)
+	if len(*vouchers) == 0 {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Belum ada list voucher",
+			"Status":  http.StatusNotFound,
+		})
+	} else {
+		var voucherResponses []ve.VoucherResponse
+		for _, voucher := range *vouchers {
+			outputDateFormat := "02 January 2006"
+			startDate := voucher.StartDate.Format(outputDateFormat)
+			endDate := voucher.EndDate.Format(outputDateFormat)
 
-		voucherResponse := ve.VoucherResponse{
-			Type:               voucher.VoucherType.Type,
-			ClaimableUserCount: voucher.ClaimableUserCount,
-			StartDate:          startDate,
-			EndDate:            endDate,
+			voucherResponse := ve.VoucherResponse{
+				VoucherId:          voucher.VoucherId,
+				Type:               voucher.VoucherType.Type,
+				ClaimableUserCount: voucher.ClaimableUserCount,
+				StartDate:          startDate,
+				EndDate:            endDate,
+			}
+
+			voucherResponses = append(voucherResponses, voucherResponse)
 		}
 
-		voucherResponses = append(voucherResponses, voucherResponse)
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Vouchers":  voucherResponses,
+			"Page":      page,
+			"TotalPage": int(math.Ceil(float64(total) / float64(pageSize))),
+			"Status":    http.StatusOK,
+		})
 	}
-
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message":  "Berhasil memfilter data voucher",
-		"Vouchers": voucherResponses,
-		"Status":   http.StatusOK,
-	})
 }

@@ -17,7 +17,7 @@ func (transactionHandler *TransactionHandler) RegisterRoutes(e *echo.Echo) {
 	// transactionGroup.GET("/claim-voucher/:id", transactionHandler.ClaimVoucher())
 	transactionGroup.GET("/voucher", transactionHandler.GetVoucherUser())
 	// transactionGroup.GET("/voucher/:id", transactionHandler.DetailVoucher())
-	transactionGroup.POST("/shipping-options", ShippingOptions())
+	transactionGroup.POST("/shipping-options", transactionHandler.ShippingOptions())
 	transactionGroup.POST("/midtrans/notifications", transactionHandler.MidtransNotifications())
 	transactionGroup.GET("/status-payment", transactionHandler.GetPaymentStatus())
 }

@@ -1,6 +1,7 @@
 package order
 
 import (
+	eo "github.com/berrylradianh/ecowave-go/modules/entity/order"
 	ro "github.com/berrylradianh/ecowave-go/modules/repository/user/order"
 )
 
@@ -9,7 +10,7 @@ type OderUsecase interface {
 	// OrderDetail(id uint) (interface{}, error)
 	Tracking(resi string, courier string) (interface{}, error)
 	ConfirmOrder(id string) error
-	CancelOrder(id string, canceledReason string) error
+	CancelOrder(co eo.CanceledOrder) error
 }
 
 type orderUsecase struct {

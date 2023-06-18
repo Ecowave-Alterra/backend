@@ -20,6 +20,8 @@ func RegisterSeed(db *gorm.DB) []Seed {
 		{Seed: CreateProductCategory()},
 		{Seed: CreateProduct()},
 		{Seed: CreateProductImage()},
+		{Seed: CreateTransaction()},
+		{Seed: CreateTransactionDetail()},
 	}
 }
 

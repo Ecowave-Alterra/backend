@@ -7,14 +7,13 @@ import (
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	eu "github.com/berrylradianh/ecowave-go/modules/entity/user"
 	ev "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
-	"github.com/labstack/echo/v4"
 )
 
 func (tr *transactionRepo) CreateTransaction(transaction *et.Transaction) error {
 
 	err := tr.db.Create(&transaction).Error
 	if err != nil {
-		return echo.NewHTTPError(500, err)
+		return err
 	}
 
 	//update stock
@@ -22,13 +21,13 @@ func (tr *transactionRepo) CreateTransaction(transaction *et.Transaction) error 
 		var product ep.Product
 		err := tr.db.Select("stock").Where("product_id = ?", val.ProductId).First(&product).Error
 		if err != nil {
-			return echo.NewHTTPError(404, err)
+			return err
 		}
 
 		stock := product.Stock - val.Qty
 		err = tr.db.Model(&ep.Product{}).Where("product_id = ?", val.ProductId).Update("stock", stock).Error
 		if err != nil {
-			return echo.NewHTTPError(500, err)
+			return err
 		}
 	}
 	return nil
@@ -51,7 +50,7 @@ func (tr *transactionRepo) GetPoint(id uint) (uint, error) {
 	var userDetail eu.UserDetail
 
 	if err := tr.db.Where("id = ?", id).First(&userDetail).Error; err != nil {
-		return 0, echo.NewHTTPError(404, err)
+		return 0, err
 	}
 	point := userDetail.Point
 
@@ -83,17 +82,17 @@ func (tr *transactionRepo) GetVoucherUser(id uint, offset int, pageSize int) ([]
 
 	err := tr.db.Select(`id`).Table("(?) as sub", subquery).Where("user_claim > max_claim_limit").Scan(&idVoucher).Error
 	if err != nil {
-		return nil, 0, echo.NewHTTPError(404, err)
+		return nil, 0, err
 	}
 
 	err = tr.db.Not(idVoucher).Find(&voucher).Count(&count).Error
 	if err != nil {
-		return nil, 0, echo.NewHTTPError(404, err)
+		return nil, 0, err
 	}
 
 	err = tr.db.Preload("VoucherType").Offset(offset).Limit(pageSize).Not(idVoucher).Find(&voucher).Error
 	if err != nil {
-		return voucher, 0, echo.NewHTTPError(404, err)
+		return voucher, 0, err
 	}
 
 	return voucher, count, nil
@@ -104,7 +103,7 @@ func (tr *transactionRepo) CountVoucherUser(idUser uint, idVoucher uint) (uint, 
 
 	err := tr.db.Model(&et.Transaction{}).Where("user_id = ? AND voucher_id = ?", idUser, idVoucher).Count(&count).Error
 	if err != nil {
-		return 0, echo.NewHTTPError(404, err)
+		return 0, err
 	}
 
 	return uint(count), nil
@@ -115,7 +114,7 @@ func (tr *transactionRepo) CountVoucherUser(idUser uint, idVoucher uint) (uint, 
 // 	var voucher ev.Voucher
 
 // 	if err := tr.db.Where("id = ?", id).First(&voucher).Error; err != nil {
-// 		return voucher, echo.NewHTTPError(404, err)
+// 		return voucher, err
 // 	}
 
 // 	return voucher, nil
@@ -125,7 +124,7 @@ func (tr *transactionRepo) CountVoucherUser(idUser uint, idVoucher uint) (uint, 
 // 	var voucher ev.Voucher
 
 // 	if err := tr.db.Preload("VoucherType").Where("id = ?", id).First(&voucher).Error; err != nil {
-// 		return voucher, echo.NewHTTPError(404, err)
+// 		return voucher, err
 // 	}
 // 	return voucher, nil
 // }

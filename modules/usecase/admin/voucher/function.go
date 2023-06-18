@@ -69,6 +69,10 @@ func (vc *voucherUsecase) DeleteVoucher(voucherId string, voucher *ve.Voucher) e
 	return vc.voucherRepo.DeleteVoucher(voucherId, voucher)
 }
 
-func (vc *voucherUsecase) FilterVouchersByType(voucherType string, vouchers *[]ve.Voucher) ([]ve.Voucher, error) {
-	return vc.voucherRepo.FilterVouchersByType(voucherType, vouchers)
+func (vc *voucherUsecase) FilterVoucher(filter string, offset, pageSize int) (*[]ve.Voucher, int64, error) {
+	vouchers, count, err := vc.voucherRepo.FilterVoucher(filter, offset, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+	return vouchers, count, nil
 }
