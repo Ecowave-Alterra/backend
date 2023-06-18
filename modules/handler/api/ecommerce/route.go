@@ -10,5 +10,4 @@ func (eh *EcommerceHandler) RegisterRoutes(e *echo.Echo) {
 
 	productGroup := e.Group("/user/ecommerce")
 	productGroup.GET("", eh.GetProductEcommerce)
-	// productGroup.GET("/filter", eh.FilterProductByCategoryAndPrice)
 }
