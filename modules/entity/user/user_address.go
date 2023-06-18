@@ -17,6 +17,20 @@ type UserAddress struct {
 	UserId       uint   `json:"UserId" form:"UserId"`
 }
 
+type UserAddressRequest struct {
+	Recipient    string `json:"Recipient" form:"Recipient"`
+	Phone        string `json:"Phone" form:"Phone" validate:"min=10,max=13"`
+	ProvinceId   string `json:"ProvinceId" form:"ProvinceId"`
+	ProvinceName string `json:"ProvinceName" form:"ProvinceName"`
+	CityId       string `json:"CityId" form:"CityId"`
+	CityName     string `json:"CityName" form:"CityName"`
+	Address      string `json:"Address" form:"Address"`
+	Note         string `json:"Note" form:"Note"`
+	Mark         string `json:"Mark" form:"Mark"`
+	IsPrimary    bool   `json:"IsPrimary" form:"IsPrimary"`
+	UserId       uint   `json:"UserId" form:"UserId"`
+}
+
 type UserAddressResponse struct {
 	Id           int
 	Recipient    string

@@ -17,17 +17,16 @@ func (pc *profileUsecase) GetUserProfile(user *ut.User, id int) error {
 	return pc.profileRepo.GetUserProfile(user, id)
 }
 
-func (pc *profileUsecase) GetUserDetailProfile(userDetail *ut.UserDetail, id int) (bool, error) {
-	available, err := pc.profileRepo.GetUserDetailProfile(userDetail, id)
-	return available, err
+func (pc *profileUsecase) GetUserDetailProfile(userDetail *ut.UserDetail, id int) error {
+	return pc.profileRepo.GetUserDetailProfile(userDetail, id)
 }
 
-func (pc *profileUsecase) UpdateUserProfile(user *ut.User, id int) error {
-	return pc.profileRepo.UpdateUserProfile(user, id)
+func (pc *profileUsecase) UpdateUserProfile(userRequest *ut.UserRequest, id int) error {
+	return pc.profileRepo.UpdateUserProfile(userRequest, id)
 }
 
-func (pc *profileUsecase) UpdateUserDetailProfile(userDetail *ut.UserDetail, id int) error {
-	return pc.profileRepo.UpdateUserDetailProfile(userDetail, id)
+func (pc *profileUsecase) UpdateUserDetailProfile(userDetailRequest *ut.UserDetailRequest, id int) error {
+	return pc.profileRepo.UpdateUserDetailProfile(userDetailRequest, id)
 }
 
 func (pc *profileUsecase) CreateUserDetailProfile(userDetail *ut.UserDetail) error {
@@ -54,8 +53,8 @@ func (pc *profileUsecase) UpdateAddressPrimaryProfile(address *ut.UserAddress, i
 	return pc.profileRepo.UpdateAddressPrimaryProfile(address, idUser)
 }
 
-func (pc *profileUsecase) UpdateAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error {
-	return pc.profileRepo.UpdateAddressByIdProfile(address, idUser, idAddress)
+func (pc *profileUsecase) UpdateAddressByIdProfile(addressRequest *ut.UserAddressRequest, idUser int, idAddress int) error {
+	return pc.profileRepo.UpdateAddressByIdProfile(addressRequest, idUser, idAddress)
 }
 
 func (pc *profileUsecase) UpdatePasswordProfile(user *ut.User, oldPassword string, newPassword string, id int) (string, error) {

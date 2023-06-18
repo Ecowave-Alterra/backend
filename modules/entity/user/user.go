@@ -24,6 +24,11 @@ type UserResponseLogin struct {
 	Token    string
 }
 
+type UserRequest struct {
+	Email    string `json:"Email" form:"Email" validate:"email"`
+	Username string `json:"Username" form:"Username"`
+}
+
 type UserResponse struct {
 	Id              int    `json:"Id"`
 	GoogleId        string `json:"GoogleId"`

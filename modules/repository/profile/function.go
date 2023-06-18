@@ -20,17 +20,12 @@ func (pr *profileRepo) GetUserProfile(user *ut.User, id int) error {
 	return nil
 }
 
-func (pr *profileRepo) GetUserDetailProfile(userDetail *ut.UserDetail, id int) (bool, error) {
-	result := pr.db.Raw("SELECT * FROM user_details WHERE user_id = ?", id).Scan(&userDetail)
-	if result.Error != nil {
-		return false, result.Error
+func (pr *profileRepo) GetUserDetailProfile(userDetail *ut.UserDetail, id int) error {
+	if err := pr.db.Raw("SELECT * FROM user_details WHERE user_id = ?", id).Scan(&userDetail).Error; err != nil {
+		return err
 	}
 
-	if result.RowsAffected == 0 {
-		return false, nil
-	}
-
-	return true, nil
+	return nil
 }
 
 func (pr *profileRepo) CreateUserDetailProfile(userDetail *ut.UserDetail) error {
@@ -41,16 +36,16 @@ func (pr *profileRepo) CreateUserDetailProfile(userDetail *ut.UserDetail) error 
 	return nil
 }
 
-func (pr *profileRepo) UpdateUserProfile(user *ut.User, id int) error {
-	if err := pr.db.Raw("UPDATE users SET email = ?, username = ? WHERE id = ?", user.Email, user.Username, id).Scan(&user).Error; err != nil {
+func (pr *profileRepo) UpdateUserProfile(userRequest *ut.UserRequest, id int) error {
+	if err := pr.db.Raw("UPDATE users SET email = ?, username = ? WHERE id = ?", userRequest.Email, userRequest.Username, id).Scan(&userRequest).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (pr *profileRepo) UpdateUserDetailProfile(userDetail *ut.UserDetail, id int) error {
-	if err := pr.db.Raw("UPDATE user_details SET full_name = ?, phone = ?, profile_photo_url = ? WHERE user_id = ?", userDetail.Name, userDetail.Phone, userDetail.ProfilePhotoUrl, id).Scan(&userDetail).Error; err != nil {
+func (pr *profileRepo) UpdateUserDetailProfile(userDetailRequest *ut.UserDetailRequest, id int) error {
+	if err := pr.db.Raw("UPDATE user_details SET name = ?, phone = ?, profile_photo_url = ? WHERE user_id = ?", userDetailRequest.Name, userDetailRequest.Phone, userDetailRequest.ProfilePhotoUrl, id).Scan(&userDetailRequest).Error; err != nil {
 		return err
 	}
 
@@ -103,8 +98,10 @@ func (pr *profileRepo) UpdateAddressPrimaryProfile(address *ut.UserAddress, idUs
 	return nil
 }
 
-func (pr *profileRepo) UpdateAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error {
-	if err := pr.db.Where("user_id = ? AND id = ?", idUser, idAddress).Updates(&address).Error; err != nil {
+func (pr *profileRepo) UpdateAddressByIdProfile(addressRequest *ut.UserAddressRequest, idUser int, idAddress int) error {
+	var address ut.UserAddress
+
+	if err := pr.db.Model(address).Where("user_id = ? AND id = ?", idUser, idAddress).Updates(&addressRequest).Error; err != nil {
 		return err
 	}
 

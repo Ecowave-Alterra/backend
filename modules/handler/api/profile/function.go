@@ -1,14 +1,15 @@
 package profile
 
 import (
-	"log"
 	"math"
 	"net/http"
 	"strconv"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
+	vld "github.com/berrylradianh/ecowave-go/helper/validator"
 	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
-	"github.com/go-playground/validator"
+
+	// "github.com/go-playground/validator"
 
 	"github.com/labstack/echo/v4"
 )
@@ -31,17 +32,10 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 		})
 	}
 
-	available, err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara)
-	if err != nil {
+	if err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Gagal mendapatkan profil",
 		})
-	}
-
-	if !available {
-		userDetail.Name = ""
-		userDetail.ProfilePhotoUrl = ""
-		userDetail.Phone = ""
 	}
 
 	if err := ph.profileUsecase.GetAllAddressProfileNoPagination(&addresses, idUserSementara); err != nil {
@@ -113,15 +107,13 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 		})
 	}
 
-	available, err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara)
-	if err != nil {
+	if err := ph.profileUsecase.GetUserDetailProfile(&userDetail, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Gagal mendapatkan profil",
 		})
 	}
 
-	availableBefore, err := ph.profileUsecase.GetUserDetailProfile(&userDetailBefore, idUserSementara)
-	if err != nil {
+	if err := ph.profileUsecase.GetUserDetailProfile(&userDetailBefore, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Gagal mendapatkan profil",
 		})
@@ -184,24 +176,26 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 		}
 	}
 
-	if err := c.Validate(user); err != nil {
-		if validationErr, ok := err.(validator.ValidationErrors); ok {
-			message := ""
-			log.Println(validationErr)
-			for _, e := range validationErr {
-				if e.Tag() == "email" {
-					message = "Alamat email tidak valid"
-				}
-			}
-
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"Message": message,
-				"Status":  http.StatusInternalServerError,
-			})
-		}
+	userRequest := ut.UserRequest{
+		Email:    user.Email,
+		Username: user.Username,
 	}
 
-	if err := ph.profileUsecase.UpdateUserProfile(&user, idUserSementara); err != nil {
+	userDetailRequest := ut.UserDetailRequest{
+		Name:            userDetail.Name,
+		Phone:           userDetail.Phone,
+		ProfilePhotoUrl: userDetail.ProfilePhotoUrl,
+	}
+
+	if err := vld.Validation(userRequest); err != nil {
+		return err
+	}
+
+	if err := vld.Validation(userDetailRequest); err != nil {
+		return err
+	}
+
+	if err := ph.profileUsecase.UpdateUserProfile(&userRequest, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Ups! Ada kendala saat mengubah profil kamu. Coba lagi ya",
 		})
@@ -209,22 +203,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 		message = "Yey! Profil kamu berhasil diubah"
 	}
 
-	if !available && !availableBefore {
-		userDetail = ut.UserDetail{
-			Name:            userDetail.Name,
-			Phone:           userDetail.Phone,
-			ProfilePhotoUrl: userDetail.ProfilePhotoUrl,
-			UserId:          uint(idUserSementara),
-		}
-
-		if err := ph.profileUsecase.CreateUserDetailProfile(&userDetail); err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Gagal membuat user detail profil",
-			})
-		}
-	}
-
-	if err := ph.profileUsecase.UpdateUserDetailProfile(&userDetail, idUserSementara); err != nil {
+	if err := ph.profileUsecase.UpdateUserDetailProfile(&userDetailRequest, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Ups! Ada kendala saat mengubah profil kamu. Coba lagi ya",
 		})
@@ -247,7 +226,7 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	address.UserId = 2
+	address.UserId = 3
 
 	if err := c.Bind(&address); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -255,41 +234,8 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 		})
 	}
 
-	if err := c.Validate(address); err != nil {
-		if validationErr, ok := err.(validator.ValidationErrors); ok {
-			message := ""
-			for _, e := range validationErr {
-				if e.Tag() == "required" && e.Field() == "Recipient" {
-					message = "Nama penerima wajib diisi"
-				}
-				if e.Tag() == "required" && e.Field() == "Phone" {
-					message = "Nomor telepon wajib diisi"
-				}
-				if e.Tag() == "required" && e.Field() == "ProvinceId" {
-					message = "Id provinsi wajib diisi"
-				}
-				if e.Tag() == "required" && e.Field() == "ProvinceName" {
-					message = "Nama provinsi wajib diisi"
-				}
-				if e.Tag() == "required" && e.Field() == "CityId" {
-					message = "Id kota wajib diisi"
-				}
-				if e.Tag() == "required" && e.Field() == "CityName" {
-					message = "Nama kota wajib diisi"
-				}
-				if e.Tag() == "required" && e.Field() == "Address" {
-					message = "Alamat lengkap wajib diisi"
-				}
-				if e.Tag() == "max" {
-					message = "Nomor telepon tidak boleh lebih dari 13 digit"
-				}
-			}
-
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"Message": message,
-				"Status":  http.StatusInternalServerError,
-			})
-		}
+	if err := vld.Validation(address); err != nil {
+		return err
 	}
 
 	checkPhone := ""
@@ -398,10 +344,11 @@ func (ph *ProfileHandler) GetAllAddressProfile(c echo.Context) error {
 
 func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 	var address ut.UserAddress
+	var addressRequest ut.UserAddressRequest
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	address.UserId = 2
+	address.UserId = 3
 
 	idAddress, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -409,39 +356,33 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 	}
 
 	if err := ph.profileUsecase.GetAddressByIdProfile(&address, int(address.UserId), idAddress); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "Gagal mendapatkan alamat",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
-	if err := c.Bind(&address); err != nil {
+	if err := c.Bind(&addressRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Gagal",
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
-	if err := c.Validate(address); err != nil {
-		if validationErr, ok := err.(validator.ValidationErrors); ok {
-			message := ""
-			for _, e := range validationErr {
-				if e.Tag() == "max" {
-					message = "Nomor telepon tidak boleh lebih dari 13 digit"
-				}
-			}
+	if addressRequest.Phone == "" {
+		addressRequest.Phone = address.Phone
+	}
 
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"Message": message,
-				"Status":  http.StatusInternalServerError,
-			})
-		}
+	if err := vld.Validation(addressRequest); err != nil {
+		return err
 	}
 
 	checkPhone := ""
-	for i := 0; i < len(address.Phone); i++ {
+	for i := 0; i < len(addressRequest.Phone); i++ {
 		if i == 2 {
 			break
 		}
-		checkPhone += string(address.Phone[i])
+		checkPhone += string(addressRequest.Phone[i])
 	}
 
 	if checkPhone != "08" {
@@ -451,20 +392,22 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 		})
 	}
 
-	if address.IsPrimary {
+	if addressRequest.IsPrimary {
 		if err := ph.profileUsecase.UpdateAddressPrimaryProfile(&address, int(address.UserId)); err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Gagal mengubah alamat utama",
+				"Status":  http.StatusInternalServerError,
 			})
 		}
-		address.IsPrimary = true
+		addressRequest.IsPrimary = true
 	} else {
-		address.IsPrimary = false
+		addressRequest.IsPrimary = false
 	}
 
-	if err := ph.profileUsecase.UpdateAddressByIdProfile(&address, int(address.UserId), idAddress); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+	if err := ph.profileUsecase.UpdateAddressByIdProfile(&addressRequest, int(address.UserId), idAddress); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": "Gagal mengubah alamat",
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
@@ -480,7 +423,7 @@ func (ph *ProfileHandler) UpdatePasswordProfile(c echo.Context) error {
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	idUserSementara := 2
+	idUserSementara := 3
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
