@@ -12,15 +12,6 @@ func (ic *informationUsecase) GetAllInformations() (*[]ie.UserInformationRespons
 	return informations, nil
 }
 
-func (ic *informationUsecase) GetDetailInformations(id string) (*ie.UserInformationDetailResponse, error) {
-	informations, err := ic.informationRepo.GetDetailInformations(id)
-
-	if err != nil {
-		return informations, err
-	}
-	return informations, nil
-}
-
 func (ic *informationUsecase) UpdatePoint(id uint) error {
 
 	point, err := ic.informationRepo.GetPoint(id)

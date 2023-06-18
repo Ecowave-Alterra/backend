@@ -7,7 +7,6 @@ import (
 
 type InformationRepo interface {
 	GetAllInformations() (*[]ie.UserInformationResponse, error)
-	GetDetailInformations(id string) (*ie.UserInformationDetailResponse, error)
 	UpdatePoint(id uint, point uint) error
 	GetPoint(id uint) (uint, error)
 }

@@ -17,29 +17,13 @@ func (ir *informationRepo) GetAllInformations() (*[]ie.UserInformationResponse, 
 			InformationId:   val.InformationId,
 			Title:           val.Title,
 			PhotoContentUrl: val.PhotoContentUrl,
+			Content:         val.Content,
 			Date:            val.CreatedAt,
 		}
 		informationsRes = append(informationsRes, result)
 	}
 
 	return &informationsRes, nil
-}
-
-func (ir *informationRepo) GetDetailInformations(id string) (*ie.UserInformationDetailResponse, error) {
-	var informations ie.Information
-
-	if err := ir.db.Where("information_id = ?", id).First(&informations).Error; err != nil {
-		return nil, err
-	}
-
-	informationDetail := ie.UserInformationDetailResponse{
-		Title:           informations.Title,
-		PhotoContentUrl: informations.PhotoContentUrl,
-		Date:            informations.CreatedAt,
-		Content:         informations.Content,
-	}
-
-	return &informationDetail, nil
 }
 
 func (ir *informationRepo) UpdatePoint(id uint, point uint) error {
