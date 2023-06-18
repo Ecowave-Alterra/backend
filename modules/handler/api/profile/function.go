@@ -23,7 +23,7 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	// var userId = claims["user_id"].(float64)
 	// log.Println(userId)
 
-	idUserSementara := 2
+	idUserSementara := 3
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -99,7 +99,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	idUserSementara := 2
+	idUserSementara := 3
 
 	if err := ph.profileUsecase.GetAllUserProfile(&allUser); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -145,7 +145,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	if phone != "" {
 		userDetail.Phone = phone
 	}
-	log.Println(userDetail.Phone)
+
 	if fileHeader != nil {
 		cloudstorage.Folder = "img/users/profile/"
 
@@ -212,6 +212,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	if !available && !availableBefore {
 		userDetail = ut.UserDetail{
 			Name:            userDetail.Name,
+			Phone:           userDetail.Phone,
 			ProfilePhotoUrl: userDetail.ProfilePhotoUrl,
 			UserId:          uint(idUserSementara),
 		}
