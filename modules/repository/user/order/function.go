@@ -19,6 +19,10 @@ func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize i
 	if err != nil {
 		return nil, 0, echo.NewHTTPError(404, err)
 	}
+	err = or.db.Preload("TransactionDetails").Where("status_transaction = ? AND user_id = ?", filter, idUser).Find(&transaction).Offset(offset).Limit(pageSize).Error
+	if err != nil {
+		return nil, 0, echo.NewHTTPError(404, err)
+	}
 
 	for _, val := range transaction {
 		for _, td := range val.TransactionDetails {
