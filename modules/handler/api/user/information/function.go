@@ -28,7 +28,7 @@ func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 		informations, total, err := ih.informationUsecase.GetAllInformations(offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
+				"Message": err,
 				"Status":  http.StatusInternalServerError,
 			})
 		}
@@ -52,7 +52,7 @@ func (ih *InformationHandler) UpdatePoint() echo.HandlerFunc {
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  http.StatusBadRequest,
-				"Message": err.Error(),
+				"Message": err,
 			})
 		}
 
