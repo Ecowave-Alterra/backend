@@ -8,7 +8,7 @@ import (
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 )
 
-func (ec *ecommerceUseCase) GetAllProduct(products *[]ep.Product, offset, pageSize int) (*[]ee.ProductResponse, int64, error) {
+func (ec *ecommerceUseCase) GetProductEcommerce(products *[]ep.Product, offset, pageSize int) (*[]ee.ProductResponse, int64, error) {
 	var productResponses []ee.ProductResponse
 	var productImage ep.ProductImage
 

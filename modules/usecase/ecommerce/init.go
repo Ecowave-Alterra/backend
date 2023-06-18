@@ -7,7 +7,7 @@ import (
 )
 
 type EcommerceUsecase interface {
-	GetAllProduct(products *[]ep.Product, offset, pageSize int) (*[]ee.ProductResponse, int64, error)
+	GetProductEcommerce(products *[]ep.Product, offset, pageSize int) (*[]ee.ProductResponse, int64, error)
 }
 
 type ecommerceUseCase struct {

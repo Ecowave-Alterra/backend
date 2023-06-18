@@ -22,7 +22,7 @@ func (eh *EcommerceHandler) GetProductEcommerce(c echo.Context) error {
 	pageSize := 10
 	offset := (page - 1) * pageSize
 
-	productResponses, total, err := eh.ecommerceUseCase.GetAllProduct(products, offset, pageSize)
+	productResponses, total, err := eh.ecommerceUseCase.GetProductEcommerce(products, offset, pageSize)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": "Failed to get product datas",
