@@ -1,6 +1,7 @@
 package common
 
 import (
+	dh "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/dashboard"
 	aih "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/information"
 	ph "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/product"
 	pch "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/product_category"
@@ -20,4 +21,5 @@ type Handler struct {
 	OrderHandlerUser        *ohu.OrderHandler
 	ProductCategoryHandler  *pch.ProductCategoryHandler
 	ProductHandler          *ph.ProductHandler
+	DashboardHandler        *dh.DashboardHandler
 }

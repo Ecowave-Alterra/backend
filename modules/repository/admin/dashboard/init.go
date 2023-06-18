@@ -1,11 +1,11 @@
-package information
+package dashboard
 
 import (
 	"gorm.io/gorm"
 )
 
 type DashboardRepo interface {
-	GetDashboard(filter string) error
+	GetDashboard(filter string) (int64, int64, int64, error)
 }
 
 type dashboardRepo struct {
