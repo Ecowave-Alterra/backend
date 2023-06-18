@@ -1,25 +1,22 @@
 package transaction
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/berrylradianh/ecowave-go/helper/hash"
 	mdtrns "github.com/berrylradianh/ecowave-go/helper/midtrans"
+	"github.com/berrylradianh/ecowave-go/helper/rajaongkir"
 	em "github.com/berrylradianh/ecowave-go/modules/entity/midtrans"
+	er "github.com/berrylradianh/ecowave-go/modules/entity/rajaongkir"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
+
 	"github.com/labstack/echo/v4"
 )
 
-func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (string, error) {
+func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (string, string, error) {
 	var productCost float64
 
 	for _, cost := range transaction.TransactionDetails {
@@ -34,14 +31,15 @@ func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (st
 
 	redirectUrl, err := mdtrns.CreateMidtransUrl(transaction)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
+	transaction.PaymentUrl = redirectUrl
 
 	err = tu.transactionRepo.CreateTransaction(transaction)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return redirectUrl, nil
+	return redirectUrl, transId, nil
 }
 func (tu *transactionUsecase) MidtransNotifications(midtransRequest *em.MidtransRequest) error {
 
@@ -171,206 +169,13 @@ func (tu *transactionUsecase) GetVoucherUser(id uint, offset int, pageSize int) 
 
 //		return diskon, nil
 //	}
-func ShippingOptions(ship *et.ShippingRequest) (interface{}, error) {
+func (tu *transactionUsecase) ShippingOptions(ship *er.RajaongkirRequest) (interface{}, error) {
 
-	// malang kota
-	alamatPengirim := "256"
-	destination := ship.CityId
-	weight := strconv.FormatUint(uint64(ship.Weight), 10)
-	courier := []string{"jne", "pos", "tiki"}
-
-	var result []et.ShippingResponse
-
-	for _, val := range courier {
-		url := "https://api.rajaongkir.com/starter/cost"
-
-		payloadStrings := fmt.Sprintf("origin=%s&destination=%s&weight=%s&courier=%s",
-			alamatPengirim,
-			destination,
-			weight,
-			val,
-		)
-
-		payload := strings.NewReader(payloadStrings)
-
-		key := os.Getenv("RAJAONGKIR_KEY")
-
-		req, _ := http.NewRequest("POST", url, payload)
-		req.Header.Add("key", key)
-		req.Header.Add("content-type", "application/x-www-form-urlencoded")
-		res, _ := http.DefaultClient.Do(req)
-		body, _ := ioutil.ReadAll(res.Body)
-
-		var responseData et.ShippingResponse
-		if err := json.Unmarshal(body, &responseData); err != nil {
-			echo.NewHTTPError(500, "Can't Unmarshal JSON")
-		}
-
-		result = append(result, responseData)
+	res, err := rajaongkir.ShippingOptions(ship)
+	if err != nil {
+		return nil, err
 	}
 
-	return result, nil
+	return res, nil
 
 }
-
-// type Client snap.Client
-
-// // New : this function will always be called when the Snap is initiated
-// func (c *Client) New(serverKey string, env midtrans.EnvironmentType) {
-// 	c.Env = env
-// 	c.ServerKey = serverKey
-// 	c.Options = &midtrans.ConfigOptions{}
-// 	c.HttpClient = midtrans.GetHttpClient(env)
-// }
-
-// func getDefaultClient() Client {
-// 	return Client{
-// 		ServerKey:  midtrans.ServerKey,
-// 		Env:        midtrans.Environment,
-// 		HttpClient: midtrans.GetHttpClient(midtrans.Environment),
-// 		Options: &midtrans.ConfigOptions{
-// 			PaymentOverrideNotification: midtrans.PaymentOverrideNotification,
-// 			PaymentAppendNotification:   midtrans.PaymentAppendNotification,
-// 		},
-// 	}
-// }
-
-// func (c Client) CreateTransactionWithMap(req *snap.RequestParamWithMap) (snap.ResponseWithMap, *midtrans.Error) {
-// 	resp := snap.ResponseWithMap{}
-// 	jsonReq, _ := json.Marshal(req)
-// 	err := c.HttpClient.Call(
-// 		http.MethodPost,
-// 		fmt.Sprintf("%s/snap/v1/transactions", c.Env.SnapURL()),
-// 		&c.ServerKey,
-// 		c.Options,
-// 		bytes.NewBuffer(jsonReq),
-// 		&resp,
-// 	)
-
-// 	if err != nil {
-// 		return resp, err
-// 	}
-// 	return resp, nil
-// }
-// func CreateTransactionWithMap(req *snap.RequestParamWithMap) (snap.ResponseWithMap, *midtrans.Error) {
-// 	return getDefaultClient().CreateTransactionWithMap(req)
-// }
-// func (c Client) CreateTransactionTokenWithMap(req *snap.RequestParamWithMap) (string, *midtrans.Error) {
-// 	var snapToken string
-// 	resp, err := c.CreateTransactionWithMap(req)
-
-// 	if err != nil {
-// 		return snapToken, err
-// 	}
-
-// 	if token, found := resp["token"]; !found {
-// 		return snapToken, &midtrans.Error{
-// 			Message:    "Token field notfound",
-// 			StatusCode: 0,
-// 		}
-// 	} else {
-// 		snapToken = token.(string)
-// 		return snapToken, nil
-// 	}
-// }
-
-// // CreateTransactionTokenWithMap : Do `/transactions` API request to SNAP API to get Snap token with map as
-// // body parameter, will be converted to JSON, more detail refer to: https://snap-docs.midtrans.com
-// func CreateTransactionTokenWithMap(req *snap.RequestParamWithMap) (string, *midtrans.Error) {
-// 	return getDefaultClient().CreateTransactionTokenWithMap(req)
-// }
-
-// // CreateTransactionUrlWithMap : Do `/transactions` API request to SNAP API to get Snap redirect url with map as
-// // body parameter, will be converted to JSON, more detail refer to: https://snap-docs.midtrans.com
-// func (c Client) CreateTransactionUrlWithMap(req *snap.RequestParamWithMap) (string, *midtrans.Error) {
-// 	var redirectUrl string
-// 	resp, err := c.CreateTransactionWithMap(req)
-
-// 	if err != nil {
-// 		return redirectUrl, err
-// 	}
-
-// 	if url, found := resp["redirect_url"]; !found {
-// 		return redirectUrl, &midtrans.Error{
-// 			Message:    "Error redirect_url field notfound in json response",
-// 			StatusCode: 0,
-// 		}
-// 	} else {
-// 		redirectUrl = url.(string)
-// 		return redirectUrl, nil
-// 	}
-// }
-
-// // CreateTransactionUrlWithMap : Do `/transactions` API request to SNAP API to get Snap redirect url with map
-// // as body parameter, will be converted to JSON, more detail refer to: https://snap-docs.midtrans.com
-// func CreateTransactionUrlWithMap(req *snap.RequestParamWithMap) (string, *midtrans.Error) {
-// 	return getDefaultClient().CreateTransactionUrlWithMap(req)
-// }
-
-// // CreateTransaction : Do `/transactions` API request to SNAP API to get Snap token and redirect url with `snap.Request`
-// // as body parameter, will be converted to JSON, more detail refer to: https://snap-docs.midtrans.com
-// func (c Client) CreateTransaction(req *snap.Request) (*snap.Response, *midtrans.Error) {
-// 	resp := &snap.Response{}
-// 	jsonReq, _ := json.Marshal(req)
-// 	err := c.HttpClient.Call(
-// 		http.MethodPost,
-// 		fmt.Sprintf("%s/snap/v1/transactions", c.Env.SnapURL()),
-// 		&c.ServerKey,
-// 		c.Options,
-// 		bytes.NewBuffer(jsonReq),
-// 		resp,
-// 	)
-
-// 	if err != nil {
-// 		return resp, err
-// 	}
-// 	return resp, nil
-// }
-
-// // CreateTransaction : Do `/transactions` API request to SNAP API to get Snap token and redirect url with `snap.Request`
-// // as body parameter, will be converted to JSON, more detail refer to: https://snap-docs.midtrans.com
-// func CreateTransaction(req *snap.Request) (*snap.Response, *midtrans.Error) {
-// 	return getDefaultClient().CreateTransaction(req)
-// }
-
-// // CreateTransactionToken : Do `/transactions` API request to SNAP API to get Snap token with `snap.Request` as
-// // body parameter, will be converted to JSON, more detail refer to: https://snap-docs.midtrans.com
-// func (c Client) CreateTransactionToken(req *snap.Request) (string, *midtrans.Error) {
-// 	var snapToken string
-// 	resp, err := c.CreateTransaction(req)
-// 	if err != nil {
-// 		return snapToken, err
-// 	}
-
-// 	if resp.Token != "" {
-// 		snapToken = resp.Token
-// 	}
-// 	return snapToken, nil
-// }
-
-// // CreateTransactionToken : Do `/transactions` API request to SNAP API to get Snap token with `snap.Request` as
-// // body parameter, will be converted to JSON, more detail refer to: https://snap-docs.midtrans.com
-// func CreateTransactionToken(req *snap.Request) (string, *midtrans.Error) {
-// 	return getDefaultClient().CreateTransactionToken(req)
-// }
-
-// // CreateTransactionUrl : Do `/transactions` API request to SNAP API to get Snap redirect url with `snap.Request`
-// // as body parameter, will be converted to JSON, more detail refer to: https://snap-docs.midtrans.com
-// func (c Client) CreateTransactionUrl(req *snap.Request) (string, *midtrans.Error) {
-// 	var redirectUrl string
-// 	resp, err := c.CreateTransaction(req)
-// 	if err != nil {
-// 		return redirectUrl, err
-// 	}
-
-// 	if resp.RedirectURL != "" {
-// 		redirectUrl = resp.RedirectURL
-// 	}
-// 	return redirectUrl, nil
-// }
-
-// // CreateTransactionUrl : Do `/transactions` API request to SNAP API to get Snap redirect url with `snap.Request`
-// // as body parameter, will be converted to JSON, more detail refer to: https://snap-docs.midtrans.com
-// func CreateTransactionUrl(req *snap.Request) (string, *midtrans.Error) {
-// 	return getDefaultClient().CreateTransactionUrl(req)
-// }

@@ -7,7 +7,7 @@ import (
 
 	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	h "github.com/berrylradianh/ecowave-go/helper/getIdUser"
-	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
+	eo "github.com/berrylradianh/ecowave-go/modules/entity/order"
 
 	"github.com/labstack/echo/v4"
 )
@@ -102,7 +102,10 @@ func (oh *OrderHandler) Tracking() echo.HandlerFunc {
 func (oh *OrderHandler) ConfirmOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		id := c.Param("id")
+		co := eo.ConfirmOrder{}
+		c.Bind(&co)
+
+		id := co.TransactionId
 		err := oh.orderUsecase.ConfirmOrder(id)
 		if err != nil {
 			code, msg := cs.CustomStatus(err.Error())
@@ -122,12 +125,10 @@ func (oh *OrderHandler) ConfirmOrder() echo.HandlerFunc {
 func (oh *OrderHandler) CancelOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		id := c.Param("id")
-		cr := et.CanceledReason{}
-		c.Bind(&cr)
-		canceledReason := cr.CanceledReason
+		cancelOrder := eo.CanceledOrder{}
+		c.Bind(&cancelOrder)
 
-		err := oh.orderUsecase.CancelOrder(id, canceledReason)
+		err := oh.orderUsecase.CancelOrder(cancelOrder)
 		if err != nil {
 			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{

@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	b "github.com/berrylradianh/ecowave-go/helper/binderbyte"
+	eo "github.com/berrylradianh/ecowave-go/modules/entity/order"
 
 	"github.com/labstack/echo/v4"
 )
@@ -104,9 +105,9 @@ func (oc *orderUsecase) ConfirmOrder(id string) error {
 
 	return nil
 }
-func (oc *orderUsecase) CancelOrder(id string, canceledReason string) error {
+func (oc *orderUsecase) CancelOrder(co eo.CanceledOrder) error {
 
-	statusTransaction, err := oc.orderRepo.GetStatusOrder(id)
+	statusTransaction, err := oc.orderRepo.GetStatusOrder(co.TransactionId)
 	if err != nil {
 		return err
 	}
@@ -115,7 +116,7 @@ func (oc *orderUsecase) CancelOrder(id string, canceledReason string) error {
 		return echo.NewHTTPError(400, "Tidak bisa membatalkan pesanan")
 	}
 
-	err = oc.orderRepo.CancelOrder(id, canceledReason)
+	err = oc.orderRepo.CancelOrder(co)
 	if err != nil {
 		return err
 	}
