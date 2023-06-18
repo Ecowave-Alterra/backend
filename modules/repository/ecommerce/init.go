@@ -8,7 +8,7 @@ import (
 
 type EcommerceRepo interface {
 	GetAllProduct(products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
-	GetProductByID(productId string) ([]ee.ReviewResponse, error)
+	GetProductByID(productId string) (bool, []ee.ReviewResponse, error)
 	GetProductImageURLById(productId string, productImage *ep.ProductImage) ([]ep.ProductImage, error)
 	AvgRating(productId string) (float64, error)
 }

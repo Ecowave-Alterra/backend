@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	"github.com/labstack/echo/v4"
 )
@@ -24,17 +23,9 @@ func (eh *EcommerceHandler) GetProductEcommerce(c echo.Context) error {
 
 	productResponses, total, err := eh.ecommerceUseCase.GetProductEcommerce(products, offset, pageSize)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "Failed to get product datas",
-			"Error":   err,
-		})
-	}
-
-	if err != nil {
-		code, msg := cs.CustomStatus(err.Error())
-		return c.JSON(code, echo.Map{
-			"Status":  code,
-			"Message": msg,
+			"Status":  http.StatusNotFound,
 		})
 	}
 

@@ -28,14 +28,19 @@ func (ec *ecommerceUseCase) GetProductEcommerce(products *[]ep.Product, offset, 
 			productImageURLs = append(productImageURLs, image.ProductImageUrl)
 		}
 
-		avgRating, err := ec.ecommerceRepo.AvgRating(product.ProductID)
+		exist, reviews, err := ec.ecommerceRepo.GetProductByID(product.ProductID)
 		if err != nil {
 			return &productResponses, count, err
 		}
 
-		reviews, err := ec.ecommerceRepo.GetProductByID(product.ProductID)
-		if err != nil {
-			return &productResponses, count, err
+		var avgRating float64
+		if exist {
+			avgRating, err = ec.ecommerceRepo.AvgRating(product.ProductID)
+			if err != nil {
+				return &productResponses, count, err
+			}
+		} else {
+			avgRating = 0
 		}
 
 		productResponse := ee.ProductResponse{
