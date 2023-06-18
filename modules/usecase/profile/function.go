@@ -38,8 +38,12 @@ func (pc *profileUsecase) CreateAddressProfile(address *ut.UserAddress) error {
 	return pc.profileRepo.CreateAddressProfile(address)
 }
 
-func (pc *profileUsecase) GetAllAddressProfile(address *[]ut.UserAddress, idUser int) error {
-	return pc.profileRepo.GetAllAddressProfile(address, idUser)
+func (pc *profileUsecase) GetAllAddressProfileNoPagination(address *[]ut.UserAddress, idUser int) error {
+	return pc.profileRepo.GetAllAddressProfileNoPagination(address, idUser)
+}
+
+func (pc *profileUsecase) GetAllAddressProfile(address *[]ut.UserAddress, idUser, offset, pageSize int) (*[]ut.UserAddress, int64, error) {
+	return pc.profileRepo.GetAllAddressProfile(address, idUser, offset, pageSize)
 }
 
 func (pc *profileUsecase) GetAddressByIdProfile(address *ut.UserAddress, idUser int, idAddress int) error {

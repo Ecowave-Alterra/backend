@@ -8,7 +8,6 @@ type User struct {
 	Email         string     `json:"Email" form:"Email" validate:"required,email"`
 	GoogleId      string     `json:"GoogleId" form:"GoogleId"`
 	Username      string     `json:"Username" form:"Username" validate:"required"`
-	Phone         string     `json:"Phone" form:"Phone" validate:"required,min=10,max=15"`
 	Password      string     `json:"Password" form:"Password" validate:"required,min=8"`
 	UserDetail    UserDetail `gorm:"foreignKey:UserId"`
 	UserAddresses []UserAddress

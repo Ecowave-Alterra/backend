@@ -15,7 +15,6 @@ func CreateUser() []*ut.User {
 			Email:    "user1@gmail.com",
 			GoogleId: "qwertyuiop",
 			Username: "user1",
-			Phone:    "085123456789",
 			Password: string(hashPasswordUser1),
 		},
 		{
@@ -23,7 +22,6 @@ func CreateUser() []*ut.User {
 			Email:    "user2@gmail.com",
 			GoogleId: "asdfghjkl",
 			Username: "user2",
-			Phone:    "085123456789",
 			Password: string(hashPasswordUser2),
 		},
 	}

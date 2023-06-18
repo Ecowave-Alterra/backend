@@ -2,6 +2,7 @@ package profile
 
 import (
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -22,7 +23,7 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	// var userId = claims["user_id"].(float64)
 	// log.Println(userId)
 
-	idUserSementara := 1
+	idUserSementara := 2
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -40,9 +41,10 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	if !available {
 		userDetail.Name = ""
 		userDetail.ProfilePhotoUrl = ""
+		userDetail.Phone = ""
 	}
 
-	if err := ph.profileUsecase.GetAllAddressProfile(&addresses, idUserSementara); err != nil {
+	if err := ph.profileUsecase.GetAllAddressProfileNoPagination(&addresses, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Gagal mendapatkan alamat",
 		})
@@ -67,15 +69,16 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	}
 
 	userResponse := ut.UserResponse{
-		Id:        int(user.ID),
-		GoogleId:  user.GoogleId,
-		RoleId:    int(user.RoleId),
-		Name:      userDetail.Name,
-		Username:  user.Username,
-		Email:     user.Email,
-		Phone:     user.Phone,
-		Point:     userDetail.Point,
-		Addresses: addressResponses,
+		Id:              int(user.ID),
+		GoogleId:        user.GoogleId,
+		RoleId:          int(user.RoleId),
+		Name:            userDetail.Name,
+		Username:        user.Username,
+		Email:           user.Email,
+		Phone:           userDetail.Phone,
+		Point:           userDetail.Point,
+		ProfilePhotoUrl: userDetail.ProfilePhotoUrl,
+		Addresses:       addressResponses,
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
@@ -96,7 +99,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	idUserSementara := 1
+	idUserSementara := 2
 
 	if err := ph.profileUsecase.GetAllUserProfile(&allUser); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -140,9 +143,9 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 		user.Username = username
 	}
 	if phone != "" {
-		user.Phone = phone
+		userDetail.Phone = phone
 	}
-
+	log.Println(userDetail.Phone)
 	if fileHeader != nil {
 		cloudstorage.Folder = "img/users/profile/"
 
@@ -176,6 +179,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 		if value.Username == username {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
 				"Message": "Username sudah digunakan sebelumnya",
+				"Status":  http.StatusBadRequest,
 			})
 		}
 	}
@@ -190,8 +194,9 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 				}
 			}
 
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": message,
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 	}
@@ -232,6 +237,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": message,
+		"Status":  http.StatusOK,
 	})
 }
 
@@ -240,7 +246,7 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	address.UserId = 1
+	address.UserId = 2
 
 	if err := c.Bind(&address); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -258,6 +264,18 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 				if e.Tag() == "required" && e.Field() == "Phone" {
 					message = "Nomor telepon wajib diisi"
 				}
+				if e.Tag() == "required" && e.Field() == "ProvinceId" {
+					message = "Id provinsi wajib diisi"
+				}
+				if e.Tag() == "required" && e.Field() == "ProvinceName" {
+					message = "Nama provinsi wajib diisi"
+				}
+				if e.Tag() == "required" && e.Field() == "CityId" {
+					message = "Id kota wajib diisi"
+				}
+				if e.Tag() == "required" && e.Field() == "CityName" {
+					message = "Nama kota wajib diisi"
+				}
 				if e.Tag() == "required" && e.Field() == "Address" {
 					message = "Alamat lengkap wajib diisi"
 				}
@@ -266,8 +284,9 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 				}
 			}
 
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": message,
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 	}
@@ -281,8 +300,9 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 	}
 
 	if checkPhone != "08" {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": "Pastikan nomor kamu dimulai dengan '08'",
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
@@ -303,26 +323,52 @@ func (ph *ProfileHandler) CreateAddressProfile(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message": "Alamat berhasil dibuat",
+	return c.JSON(http.StatusCreated, map[string]interface{}{
+		"Message": "Yey! Kamu berhasil menambahkan alamat",
+		"Status":  http.StatusCreated,
 	})
 }
 
 func (ph *ProfileHandler) GetAllAddressProfile(c echo.Context) error {
-	var addresses []ut.UserAddress
+	var addresses *[]ut.UserAddress
 	var addressResponses []ut.UserAddressResponse
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	idUserSementara := 1
+	idUserSementara := 2
 
-	if err := ph.profileUsecase.GetAllAddressProfile(&addresses, idUserSementara); err != nil {
+	pageParam := c.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	pageSize := 10
+	offset := (page - 1) * pageSize
+
+	addresses, total, err := ph.profileUsecase.GetAllAddressProfile(addresses, idUserSementara, offset, pageSize)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Gagal mendapatkan alamat",
 		})
 	}
 
-	for _, address := range addresses {
+	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+	if page > totalPages {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Halaman Tidak Ditemukan",
+			"Status":  http.StatusNotFound,
+		})
+	}
+
+	if addresses == nil || len(*addresses) == 0 {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"Message": "Belum ada list alamat",
+			"Status":  http.StatusNotFound,
+		})
+	}
+
+	for _, address := range *addresses {
 		addressResponse := ut.UserAddressResponse{
 			Id:           int(address.ID),
 			Recipient:    address.Recipient,
@@ -341,8 +387,11 @@ func (ph *ProfileHandler) GetAllAddressProfile(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message": "Alamat berhasil didapatkan",
-		"Data":    addressResponses,
+		"Message":   "Alamat berhasil didapatkan",
+		"Data":      addressResponses,
+		"Page":      page,
+		"Status":    http.StatusOK,
+		"TotalPage": totalPages,
 	})
 }
 
@@ -351,7 +400,7 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	address.UserId = 1
+	address.UserId = 2
 
 	idAddress, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -379,8 +428,9 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 				}
 			}
 
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": message,
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 	}
@@ -394,8 +444,9 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 	}
 
 	if checkPhone != "08" {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": "Pastikan nomor kamu dimulai dengan '08'",
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
@@ -417,7 +468,8 @@ func (ph *ProfileHandler) UpdateAddressProfile(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message": "Alamat berhasil diubah",
+		"Message": "Yey! Kamu berhasil mengubah alamat",
+		"Status":  http.StatusOK,
 	})
 }
 
@@ -427,7 +479,7 @@ func (ph *ProfileHandler) UpdatePasswordProfile(c echo.Context) error {
 
 	// var claims = midjwt.GetClaims2(c)
 	// var userId = claims["user_id"].(float64)
-	idUserSementara := 1
+	idUserSementara := 2
 
 	if err := ph.profileUsecase.GetUserProfile(&user, idUserSementara); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -444,12 +496,14 @@ func (ph *ProfileHandler) UpdatePasswordProfile(c echo.Context) error {
 	if len(userPassword.Password) < 8 {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Password harus mengandung minimal 8 karakter",
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
 	if userPassword.Password != userPassword.ConfirmNewPassword {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": "Password tidak cocok",
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
@@ -457,11 +511,13 @@ func (ph *ProfileHandler) UpdatePasswordProfile(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"Message": message,
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": "Password berhasil diubah",
+		"Status":  http.StatusOK,
 	})
 }
 
