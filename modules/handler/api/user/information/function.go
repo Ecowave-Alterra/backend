@@ -1,7 +1,9 @@
 package information
 
 import (
+	"math"
 	"net/http"
+	"strconv"
 
 	h "github.com/berrylradianh/ecowave-go/helper/getIdUser"
 
@@ -11,17 +13,32 @@ import (
 func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 	return func(e echo.Context) error {
 
-		informations, err := ih.informationUsecase.GetAllInformations()
+		pageParam := e.QueryParam("page")
+		page, err := strconv.Atoi(pageParam)
+		if err != nil {
+			return e.JSON(http.StatusBadRequest, echo.Map{
+				"Status":  400,
+				"Message": err,
+			})
+		}
+
+		pageSize := 10
+		offset := (page - 1) * pageSize
+
+		informations, total, err := ih.informationUsecase.GetAllInformations(offset, pageSize)
 		if err != nil {
 			return e.JSON(http.StatusInternalServerError, echo.Map{
 				"Message": err.Error(),
 				"Status":  http.StatusInternalServerError,
 			})
 		}
+		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
 
 		return e.JSON(http.StatusOK, map[string]interface{}{
-			"Informations": informations,
 			"Status":       http.StatusOK,
+			"Page":         page,
+			"TotalPage":    totalPages,
+			"Informations": informations,
 		})
 	}
 }

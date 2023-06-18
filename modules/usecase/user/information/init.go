@@ -6,7 +6,7 @@ import (
 )
 
 type InformationUsecase interface {
-	GetAllInformations() (*[]ie.UserInformationResponse, error)
+	GetAllInformations(offset int, pageSize int) (*[]ie.UserInformationResponse, int64, error)
 	UpdatePoint(id uint) error
 }
 

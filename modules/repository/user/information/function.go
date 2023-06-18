@@ -5,11 +5,18 @@ import (
 	eu "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
-func (ir *informationRepo) GetAllInformations() (*[]ie.UserInformationResponse, error) {
+func (ir *informationRepo) GetAllInformations(offset int, pageSize int) (*[]ie.UserInformationResponse, int64, error) {
 	var informations []ie.Information
 	var informationsRes []ie.UserInformationResponse
-	if err := ir.db.Where("status = ?", "Terbit").Find(&informations).Error; err != nil {
-		return nil, err
+	var count int64
+
+	err := ir.db.Where("status = ?", "Terbit").Find(&informations).Count(&count).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	err = ir.db.Where("status = ?", "Terbit").Find(&informations).Offset(offset).Limit(pageSize).Error
+	if err != nil {
+		return nil, 0, err
 	}
 
 	for _, val := range informations {
@@ -23,7 +30,7 @@ func (ir *informationRepo) GetAllInformations() (*[]ie.UserInformationResponse, 
 		informationsRes = append(informationsRes, result)
 	}
 
-	return &informationsRes, nil
+	return &informationsRes, count, nil
 }
 
 func (ir *informationRepo) UpdatePoint(id uint, point uint) error {
