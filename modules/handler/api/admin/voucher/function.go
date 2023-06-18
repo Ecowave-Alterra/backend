@@ -220,6 +220,7 @@ func (vh *VoucherHandler) FilterVoucher(c echo.Context) error {
 			endDate := voucher.EndDate.Format(outputDateFormat)
 
 			voucherResponse := ve.VoucherResponse{
+				VoucherId:          voucher.VoucherId,
 				Type:               voucher.VoucherType.Type,
 				ClaimableUserCount: voucher.ClaimableUserCount,
 				StartDate:          startDate,
