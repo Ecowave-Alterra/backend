@@ -1,11 +1,12 @@
 package dashboard
 
 import (
+	de "github.com/berrylradianh/ecowave-go/modules/entity/dashboard"
 	"gorm.io/gorm"
 )
 
 type DashboardRepo interface {
-	GetDashboard(filter string) (int64, int64, int64, int64, error)
+	GetDashboard(filter string) (int64, int64, int64, *[]de.FavouriteProducts, error)
 }
 
 type dashboardRepo struct {

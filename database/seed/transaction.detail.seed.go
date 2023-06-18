@@ -9,6 +9,7 @@ func CreateTransactionDetail() []*et.TransactionDetail {
 		{
 			TransactionId: 1,
 			ProductId:     "a3325f33-e01a-4e40-9ca7-5d84c4337094",
+			ProductID:     1,
 			ProductName:   "Product Name 1",
 			Qty:           1,
 			SubTotalPrice: 30000,
@@ -16,6 +17,7 @@ func CreateTransactionDetail() []*et.TransactionDetail {
 		{
 			TransactionId: 2,
 			ProductId:     "a3325f33-e01a-4e40-9ca7-5d84c4337094",
+			ProductID:     2,
 			ProductName:   "Product Name 1",
 			Qty:           1,
 			SubTotalPrice: 30000,
@@ -23,6 +25,7 @@ func CreateTransactionDetail() []*et.TransactionDetail {
 		{
 			TransactionId: 3,
 			ProductId:     "a3325f33-e01a-4e40-9ca7-5d84c4337094",
+			ProductID:     2,
 			ProductName:   "Product Name 1",
 			Qty:           1,
 			SubTotalPrice: 30000,
@@ -30,6 +33,7 @@ func CreateTransactionDetail() []*et.TransactionDetail {
 		{
 			TransactionId: 4,
 			ProductId:     "a3325f33-e01a-4e40-9ca7-5d84c4337094",
+			ProductID:     3,
 			ProductName:   "Product Name 1",
 			Qty:           1,
 			SubTotalPrice: 30000,
@@ -37,6 +41,7 @@ func CreateTransactionDetail() []*et.TransactionDetail {
 		{
 			TransactionId: 5,
 			ProductId:     "a3325f33-e01a-4e40-9ca7-5d84c4337094",
+			ProductID:     3,
 			ProductName:   "Product Name 1",
 			Qty:           1,
 			SubTotalPrice: 30000,
