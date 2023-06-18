@@ -12,8 +12,6 @@ import (
 	em "github.com/berrylradianh/ecowave-go/modules/entity/midtrans"
 	er "github.com/berrylradianh/ecowave-go/modules/entity/rajaongkir"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
-
-	"github.com/labstack/echo/v4"
 )
 
 func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (string, string, error) {
@@ -46,9 +44,8 @@ func (tu *transactionUsecase) MidtransNotifications(midtransRequest *em.Midtrans
 	Key := hash.Hash(midtransRequest.OrderId, midtransRequest.StatusCode, midtransRequest.GrossAmount)
 
 	if Key != midtransRequest.SignatureKey {
-		log.Println("sini?", Key)
 		log.Println(midtransRequest.SignatureKey)
-		return echo.NewHTTPError(400, "Invalid Transaction")
+		return errors.New("Invalid Transaction")
 	}
 
 	transaction := et.Transaction{
@@ -100,75 +97,6 @@ func (tu *transactionUsecase) GetVoucherUser(id uint, offset int, pageSize int) 
 	return res, count, nil
 }
 
-// func (tu *transactionUsecase) DetailVoucher(id uint) (interface{}, error) {
-
-// 	res, err := tu.transactionRepo.DetailVoucher(id)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	if res.ID == 0 {
-// 		return nil, echo.NewHTTPError(404, "Belum ada detail voucher")
-// 	}
-
-// 	detailVoucher := ev.VoucherUserResponse{
-// 		Id:              res.ID,
-// 		Type:            res.VoucherType.Type,
-// 		EndDate:         res.EndDate,
-// 		PhotoUrl:        res.VoucherType.PhotoURL,
-// 		MinimumPurchase: res.MinimumPurchase,
-// 		MaximumDiscount: res.MaximumDiscount,
-// 		DiscountPercent: res.DiscountPercent,
-// 	}
-
-// 	return detailVoucher, nil
-// }
-
-// func (tu *transactionUsecase) ClaimVoucher(idUser uint, idVoucher uint, shipCost float64, productCost float64) (float64, error) {
-
-// 	var diskon float64
-
-// 	res, err := tu.transactionRepo.ClaimVoucher(idVoucher)
-// 	if err != nil {
-// 		return 0, err
-// 	}
-
-// 	// validasi limit voucher user
-// 	userClaim, err := tu.transactionRepo.CountVoucherUser(idUser, idVoucher)
-// 	if err != nil {
-// 		return 0, err
-// 	}
-// 	if res.ClaimableCount > userClaim {
-// 		return 0, echo.NewHTTPError(400, "User telah melebihi batas penggunaan voucher")
-// 	}
-// 	// validasi limit voucher
-// 	if res.MaxClaimLimit <= 0 {
-// 		return 0, echo.NewHTTPError(400, "Voucher telah melebihi batas penggunaan")
-// 	}
-// 	// validasi tanggal
-// 	now := time.Now()
-// 	date := res.EndDate.Before(now)
-// 	if !date {
-// 		return 0, echo.NewHTTPError(400, "Telah melewati batas tanggal penggunaan voucher")
-// 	}
-// 	// validasi minimal belanjaan
-// 	if res.MinimumPurchase > productCost {
-// 		return 0, echo.NewHTTPError(400, "Total pembelian kurang untuk menggunakan voucher ini")
-// 	}
-
-// 	if res.VoucherType.Type == "Gratis Ongkir" {
-// 		diskon = (shipCost * res.DiscountPercent) / 100
-// 	}
-
-// 	if res.VoucherType.Type == "Diskon Belanja" {
-// 		diskon = (productCost * res.DiscountPercent) / 100
-
-// 		if diskon > res.MaximumDiscount {
-// 			diskon = res.MaximumDiscount
-// 		}
-// 	}
-
-//		return diskon, nil
-//	}
 func (tu *transactionUsecase) ShippingOptions(ship *er.RajaongkirRequest) (interface{}, error) {
 
 	res, err := rajaongkir.ShippingOptions(ship)
