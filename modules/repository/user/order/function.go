@@ -67,6 +67,8 @@ func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize i
 			Discount:           val.Discount,
 			TotalPrice:         val.TotalPrice,
 			CanceledReason:     val.CanceledReason,
+			EstimationDay:      val.EstimationDay,
+			PaymentUrl:         val.PaymentUrl,
 			OrderDetail:        OrderDetail,
 			Address:            address,
 		}
@@ -136,16 +138,16 @@ func (or *orderRepo) ConfirmOrder(id string) error {
 	return nil
 }
 
-func (or *orderRepo) CancelOrder(id string, canceledReason string) error {
+func (or *orderRepo) CancelOrder(co eo.CanceledOrder) error {
 
-	err := or.db.Model(&et.Transaction{}).Where("transaction_id = ?", id).Updates(et.Transaction{StatusTransaction: "Dibatalkan", CanceledReason: canceledReason}).Error
+	err := or.db.Model(&et.Transaction{}).Where("transaction_id = ?", co.TransactionId).Updates(et.Transaction{StatusTransaction: "Dibatalkan", CanceledReason: co.CanceledReason}).Error
 
 	if err != nil {
 		return echo.NewHTTPError(500, err)
 	}
 
 	var transaction et.Transaction
-	err = or.db.Where("transaction_id = ?", id).First(&transaction).Error
+	err = or.db.Where("transaction_id = ?", co.TransactionId).First(&transaction).Error
 	if err != nil {
 		return echo.NewHTTPError(404, err)
 	}

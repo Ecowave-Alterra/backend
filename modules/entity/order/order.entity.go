@@ -6,6 +6,14 @@ import (
 	eu "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
+type CanceledOrder struct {
+	TransactionId  string `json:"TransactionId" form:"TransactionId" validate:"required"`
+	CanceledReason string `json:"CanceledReason" form:"CanceledReason" validate:"required"`
+}
+type ConfirmOrder struct {
+	TransactionId string `json:"TransactionId" form:"TransactionId" validate:"required"`
+}
+
 type Order struct {
 	TransactionId      string
 	CreatedAt          time.Time
@@ -23,6 +31,8 @@ type Order struct {
 	VoucherId          uint
 	Discount           float64
 	TotalPrice         float64
+	EstimationDay      string
+	PaymentUrl         string
 	CanceledReason     string
 	OrderDetail        []OrderDetail
 	Address            eu.UserAddress

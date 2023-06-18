@@ -1,6 +1,7 @@
 package order
 
 import (
+	eo "github.com/berrylradianh/ecowave-go/modules/entity/order"
 	"gorm.io/gorm"
 )
 
@@ -11,7 +12,7 @@ type OrderRepo interface {
 	// GetPromoName(id uint) (string, error)
 	ConfirmOrder(id string) error
 	GetStatusOrder(id string) (string, error)
-	CancelOrder(id string, canceledReason string) error
+	CancelOrder(co eo.CanceledOrder) error
 }
 
 type orderRepo struct {

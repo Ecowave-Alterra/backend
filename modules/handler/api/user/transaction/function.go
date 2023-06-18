@@ -8,8 +8,8 @@ import (
 	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	h "github.com/berrylradianh/ecowave-go/helper/getIdUser"
 	em "github.com/berrylradianh/ecowave-go/modules/entity/midtrans"
+	er "github.com/berrylradianh/ecowave-go/modules/entity/rajaongkir"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
-	ut "github.com/berrylradianh/ecowave-go/modules/usecase/user/transaction"
 
 	"github.com/labstack/echo/v4"
 )
@@ -23,7 +23,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		c.Bind(&transaction)
 		transaction.UserId = uint(id)
 
-		snapUrl, err := th.transactionUsecase.CreateTransaction(&transaction)
+		snapUrl, transactionId, err := th.transactionUsecase.CreateTransaction(&transaction)
 		if err != nil {
 			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{
@@ -33,9 +33,10 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Status":      201,
-			"Message":     "Success Create Transaction",
-			"Payment_url": snapUrl,
+			"Status":         201,
+			"Message":        "Success Create Transaction",
+			"Transaction_Id": transactionId,
+			"Payment_url":    snapUrl,
 		})
 	}
 
@@ -222,13 +223,13 @@ func (th *TransactionHandler) GetVoucherUser() echo.HandlerFunc {
 // 	}
 // }
 
-func ShippingOptions() echo.HandlerFunc {
+func (th *TransactionHandler) ShippingOptions() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		ship := et.ShippingRequest{}
+		ship := er.RajaongkirRequest{}
 		c.Bind(&ship)
 
-		res, err := ut.ShippingOptions(&ship)
+		res, err := th.transactionUsecase.ShippingOptions(&ship)
 
 		if err != nil {
 			code, msg := cs.CustomStatus(err.Error())
