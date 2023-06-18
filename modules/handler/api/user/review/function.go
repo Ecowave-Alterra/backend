@@ -2,6 +2,7 @@ package review
 
 import (
 	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
@@ -16,15 +17,17 @@ func (rh *ReviewHandler) CreateReview(c echo.Context) error {
 
 	countTransactionDetail, err := rh.reviewUsecase.CountTransactionDetail(transactionId)
 	if err != nil {
-		return c.JSON(500, echo.Map{
-			"Message": err,
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"Message": "Gagal",
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
 	idTransactionDetails, err := rh.reviewUsecase.GetIdTransactionDetail(transactionId)
 	if err != nil {
-		return c.JSON(500, echo.Map{
-			"Message": err,
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Gagal mendapatkan id transaction detail",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
@@ -39,31 +42,44 @@ func (rh *ReviewHandler) CreateReview(c echo.Context) error {
 		videoHeader, _ := c.FormFile(fmt.Sprintf("VideoUrl%d", i))
 
 		if err := rh.reviewUsecase.CreateRatingProduct(ratingProduct, comment, fileHeader, videoHeader, idTransactionDetails[i-1]); err != nil {
-			return c.JSON(500, echo.Map{
-				"Message": err,
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"Message": "Gagal membuat rating",
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 	}
 
-	ratingExpedition, err := strconv.ParseFloat(c.FormValue("ExpeditionRating"), 32)
-	if err != nil {
-		return err
-	}
+	var ratingExpeditionF float64
+	ratingExpedition := c.FormValue("ExpeditionRating")
+	if ratingExpedition != "" {
+		ratingExpeditionF, err = strconv.ParseFloat(ratingExpedition, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"Message": "Gagal",
+				"Status":  http.StatusBadRequest,
+			})
+		}
 
-	if err := rh.reviewUsecase.UpdateExpeditionRating(float32(ratingExpedition), transactionId); err != nil {
-		return c.JSON(500, echo.Map{
-			"Message": err,
-		})
-	}
-
-	idUserTemp := 2
-	if ratingExpedition != 0 && ratingProduct != 0 {
-		if err := rh.reviewUsecase.UpdatePoint(idUserTemp); err != nil {
-			return err
+		if err := rh.reviewUsecase.UpdateExpeditionRating(float32(ratingExpeditionF), transactionId); err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"Message": "Gagal mengubah rating ekspedisi",
+				"Status":  http.StatusInternalServerError,
+			})
 		}
 	}
 
-	return c.JSON(200, echo.Map{
-		"Message": "Success create review",
+	idUserTemp := 2
+	if ratingExpeditionF != 0 && ratingProduct != 0 {
+		if err := rh.reviewUsecase.UpdatePoint(idUserTemp); err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"Message": "Gagal mengubah point user",
+				"Status":  http.StatusInternalServerError,
+			})
+		}
+	}
+
+	return c.JSON(http.StatusCreated, echo.Map{
+		"Message": "Yey! Kamu mendapatkan point +10",
+		"Status":  http.StatusCreated,
 	})
 }

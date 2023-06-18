@@ -5,7 +5,6 @@ import (
 	"mime/multipart"
 
 	er "github.com/berrylradianh/ecowave-go/modules/entity/review"
-	// et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
 	vld "github.com/berrylradianh/ecowave-go/helper/validator"
