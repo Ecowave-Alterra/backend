@@ -8,8 +8,6 @@ import (
 
 type EcommerceUsecase interface {
 	GetAllProduct(products *[]ep.Product, offset, pageSize int) (*[]ee.ProductResponse, int64, error)
-	GetProductByID(productId string) (ee.ProductDetailResponse, error)
-	FilterProductByCategoryAndPrice(qCategory, qPrice string, offset, pageSize int) (*[]ee.ProductResponse, int64, error)
 }
 
 type ecommerceUseCase struct {

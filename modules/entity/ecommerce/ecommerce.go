@@ -1,32 +1,7 @@
 package ecommerce
 
-type ProductResponse struct {
-	Name            string
-	Price           float64
-	Rating          float64
-	ProductImageUrl string
-}
-
-type QueryResponse struct {
-	Id              int     `json:"Id"`
-	ProductId       string  `json:"ProductId"`
-	Name            string  `json:"Name"`
-	Category        string  `json:"Category"`
-	Stock           int     `json:"Stock"`
-	Price           float64 `json:"Price"`
-	Status          string  `json:"Status"`
-	Description     string  `json:"Description"`
-	FullName        string  `json:"Full_name"`
-	ProfilePhotoUrl string  `json:"ProfilePhotoUrl"`
-	Rating          float64 `json:"Rating"`
-	Comment         string  `json:"Comment"`
-	CommentAdmin    string  `json:"Comment_admin"`
-	PhotoURL        string  `json:"Photo_url"`
-	VideoURL        string  `json:"Video_url"`
-}
-
 type ReviewResponse struct {
-	FullName        string  `json:"FullName"`
+	Name            string  `json:"Name"`
 	ProfilePhotoUrl string  `json:"ProfilePhotoUrl"`
 	Rating          float64 `json:"Rating"`
 	Comment         string  `json:"Comment"`
@@ -35,7 +10,7 @@ type ReviewResponse struct {
 	VideoURL        string  `json:"Video_url"`
 }
 
-type ProductDetailResponse struct {
+type ProductResponse struct {
 	ProductId       string           `json:"ProductId"`
 	Name            string           `json:"Name"`
 	Category        string           `json:"Category"`

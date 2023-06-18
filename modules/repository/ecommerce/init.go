@@ -8,14 +8,14 @@ import (
 
 type EcommerceRepo interface {
 	GetAllProduct(products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
-	GetProductByID(productId string) ([]ee.QueryResponse, error)
+	GetProductByID(productId string) ([]ee.ReviewResponse, error)
 	GetProductImageURLById(productId string, productImage *ep.ProductImage) ([]ep.ProductImage, error)
 	AvgRating(productId string) (float64, error)
-	FilterProductByCategory(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
-	FilterProductByCategoryAndPriceMax(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
-	FilterProductByCategoryAndPriceMin(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
-	FilterProductByAllCategoryAndPriceMax(products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
-	FilterProductByAllCategoryAndPriceMin(products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
+	// FilterProductByCategory(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
+	// FilterProductByCategoryAndPriceMax(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
+	// FilterProductByCategoryAndPriceMin(category string, products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
+	// FilterProductByAllCategoryAndPriceMax(products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
+	// FilterProductByAllCategoryAndPriceMin(products *[]ep.Product, offset, pageSize int) (*[]ep.Product, int64, error)
 }
 
 type ecommerceRepo struct {

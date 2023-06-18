@@ -7,7 +7,7 @@ import (
 
 type ProductRepo interface {
 	CreateProduct(product *ep.Product) error
-	CheckProductExist(productId uint) (bool, error)
+	CheckProductExist(productId string) (bool, error)
 	CreateProductImage(productImage *ep.ProductImage) error
 	GetAllProduct(products *[]ep.Product) ([]ep.Product, error)
 	GetProductByID(productId string, product *ep.Product) (ep.Product, error)

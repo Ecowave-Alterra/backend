@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Product struct {
 	*gorm.Model       `json:"-"`
-	ProductID         uint            `json:"ProductId"`
+	ProductID         string          `json:"ProductId"`
 	Name              string          `json:"name" form:"name" validate:"required,max=10"`
 	Stock             uint            `json:"stock" form:"stock"`
 	Price             float64         `json:"price" form:"price"`
@@ -26,7 +26,7 @@ type ProductRequest struct {
 }
 
 type ProductResponse struct {
-	ProductID       uint     `json:"ProductId"`
+	ProductID       string   `json:"ProductId"`
 	Name            string   `json:"Name" form:"name"`
 	Category        string   `json:"Category" form:"category"`
 	Stock           uint     `json:"Stock" form:"stock"`
