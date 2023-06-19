@@ -63,6 +63,7 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 			Name:            product.Name,
 			Category:        product.ProductCategory.Category,
 			Stock:           product.Stock,
+			Weight:          product.Weight,
 			Price:           product.Price,
 			Status:          product.Status,
 			Rating:          product.Rating,
@@ -104,6 +105,7 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 		Name:            product.Name,
 		Category:        product.ProductCategory.Category,
 		Stock:           product.Stock,
+		Weight:          product.Weight,
 		TotalOrders:     uint(totalOrder),
 		TotalRevenue:    totalRevenue,
 		Price:           product.Price,
@@ -172,6 +174,7 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 				Name:            product.Name,
 				Category:        product.ProductCategory.Category,
 				Stock:           product.Stock,
+				Weight:          product.Weight,
 				Price:           product.Price,
 				Status:          product.Status,
 				Rating:          product.Rating,
@@ -218,6 +221,23 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 		})
 	} else {
 		product.Name = name
+	}
+
+	weightStr := c.FormValue("Weight")
+	if weightStr == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Masukkan weight",
+			"Status":  http.StatusBadRequest,
+		})
+	} else {
+		weight, err := strconv.ParseFloat(weightStr, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": "Invalid weight value",
+				"Status":  http.StatusBadRequest,
+			})
+		}
+		product.Weight = weight
 	}
 
 	stockStr := c.FormValue("Stock")
@@ -367,6 +387,20 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 			})
 		}
 		req.ProductCategoryId = uint(productCategoryID)
+	}
+
+	weightStr := c.FormValue("Weight")
+	if weightStr == "" {
+		req.Weight = productBefore.Weight
+	} else {
+		weight, err := strconv.ParseFloat(weightStr, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": "Invalid weight value",
+				"Status":  http.StatusBadRequest,
+			})
+		}
+		req.Weight = weight
 	}
 
 	name := c.FormValue("Name")
@@ -572,7 +606,7 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 		})
 	}
 
-	csvHeader := []string{"Product_id", "Name", "Category", "Stock", "Price", "Status", "Rating", "Description", "ProductImageUrl"}
+	csvHeader := []string{"Product_id", "Name", "Category", "Stock", "Weight", "Price", "Status", "Rating", "Description", "ProductImageUrl"}
 
 	var productImage ep.ProductImage
 	records := make([][]string, 0)
@@ -597,6 +631,7 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 			product.Name,
 			product.ProductCategory.Category,
 			strconv.Itoa(int(product.Stock)),
+			strconv.FormatFloat(product.Weight, 'f', -1, 64),
 			strconv.FormatFloat(product.Price, 'f', -1, 64),
 			product.Status,
 			strconv.FormatFloat(product.Rating, 'f', -1, 64),

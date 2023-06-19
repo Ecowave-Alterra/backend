@@ -12,6 +12,7 @@ type Product struct {
 	Stock             uint            `validate:"required"`
 	Price             float64         `validate:"required"`
 	Status            string          `validate:"required"`
+	Weight            float64         `validate:"required"`
 	Rating            float64         `validate:"required"`
 	Description       string          `validate:"required"`
 	ProductCategoryId uint            `json:"-" validate:"required"`
@@ -24,6 +25,7 @@ type ProductRequest struct {
 	Name              string   `json:"name" form:"name"`
 	Stock             uint     `json:"stock" form:"stock"`
 	Price             float64  `json:"price" form:"price"`
+	Weight            float64  `validate:"required"`
 	Description       string   `json:"description" form:"description"`
 	Status            string   `json:"status" form:"status"`
 	ProductImageUrl   []string `json:"productImageUrl" form:"productImageUrl"`
@@ -36,6 +38,7 @@ type ProductResponse struct {
 	Stock           uint
 	TotalOrders     uint    `json:"TotalOrders,omitempty"`
 	TotalRevenue    float64 `json:"TotalRevenue,omitempty"`
+	Weight          float64 `validate:"required"`
 	Price           float64
 	Status          string
 	Rating          float64
