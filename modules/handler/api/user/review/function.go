@@ -54,7 +54,7 @@ func (rh *ReviewHandler) CreateReview(c echo.Context) error {
 
 			if err := rh.reviewUsecase.CreateRatingProduct(ratingProductF, comment, fileHeader, videoHeader, idTransactionDetails[i-1]); err != nil {
 				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"Message": "Gagal membuat rating",
+					"Message": "Gagal membuat rating produk",
 					"Status":  http.StatusInternalServerError,
 				})
 			}
