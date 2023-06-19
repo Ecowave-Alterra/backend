@@ -20,6 +20,7 @@ func RegisterSeed(db *gorm.DB) []Seed {
 		{Seed: CreateVoucherType()},
 		{Seed: CreateVoucher()},
 		{Seed: CreateUserAddress()},
+		{Seed: CreateReview()},
 	}
 }
 
