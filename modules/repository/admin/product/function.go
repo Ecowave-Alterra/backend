@@ -67,9 +67,9 @@ func (pr *productRepo) GetProductByID(productId string, product *pe.Product) (*p
 	err := pr.db.Model(&te.Transaction{}).
 		Select("COALESCE(SUM(transaction_details.qty),0) AS TotalOrder").
 		Joins("JOIN transaction_details ON transactions.id = transaction_details.transaction_id").
-		Joins("JOIN products ON products.id = transaction_details.product_id").
+		Joins("JOIN products ON products.product_id = transaction_details.product_id").
 		Where("transactions.canceled_reason = ''").
-		Where("transaction_details.product_id IN (SELECT id from products WHERE product_id = ?)", productId).
+		Where("transaction_details.product_id = ?", productId).
 		Preload("ProductImages").
 		Scan(&totalOrder).Error
 	if err != nil {
@@ -79,9 +79,9 @@ func (pr *productRepo) GetProductByID(productId string, product *pe.Product) (*p
 	err = pr.db.Model(&te.Transaction{}).
 		Select("COALESCE(SUM(transaction_details.sub_total_price),0) AS TotalRevenue").
 		Joins("JOIN transaction_details ON transactions.id = transaction_details.transaction_id").
-		Joins("JOIN products ON products.id = transaction_details.product_id").
+		Joins("JOIN products ON products.product_id = transaction_details.product_id").
 		Where("transactions.canceled_reason = ''").
-		Where("transaction_details.product_id IN (SELECT id from products WHERE product_id = ?)", productId).
+		Where("transaction_details.product_id = ?", productId).
 		Preload("ProductImages").
 		Scan(&totalRevenue).Error
 	if err != nil {
