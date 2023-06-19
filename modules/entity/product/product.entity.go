@@ -1,18 +1,22 @@
 package product
 
-import "gorm.io/gorm"
+import (
+	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
+	"gorm.io/gorm"
+)
 
 type Product struct {
-	*gorm.Model       `json:"-"`
-	ProductID         uint            `json:"ProductId"`
-	Name              string          `json:"name" form:"name" validate:"required,max=10"`
-	Stock             uint            `json:"stock" form:"stock"`
-	Price             float64         `json:"price" form:"price"`
-	Status            string          `json:"status" form:"status"`
-	Rating            float64         `json:"rating" form:"rating"`
-	Description       string          `json:"description" form:"description"`
-	ProductCategoryId uint            `json:"productCategoryId" form:"productCategoryId"`
-	ProductCategory   ProductCategory `gorm:"foreignKey:ProductCategoryId"`
+	*gorm.Model        `json:"-"`
+	ProductID          string                 `json:"ProductId"`
+	Name               string                 `json:"name" form:"name" validate:"required,max=10"`
+	Stock              uint                   `json:"stock" form:"stock"`
+	Price              float64                `json:"price" form:"price"`
+	Status             string                 `json:"status" form:"status"`
+	Rating             float64                `json:"rating" form:"rating"`
+	Description        string                 `json:"description" form:"description"`
+	ProductCategoryId  uint                   `json:"productCategoryId" form:"productCategoryId"`
+	ProductCategory    ProductCategory        `gorm:"foreignKey:ProductCategoryId"`
+	TransactionDetails []et.TransactionDetail `gorm:"foreignKey:ProductId"`
 }
 
 type ProductRequest struct {

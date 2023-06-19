@@ -7,7 +7,7 @@ import (
 type Transaction struct {
 	*gorm.Model
 
-	UserId             uint
+	UserId             uint `json:"UserId" form:"UserId"`
 	VoucherId          uint `json:"VoucherId" form:"VoucherId"`
 	AddressId          uint `json:"AddressId" form:"AddressId"`
 	StatusTransaction  string
