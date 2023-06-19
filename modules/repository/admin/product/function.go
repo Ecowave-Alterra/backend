@@ -42,7 +42,7 @@ func (pr *productRepo) GetAllProduct(products *[]pe.Product, offset, pageSize in
 	if err := pr.db.
 		Preload("ProductCategory").Preload("ProductImages").
 		Offset(offset).
-		Limit(pageSize).
+		Limit(pageSize).Order("created_at ASC").
 		Find(&products).Error; err != nil {
 		return nil, 0, echo.NewHTTPError(404, err)
 	}
@@ -166,6 +166,7 @@ func (pr *productRepo) SearchProduct(search, filter string, offset, pageSize int
 			pr.db.Model(&pe.ProductCategory{}).Select("id").Where("category LIKE ?", "%"+search+"%")).
 		Where("status LIKE ?", "%"+filter+"%").
 		Preload("ProductCategory").Preload("ProductImages").
+		Order("created_at ASC").
 		Offset(offset).Limit(pageSize).
 		Find(&products).Error; err != nil {
 		return nil, 0, echo.NewHTTPError(404, err)
