@@ -5,13 +5,23 @@ go 1.18
 require github.com/google/uuid v1.3.0
 
 require (
+	cloud.google.com/go/storage v1.30.1
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-jwt v0.0.0-20221127215225-c84d41a71003
 	github.com/labstack/echo/v4 v4.10.2
 	golang.org/x/crypto v0.9.0
+	google.golang.org/api v0.114.0
+	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.1
+)
+
+require (
+	cloud.google.com/go/storage v1.30.1
+	github.com/midtrans/midtrans-go v1.3.6
+	google.golang.org/api v0.114.0
+	gorm.io/driver/mysql v1.5.1
 )
 
 require (
@@ -19,7 +29,6 @@ require (
 	cloud.google.com/go/compute v1.18.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v0.12.0 // indirect
-	cloud.google.com/go/storage v1.30.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
@@ -44,11 +53,9 @@ require (
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-	google.golang.org/api v0.114.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230320184635-7606e756e683 // indirect
 	google.golang.org/grpc v1.53.0 // indirect
 	google.golang.org/protobuf v1.29.1 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
-	gorm.io/driver/mysql v1.5.1 // indirect
 )

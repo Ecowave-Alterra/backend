@@ -9,7 +9,7 @@ import (
 type Information struct {
 	*gorm.Model `json:"-"`
 
-	InformationId   string    `json:"InformationiId,"`
+	InformationId   string    `json:"InformationiId"`
 	Title           string    `json:"Title," form:"Title" validate:"required,max=65"`
 	PhotoContentUrl string    `json:"PhotoContentUrl," form:"PhotoContentUrl" validate:"required"`
 	Content         string    `json:"Content," form:"Content" validate:"required"`
@@ -20,7 +20,8 @@ type Information struct {
 }
 
 type InformationDraftRequest struct {
-	InformationId   string    `json:"InformationiId,"`
+	*gorm.Model
+	InformationId   string    `json:"InformationiId"`
 	Title           string    `json:"Title," form:"Title" validate:"max=65"`
 	PhotoContentUrl string    `json:"PhotoContentUrl," form:"PhotoContentUrl"`
 	Content         string    `json:"Content," form:"Content"`
@@ -36,11 +37,6 @@ func (InformationDraftRequest) TableName() string {
 
 type UserInformationResponse struct {
 	InformationId   string
-	Title           string
-	PhotoContentUrl string
-	Date            time.Time
-}
-type UserInformationDetailResponse struct {
 	Title           string
 	PhotoContentUrl string
 	Content         string

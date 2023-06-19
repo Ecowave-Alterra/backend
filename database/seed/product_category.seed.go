@@ -12,5 +12,8 @@ func CreateProductCategory() *[]pct.ProductCategory {
 		{
 			Category: "kantong",
 		},
+		{
+			Category: "Lainya",
+		},
 	}
 }

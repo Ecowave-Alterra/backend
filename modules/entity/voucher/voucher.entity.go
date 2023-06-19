@@ -7,25 +7,47 @@ import (
 )
 
 type Voucher struct {
-	*gorm.Model `json:"-"`
-	// VoucherID       uint        `json:"voucherID"`
-	StartDate       time.Time   `json:"startDate" form:"startDate"`
-	EndDate         time.Time   `json:"endDate" form:"endDate"`
-	MinimumPurchase float64     `json:"minimumPurchase" form:"minimumPurchase"`
-	MaximumDiscount float64     `json:"maximumDiscount" form:"maximumDiscount"`
-	DiscountPercent float64     `json:"discountPercent" form:"discountPercent"`
-	ClaimableCount  uint        `json:"claimableCount" form:"claimableCount"`
-	MaxClaimLimit   uint        `json:"maxClaimLimit" form:"maxClaimLimit"`
-	VoucherTypeID   uint        `json:"voucherTypeID" form:"voucherTypeID"`
-	VoucherType     VoucherType `gorm:"foreignKey:VoucherTypeID"`
+	*gorm.Model        `json:"-"`
+	ID                 uint `json:"Id" gorm:"primary_key"`
+	VoucherId          string
+	StartDate          time.Time   `json:"StartDate" form:"StartDate"`
+	EndDate            time.Time   `json:"EndDate" form:"EndDate"`
+	MinimumPurchase    float64     `json:"MinimumPurchase" form:"MinimumPurchase"`
+	MaximumDiscount    float64     `json:"MaximumDiscount" form:"MaximumDiscount"`
+	DiscountPercent    float64     `json:"DiscountPercent" form:"DiscountPercent"`
+	ClaimableUserCount uint        `json:"ClaimableUserCount" form:"ClaimableUserCount"`
+	MaxClaimLimit      uint        `json:"MaxClaimLimit" form:"MaxClaimLimit"`
+	VoucherTypeID      uint        `json:"VoucherTypeID" form:"VoucherTypeID"`
+	VoucherType        VoucherType `gorm:"foreignKey:VoucherTypeID"`
+}
+
+type VoucherRequest struct {
+	*gorm.Model
+	VoucherId          string `validate:"required"`
+	StartDate          string `validate:"required"`
+	EndDate            string `validate:"required"`
+	MinimumPurchase    float64
+	MaximumDiscount    float64
+	DiscountPercent    float64
+	ClaimableUserCount uint `validate:"required"`
+	MaxClaimLimit      uint `validate:"required"`
+	VoucherTypeID      uint `validate:"required"`
+}
+
+func (VoucherRequest) TableName() string {
+	return "vouchers"
 }
 
 type VoucherResponse struct {
-	// VoucherID uint
-	Type           string
-	ClaimableCount uint
-	StartDate      string
-	EndDate        string
+	VoucherId          string  `json:"VoucherId,omitempty"`
+	Type               string  `json:"Type,omitempty"`
+	StartDate          string  `json:"StartDate,omitempty"`
+	EndDate            string  `json:"EndDate,omitempty"`
+	MinimumPurchase    float64 `json:"MinimumPurchase,omitempty"`
+	MaximumDiscount    float64 `json:"MaximumDiscount,omitempty"`
+	DiscountPercent    float64 `json:"DiscountPercent,omitempty"`
+	ClaimableUserCount uint    `json:"ClaimableUserCount,omitempty"`
+	MaxClaimLimit      uint    `json:"MaxClaimLimit,omitempty"`
 }
 
 type VoucherUserResponse struct {
@@ -38,10 +60,3 @@ type VoucherUserResponse struct {
 	MaximumDiscount float64 `json:"MaximumDiscount,omitempty"`
 	DiscountPercent float64 `json:"DiscountPercent,omitempty"`
 }
-
-// type DetailVoucherResponse struct {
-// 	Type            string
-// 	EndDate         time.Time
-// 	PhotoUrl        string
-// 	MinimumPurchase float64 `json:"omitempty"`
-// }

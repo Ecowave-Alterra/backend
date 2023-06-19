@@ -11,7 +11,6 @@ import (
 	ve "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
 
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
-	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -50,12 +49,12 @@ func InitialMigration() {
 		ue.User{},
 		ue.UserDetail{},
 		ie.Information{},
+		ve.Voucher{},
 		et.Transaction{},
 		et.TransactionDetail{},
-		ep.Product{},
-		ep.ProductCategory{},
-		ep.ProductImage{},
-		ve.Voucher{},
+		pe.Product{},
+		pe.ProductCategory{},
+		pe.ProductImage{},
 		ve.VoucherType{},
 		ue.UserAddress{},
 	)

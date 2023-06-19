@@ -4,21 +4,12 @@ import (
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 )
 
-func (ic *informationUsecase) GetAllInformations() (*[]ie.UserInformationResponse, error) {
-	informations, err := ic.informationRepo.GetAllInformations()
+func (ic *informationUsecase) GetAllInformations(offset int, pageSize int) (*[]ie.UserInformationResponse, int64, error) {
+	informations, total, err := ic.informationRepo.GetAllInformations(offset, pageSize)
 	if err != nil {
-		return informations, err
+		return informations, 0, err
 	}
-	return informations, nil
-}
-
-func (ic *informationUsecase) GetDetailInformations(id string) (*ie.UserInformationDetailResponse, error) {
-	informations, err := ic.informationRepo.GetDetailInformations(id)
-
-	if err != nil {
-		return informations, err
-	}
-	return informations, nil
+	return informations, total, nil
 }
 
 func (ic *informationUsecase) UpdatePoint(id uint) error {
