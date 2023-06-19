@@ -9,6 +9,7 @@ import (
 	"github.com/berrylradianh/ecowave-go/helper/hash"
 	mdtrns "github.com/berrylradianh/ecowave-go/helper/midtrans"
 	"github.com/berrylradianh/ecowave-go/helper/rajaongkir"
+	vld "github.com/berrylradianh/ecowave-go/helper/validator"
 	em "github.com/berrylradianh/ecowave-go/modules/entity/midtrans"
 	er "github.com/berrylradianh/ecowave-go/modules/entity/rajaongkir"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
@@ -41,6 +42,9 @@ func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (st
 	}
 	transaction.PaymentUrl = redirectUrl
 
+	if err := vld.Validation(transaction); err != nil {
+		return "", "", err
+	}
 	err = tu.transactionRepo.CreateTransaction(transaction)
 	if err != nil {
 		return "", "", err
@@ -106,6 +110,10 @@ func (tu *transactionUsecase) GetVoucherUser(id uint, offset int, pageSize int) 
 }
 
 func (tu *transactionUsecase) ShippingOptions(ship *er.RajaongkirRequest) (interface{}, error) {
+
+	if err := vld.Validation(ship); err != nil {
+		return nil, err
+	}
 
 	res, err := rajaongkir.ShippingOptions(ship)
 	if err != nil {
