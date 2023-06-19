@@ -31,27 +31,44 @@ func (rh *ReviewHandler) CreateReview(c echo.Context) error {
 		})
 	}
 
-	var ratingProduct float64
+	var ratingProductF float64
 	for i := 1; i <= countTransactionDetail; i++ {
-		ratingProduct, err = strconv.ParseFloat(c.FormValue(fmt.Sprintf("RatingProduct%d", i)), 64)
-		if err != nil {
-			return err
-		}
-		comment := c.FormValue(fmt.Sprintf("Comment%d", i))
-		fileHeader, _ := c.FormFile(fmt.Sprintf("PhotoUrl%d", i))
-		videoHeader, _ := c.FormFile(fmt.Sprintf("VideoUrl%d", i))
-
-		if err := rh.reviewUsecase.CreateRatingProduct(ratingProduct, comment, fileHeader, videoHeader, idTransactionDetails[i-1]); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Gagal membuat rating",
-				"Status":  http.StatusInternalServerError,
+		ratingProduct := c.FormValue(fmt.Sprintf("RatingProduct%d", i))
+		if ratingProduct == "" {
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"Message": "Masukkan rating produk",
+				"Status":  http.StatusBadRequest,
 			})
+		} else {
+			ratingProductF, err = strconv.ParseFloat(ratingProduct, 64)
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, echo.Map{
+					"Message": "Gagal",
+					"Status":  http.StatusBadRequest,
+				})
+			}
+
+			comment := c.FormValue(fmt.Sprintf("Comment%d", i))
+			fileHeader, _ := c.FormFile(fmt.Sprintf("PhotoUrl%d", i))
+			videoHeader, _ := c.FormFile(fmt.Sprintf("VideoUrl%d", i))
+
+			if err := rh.reviewUsecase.CreateRatingProduct(ratingProductF, comment, fileHeader, videoHeader, idTransactionDetails[i-1]); err != nil {
+				return c.JSON(http.StatusInternalServerError, echo.Map{
+					"Message": "Gagal membuat rating",
+					"Status":  http.StatusInternalServerError,
+				})
+			}
 		}
 	}
 
 	var ratingExpeditionF float64
 	ratingExpedition := c.FormValue("ExpeditionRating")
-	if ratingExpedition != "" {
+	if ratingExpedition == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"Message": "Masukkan rating ekspedisi",
+			"Status":  http.StatusBadRequest,
+		})
+	} else {
 		ratingExpeditionF, err = strconv.ParseFloat(ratingExpedition, 32)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{
@@ -69,13 +86,11 @@ func (rh *ReviewHandler) CreateReview(c echo.Context) error {
 	}
 
 	idUserTemp := 2
-	if ratingExpeditionF != 0 && ratingProduct != 0 {
-		if err := rh.reviewUsecase.UpdatePoint(idUserTemp); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Gagal mengubah point user",
-				"Status":  http.StatusInternalServerError,
-			})
-		}
+	if err := rh.reviewUsecase.UpdatePoint(idUserTemp); err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"Message": "Gagal mengubah point user",
+			"Status":  http.StatusInternalServerError,
+		})
 	}
 
 	return c.JSON(http.StatusCreated, echo.Map{
