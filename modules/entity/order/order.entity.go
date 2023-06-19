@@ -40,7 +40,7 @@ type Order struct {
 
 type OrderDetail struct {
 	// ProductId       string
-	ProductId       uint
+	ProductId       string
 	Qty             uint
 	SubTotalPrice   float64
 	ProductName     string
