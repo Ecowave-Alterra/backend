@@ -64,7 +64,7 @@ func (rc *reviewUsecase) CreateRatingProduct(rating float64, comment string, fil
 			return err
 		}
 
-		maxVideoSize := 4 * 1024 * 1024
+		maxVideoSize := 50 * 1024 * 1024
 		if err := vld.ValidateVideoSize(videoHeader, int64(maxVideoSize)); err != nil {
 			return err
 		}
