@@ -5,16 +5,12 @@ import "gorm.io/gorm"
 type ProductCategory struct {
 	*gorm.Model `json:"-"`
 
-	Name     string            `json:"name" form:"name" validate:"required"`
-	Products []ProductResponse `gorm:"foreignKey:Product_category_id"`
+	ID       uint      `json:"Id,omitempty" gorm:"primary_key"`
+	Category string    `json:"Category" form:"category" validate:"required"`
+	Products []Product `gorm:"foreignKey:ProductCategoryId"`
 }
 
 type ProductCategoryResponse struct {
-	*gorm.Model `json:"-"`
-	Name        string    `json:"name" form:"name"`
-	Products    []Product `gorm:"foreignKey:Product_category_id" json:"-"`
-}
-
-func (ProductCategoryResponse) TableName() string {
-	return "product_categories"
+	Category string    `json:"category" form:"category"`
+	Products []Product `gorm:"foreignKey:ProductCategoryId" json:"-"`
 }

@@ -5,9 +5,13 @@ import (
 
 	"github.com/berrylradianh/ecowave-go/config"
 	"github.com/berrylradianh/ecowave-go/database/seed"
+	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
+	re "github.com/berrylradianh/ecowave-go/modules/entity/role"
+	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
+	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
+	ve "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
 
-	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
-	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
+	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -20,7 +24,6 @@ func Init() {
 	InitialMigration()
 	seed.DBSeed(DB)
 }
-
 func InitDB() {
 	var err error
 
@@ -42,11 +45,19 @@ func InitDB() {
 
 func InitialMigration() {
 	DB.AutoMigrate(
-		ep.Product{},
-		ep.ProductCategory{},
-		ut.User{},
-		ut.UserDetail{},
-		ut.UserAddress{},
+		re.Role{},
+		ue.User{},
+		ue.UserDetail{},
+		ie.Information{},
+		ve.Voucher{},
+		et.Transaction{},
+		et.TransactionDetail{},
+		pe.Product{},
+		pe.ProductCategory{},
+		pe.ProductImage{},
+		ve.VoucherType{},
+		ue.UserAddress{},
 	)
-	DB.Migrator().HasConstraint(&ut.User{}, "UserAddresses")
+	DB.Migrator().HasConstraint(&ue.User{}, "UserDetail")
+	DB.Migrator().HasConstraint(&re.Role{}, "Users")
 }

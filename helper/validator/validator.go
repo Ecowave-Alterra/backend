@@ -7,14 +7,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// type CustomValidator struct {
-// 	Validator *validator.Validate
-// }
-
-// func (cv *CustomValidator) Validate(i interface{}) error {
-// 	return cv.Validator.Struct(i)
-// }
-
 func Validation(request interface{}) error {
 	validate := validator.New()
 	if err := validate.Struct(request); err != nil {
