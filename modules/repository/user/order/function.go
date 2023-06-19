@@ -64,7 +64,6 @@ func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize i
 			PaymentMethod:      val.PaymentMethod,
 			PaymentStatus:      val.PaymentStatus,
 			ExpeditionName:     val.ExpeditionName,
-			ExpeditionStatus:   val.ExpeditionStatus,
 			VoucherId:          val.VoucherId,
 			Discount:           val.Discount,
 			TotalPrice:         val.TotalPrice,

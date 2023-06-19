@@ -18,6 +18,14 @@ func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (st
 	var productCost float64
 
 	for _, cost := range transaction.TransactionDetails {
+		stock, err := tu.transactionRepo.GetStock(cost.ProductId)
+		if err != nil {
+			return "", "", err
+		}
+
+		if stock < cost.Qty {
+			return "", "", errors.New("Qty melebihi stock")
+		}
 		productCost += cost.SubTotalPrice
 	}
 
@@ -51,13 +59,13 @@ func (tu *transactionUsecase) MidtransNotifications(midtransRequest *em.Midtrans
 	transaction := et.Transaction{
 		TransactionId: midtransRequest.OrderId,
 		PaymentStatus: midtransRequest.TransactionStatus,
+		PaymentMethod: midtransRequest.PaymentType,
 	}
 	if midtransRequest.TransactionStatus == "settlement" {
 		transaction.StatusTransaction = "Dikemas"
 	}
 	err := tu.transactionRepo.UpdateTransaction(transaction)
 	if err != nil {
-		//lint:ignore ST1005 Reason for ignoring this linter
 		return errors.New("Invalid Transaction")
 	}
 

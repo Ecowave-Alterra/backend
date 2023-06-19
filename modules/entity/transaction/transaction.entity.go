@@ -17,7 +17,6 @@ type Transaction struct {
 	PaymentMethod      string  `json:"PaymentMethod" form:"PaymentMethod" validate:"required"`
 	PaymentStatus      string
 	ExpeditionName     string `json:"ExpeditionName" form:"ExpeditionName" validate:"required"`
-	ExpeditionStatus   string `json:"ExpeditionStatus" form:"ExpeditionStatus"`
 	EstimationDay      string `json:"EstimationDay" form:"EstimationDay"`
 	PaymentUrl         string `json:"PaymentUrl" form:"PaymentUrl"`
 	CanceledReason     string
