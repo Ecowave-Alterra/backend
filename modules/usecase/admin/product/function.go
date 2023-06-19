@@ -14,7 +14,7 @@ func (pc *productUseCase) CreateProduct(product *pe.Product) error {
 			return err
 		}
 		if !exists {
-			product.ProductID = productId
+			product.ProductId = productId
 			break
 		}
 	}

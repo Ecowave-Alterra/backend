@@ -5,7 +5,6 @@ import (
 
 	"github.com/berrylradianh/ecowave-go/config"
 	"github.com/berrylradianh/ecowave-go/database/seed"
-	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	re "github.com/berrylradianh/ecowave-go/modules/entity/role"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
@@ -25,6 +24,7 @@ func Init() {
 	InitialMigration()
 	seed.DBSeed(DB)
 }
+
 func InitDB() {
 	var err error
 
@@ -58,9 +58,6 @@ func InitialMigration() {
 		ve.Voucher{},
 		ve.VoucherType{},
 		ue.UserAddress{},
-		pe.ProductCategory{},
-		pe.Product{},
-		pe.ProductImage{},
 	)
 	DB.Migrator().HasConstraint(&ue.User{}, "UserDetail")
 	DB.Migrator().HasConstraint(&re.Role{}, "Users")

@@ -59,7 +59,7 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 		}
 
 		productResponse := ep.ProductResponse{
-			ProductID:       product.ProductID,
+			ProductId:       product.ProductId,
 			Name:            product.Name,
 			Category:        product.ProductCategory.Category,
 			Stock:           product.Stock,
@@ -100,7 +100,7 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 	}
 
 	productResponse := ep.ProductResponse{
-		ProductID:       product.ProductID,
+		ProductId:       product.ProductId,
 		Name:            product.Name,
 		Category:        product.ProductCategory.Category,
 		Stock:           product.Stock,
@@ -168,7 +168,7 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 			}
 
 			productResponse := ep.ProductResponse{
-				ProductID:       product.ProductID,
+				ProductId:       product.ProductId,
 				Name:            product.Name,
 				Category:        product.ProductCategory.Category,
 				Stock:           product.Stock,
@@ -308,7 +308,8 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 			PhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
 
 			productImage := ep.ProductImage{
-				ProductId:       product.ID,
+				// ProductId:       product.ID,
+				ProductId:       product.ProductId,
 				ProductImageUrl: PhotoUrl,
 			}
 			err = h.productUseCase.CreateProductImage(&productImage)
@@ -434,7 +435,8 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	}
 
 	var productImages []ep.ProductImage
-	err = h.productUseCase.DeleteProductImage(fmt.Sprint(product.ID), &productImages)
+	// err = h.productUseCase.DeleteProductImage(fmt.Sprint(product.ID), &productImages)
+	err = h.productUseCase.DeleteProductImage(fmt.Sprint(product.ProductId), &productImages)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
@@ -472,7 +474,8 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 			PhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
 
 			productImage := ep.ProductImage{
-				ProductId:       product.ID,
+				// ProductId:       product.ID,
+				ProductId:       product.ProductId,
 				ProductImageUrl: PhotoUrl,
 			}
 			err = h.productUseCase.CreateProductImage(&productImage)
@@ -574,7 +577,8 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 	var productImage ep.ProductImage
 	records := make([][]string, 0)
 	for _, product := range products {
-		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
+		// productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
+		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ProductId), &productImage)
 		if err != nil {
 			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{
@@ -589,7 +593,7 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 		}
 
 		record := []string{
-			product.ProductID,
+			product.ProductId,
 			product.Name,
 			product.ProductCategory.Category,
 			strconv.Itoa(int(product.Stock)),
