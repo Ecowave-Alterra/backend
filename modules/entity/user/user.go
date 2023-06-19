@@ -30,16 +30,16 @@ type UserRequest struct {
 }
 
 type UserResponse struct {
-	Id              int    `json:"Id"`
-	GoogleId        string `json:"GoogleId"`
-	RoleId          int    `json:"RoleId"`
-	Name            string `json:"Name"`
-	Username        string `json:"Username"`
-	Email           string `json:"Email"`
-	Phone           string `json:"Phone"`
-	Point           int    `json:"Point"`
-	ProfilePhotoUrl string `json:"ProfilePhotoUrl"`
-	Addresses       []UserAddressResponse
+	Id           int    `json:"Id"`
+	GoogleId     string `json:"GoogleId"`
+	RoleId       int    `json:"RoleId"`
+	Name         string `json:"Name"`
+	Username     string `json:"Username"`
+	Email        string `json:"Email"`
+	Phone        string `json:"Phone"`
+	Point        int    `json:"Point"`
+	ProfilePhoto string `json:"ProfilePhoto"`
+	Addresses    []UserAddressResponse
 }
 
 type UserPasswordRequest struct {

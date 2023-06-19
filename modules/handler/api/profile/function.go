@@ -66,16 +66,16 @@ func (ph *ProfileHandler) GetUserProfile(c echo.Context) error {
 	}
 
 	userResponse := ut.UserResponse{
-		Id:              int(user.ID),
-		GoogleId:        user.GoogleId,
-		RoleId:          int(user.RoleId),
-		Name:            userDetail.Name,
-		Username:        user.Username,
-		Email:           user.Email,
-		Phone:           userDetail.Phone,
-		Point:           userDetail.Point,
-		ProfilePhotoUrl: userDetail.ProfilePhotoUrl,
-		Addresses:       addressResponses,
+		Id:           int(user.ID),
+		GoogleId:     user.GoogleId,
+		RoleId:       int(user.RoleId),
+		Name:         userDetail.Name,
+		Username:     user.Username,
+		Email:        user.Email,
+		Phone:        userDetail.Phone,
+		Point:        userDetail.Point,
+		ProfilePhoto: userDetail.ProfilePhoto,
+		Addresses:    addressResponses,
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
@@ -130,7 +130,7 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	email := c.FormValue("Email")
 	username := c.FormValue("Username")
 	phone := c.FormValue("Phone")
-	fileHeader, err := c.FormFile("ProfilePhotoUrl")
+	fileHeader, err := c.FormFile("ProfilePhoto")
 
 	if name != "" {
 		userDetail.Name = name
@@ -148,8 +148,8 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	if fileHeader != nil {
 		cloudstorage.Folder = "img/users/profile/"
 
-		if userDetailBefore.ProfilePhotoUrl != "" {
-			fileName, _ := cloudstorage.GetFileName(userDetailBefore.ProfilePhotoUrl)
+		if userDetailBefore.ProfilePhoto != "" {
+			fileName, _ := cloudstorage.GetFileName(userDetailBefore.ProfilePhoto)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 					"Message": "Gagal mendapatkan nama file",
@@ -163,14 +163,14 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 			}
 		}
 
-		profilePhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
-		if profilePhotoUrl == "" {
+		profilePhoto, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
+		if profilePhoto == "" {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Ups! Foto profil gagal diunggah. Coba lagi ya",
 			})
 		}
 
-		userDetail.ProfilePhotoUrl = profilePhotoUrl
+		userDetail.ProfilePhoto = profilePhoto
 		messagePhoto = "Berhasil! Foto profil berhasil diubah"
 	}
 
@@ -189,9 +189,9 @@ func (ph *ProfileHandler) UpdateUserProfile(c echo.Context) error {
 	}
 
 	userDetailRequest := ut.UserDetailRequest{
-		Name:            userDetail.Name,
-		Phone:           userDetail.Phone,
-		ProfilePhotoUrl: userDetail.ProfilePhotoUrl,
+		Name:         userDetail.Name,
+		Phone:        userDetail.Phone,
+		ProfilePhoto: userDetail.ProfilePhoto,
 	}
 
 	if err := vld.Validation(userRequest); err != nil {
