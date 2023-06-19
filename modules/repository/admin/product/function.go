@@ -123,6 +123,12 @@ func (pr *productRepo) UpdateProductStock(productId string, stock uint) error {
 }
 
 func (pr *productRepo) DeleteProduct(productId string, product *pe.Product) error {
+	// Hapus terlebih dahulu gambar produk yang terkait
+	if err := pr.db.Where("product_id = ?", productId).Delete(&pe.ProductImage{}).Error; err != nil {
+		return echo.NewHTTPError(500, err)
+	}
+
+	// Hapus produk dari tabel products
 	if err := pr.db.Where("product_id = ?", productId).Delete(&product).Error; err != nil {
 		return echo.NewHTTPError(500, err)
 	}
@@ -132,14 +138,6 @@ func (pr *productRepo) DeleteProduct(productId string, product *pe.Product) erro
 
 func (pr *productRepo) DeleteProductImage(productID string, productImages *[]pe.ProductImage) error {
 	if err := pr.db.Where("product_id = ?", productID).Delete(&productImages).Error; err != nil {
-		return echo.NewHTTPError(500, err)
-	}
-
-	return nil
-}
-
-func (pr *productRepo) DeleteProductImageByID(ProductImageID uint, productImage *pe.ProductImage) error {
-	if err := pr.db.Where("id = ?", ProductImageID).Delete(productImage).Error; err != nil {
 		return echo.NewHTTPError(500, err)
 	}
 

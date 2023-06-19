@@ -7,19 +7,19 @@ import (
 func CreateProductImage() []*productEntity.ProductImage {
 	product_images := []*productEntity.ProductImage{
 		{
-			ProductId:       "a3325f33-e01a-4e40-9ca7-5d84c4337094",
+			ProductId:       "f71ff306-ebd7-45e5-9607-5b908dd1c423",
 			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 		{
-			ProductId:       "a3325f33-e01a-4e40-9ca7-5d84c4337094",
+			ProductId:       "f71ff306-ebd7-45e5-9607-5b908dd1c423",
 			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 		{
-			ProductId:       "06dcbb14-507e-41db-8942-a0e93f50ebe5",
+			ProductId:       "859679ad-888b-41ac-a663-4a619acc4ae3",
 			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 		{
-			ProductId:       "06dcbb14-507e-41db-8942-a0e93f50ebe5",
+			ProductId:       "859679ad-888b-41ac-a663-4a619acc4ae3",
 			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 	}

@@ -58,10 +58,6 @@ func (pc *productUseCase) DeleteProductImage(productID string, productImages *[]
 	return pc.productRepo.DeleteProductImage(productID, productImages)
 }
 
-func (pc *productUseCase) DeleteProductImageByID(ProductImageID uint, productImage *pe.ProductImage) error {
-	return pc.productRepo.DeleteProductImageByID(ProductImageID, productImage)
-}
-
 func (pc *productUseCase) SearchProduct(search, filter string, offset, pageSize int) (*[]pe.Product, int64, error) {
 	products, count, err := pc.productRepo.SearchProduct(search, filter, offset, pageSize)
 	if err != nil {

@@ -1,13 +1,16 @@
 package product
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Product struct {
-	ProductId string `gorm:"primarykey" json:"ProductId"`
-	CreatedAt time.Time
-	UpdatedAt *time.Time
-	DeletedAt *time.Time
-	// ProductID         string          `json:"ProductId"`
+	ProductId         string `gorm:"primarykey" json:"ProductId"`
+	CreatedAt         time.Time
+	UpdatedAt         *time.Time
+	DeletedAt         *gorm.DeletedAt
 	Name              string          `validate:"required,max=10"`
 	Stock             uint            `validate:"required"`
 	Price             float64         `validate:"required"`

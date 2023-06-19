@@ -9,7 +9,7 @@ import (
 func CreateProduct() []*productEntity.Product {
 	products := []*productEntity.Product{
 		{
-			ProductId:         "a3325f33-e01a-4e40-9ca7-5d84c4337094",
+			ProductId:         "859679ad-888b-41ac-a663-4a619acc4ae3",
 			ProductCategoryId: 1,
 			Name:              "Product Name 1",
 			Stock:             10,
@@ -23,7 +23,7 @@ func CreateProduct() []*productEntity.Product {
 			DeletedAt:         nil,
 		},
 		{
-			ProductId:         "06dcbb14-507e-41db-8942-a0e93f50ebe5",
+			ProductId:         "f71ff306-ebd7-45e5-9607-5b908dd1c423",
 			ProductCategoryId: 2,
 			Name:              "Product Name 2",
 			Stock:             100,
@@ -37,7 +37,7 @@ func CreateProduct() []*productEntity.Product {
 			DeletedAt:         nil,
 		},
 		{
-			ProductId:         "a3325f33-e01a-4e40-9ca7-5d84c4337095",
+			ProductId:         "ba08266c-0926-484e-a610-c2a48ac6179d",
 			ProductCategoryId: 3,
 			Name:              "Product Name 3",
 			Stock:             100,

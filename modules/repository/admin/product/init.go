@@ -17,7 +17,6 @@ type ProductRepo interface {
 	UpdateProductStock(productId string, stock uint) error
 	DeleteProduct(productId string, product *pe.Product) error
 	DeleteProductImage(productID string, productImages *[]pe.ProductImage) error
-	DeleteProductImageByID(ProductImageID uint, productImage *pe.ProductImage) error
 	SearchProduct(search, filter string, offset, pageSize int) (*[]pe.Product, int64, error)
 }
 

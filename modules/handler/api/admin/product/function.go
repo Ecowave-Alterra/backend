@@ -568,15 +568,6 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 				"Status":  http.StatusInternalServerError,
 			})
 		}
-
-		err = h.productUseCase.DeleteProductImageByID(image.ID, &image)
-		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
-			})
-		}
 	}
 
 	err = h.productUseCase.DeleteProduct(productId, product)
