@@ -34,7 +34,7 @@ func (pc *productUseCase) GetAllProductNoPagination(products *[]pe.Product) ([]p
 	return pc.productRepo.GetAllProductNoPagination(products)
 }
 
-func (pc *productUseCase) GetProductByID(productId string, product *pe.Product) (pe.Product, error) {
+func (pc *productUseCase) GetProductByID(productId string, product *pe.Product) (*pe.Product, int64, float64, error) {
 	return pc.productRepo.GetProductByID(productId, product)
 }
 

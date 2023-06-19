@@ -31,9 +31,11 @@ type ProductResponse struct {
 	Name            string
 	Category        string
 	Stock           uint
+	TotalOrders     uint    `json:"TotalOrders,omitempty"`
+	TotalRevenue    float64 `json:"TotalRevenue,omitempty"`
 	Price           float64
 	Status          string
 	Rating          float64
 	Description     string
-	ProductImageUrl []string
+	ProductImageUrl []string `json:"ProductImageUrl,omitempty"`
 }

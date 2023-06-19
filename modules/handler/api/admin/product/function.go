@@ -82,10 +82,10 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 }
 
 func (h *ProductHandler) GetProductByID(c echo.Context) error {
-	var product ep.Product
+	var product *ep.Product
 	productID := c.Param("id")
 
-	product, err := h.productUseCase.GetProductByID(productID, &product)
+	product, totalOrder, totalRevenue, err := h.productUseCase.GetProductByID(productID, product)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
@@ -104,6 +104,8 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 		Name:            product.Name,
 		Category:        product.ProductCategory.Category,
 		Stock:           product.Stock,
+		TotalOrders:     uint(totalOrder),
+		TotalRevenue:    totalRevenue,
 		Price:           product.Price,
 		Status:          product.Status,
 		Rating:          product.Rating,
@@ -343,7 +345,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	var req ep.ProductRequest
 	var product ep.Product
 
-	productBefore, err := h.productUseCase.GetProductByID(productId, &product)
+	productBefore, _, _, err := h.productUseCase.GetProductByID(productId, &product)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
@@ -510,8 +512,8 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 	productId := c.Param("id")
 
-	var product ep.Product
-	product, err := h.productUseCase.GetProductByID(productId, &product)
+	var product *ep.Product
+	product, _, _, err := h.productUseCase.GetProductByID(productId, product)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
@@ -540,7 +542,7 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 		}
 	}
 
-	err = h.productUseCase.DeleteProduct(productId, &product)
+	err = h.productUseCase.DeleteProduct(productId, product)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
