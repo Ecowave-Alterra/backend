@@ -20,7 +20,7 @@ func (dh *DashboardHandler) GetDashboard() echo.HandlerFunc {
 			}
 		}
 
-		totalRevenue, totalOrder, totalUser, top3Order, monthlyRevenue, weeklyRevenue, err := dh.dashboardUsecase.GetDashboard(filter)
+		totalRevenue, totalOrder, totalUser, top3Order, monthlyRevenue, weeklyRevenue, yearlyRevenue, err := dh.dashboardUsecase.GetDashboard(filter)
 		if err != nil {
 			return c.JSON(http.StatusOK, map[string]interface{}{
 				"Message": err.Error(),
@@ -35,6 +35,7 @@ func (dh *DashboardHandler) GetDashboard() echo.HandlerFunc {
 			"FavouriteProducts": top3Order,
 			"MonthlyRevenue":    monthlyRevenue,
 			"WeeklyRevenue":     weeklyRevenue,
+			"YearlyRevenue":     yearlyRevenue,
 			"Status":            http.StatusOK,
 		})
 	}

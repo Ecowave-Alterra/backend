@@ -6,11 +6,12 @@ import (
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
-func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de.FavouriteProducts, *[]de.MonthlyRevenue, *[]de.WeeklyRevenue, error) {
+func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de.FavouriteProducts, *[]de.MonthlyRevenue, *[]de.WeeklyRevenue, *[]de.YearlyRevenue, error) {
 	var totalRevenue int64
 	var totalOrder int64
 	var totalUser int64
 	var monthlyRevenue *[]de.MonthlyRevenue
+	var yearlyRevenue *[]de.YearlyRevenue
 	var weeklyRevenue *[]de.WeeklyRevenue
 	var top3Order *[]de.FavouriteProducts
 	// var top3Review int64
@@ -19,17 +20,17 @@ func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de
 		Where("transactions.canceled_reason = ''").
 		Row().Scan(&totalRevenue)
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, err
 	}
 
 	err = dr.db.Model(&te.Transaction{}).Count(&totalOrder).Error
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, err
 	}
 
 	err = dr.db.Model(&ue.User{}).Where("role_id = ?", 2).Count(&totalUser).Error
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, err
 	}
 
 	// query := "SELECT p.Name, SUM(td.Qty) AS TotalQty
@@ -50,7 +51,7 @@ func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de
 		Order("TotalOrders DESC").
 		Limit(3).Scan(&top3Order).Error
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, err
 	}
 
 	// query := "SELECT CASE MONTH(transactions.created_at)
@@ -91,7 +92,7 @@ func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de
 		Order("MONTH(transactions.created_at)").
 		Scan(&monthlyRevenue).Error
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, err
 	}
 
 	// query := "SELECT DAYNAME(created_at) AS day, SUM(total_price) AS revenue
@@ -105,8 +106,24 @@ func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de
 		Order("DAYOFWEEK(created_at)").
 		Scan(&weeklyRevenue).Error
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, err
 	}
 
-	return totalRevenue, totalOrder, totalUser, top3Order, monthlyRevenue, weeklyRevenue, nil
+	// SELECT YEAR(transactions.created_at) AS year, SUM(transactions.total_price) AS revenue
+	// FROM transactions
+	// WHERE YEAR(transactions.created_at) BETWEEN YEAR(CURDATE()) - 7 AND YEAR(CURDATE())
+	// GROUP BY YEAR(transactions.created_at)
+	// ORDER BY YEAR(transactions.created_at) ASC;
+	err = dr.db.Model(&te.Transaction{}).
+		Select("YEAR(created_at) AS year, SUM(total_price) AS revenue").
+		Where("YEAR(created_at) BETWEEN YEAR(CURDATE()) - 7 AND YEAR(CURDATE())").
+		Where("canceled_reason = ''").
+		Group("YEAR(created_at)").
+		Order("YEAR(created_at)").
+		Scan(&yearlyRevenue).Error
+	if err != nil {
+		return 0, 0, 0, nil, nil, nil, nil, err
+	}
+
+	return totalRevenue, totalOrder, totalUser, top3Order, monthlyRevenue, weeklyRevenue, yearlyRevenue, nil
 }

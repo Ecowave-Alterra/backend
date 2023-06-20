@@ -13,3 +13,7 @@ type WeeklyRevenue struct {
 	Day     string
 	Revenue float64
 }
+type YearlyRevenue struct {
+	Year    string
+	Revenue float64
+}
