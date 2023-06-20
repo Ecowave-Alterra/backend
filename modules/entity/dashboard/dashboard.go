@@ -8,3 +8,8 @@ type MonthlyRevenue struct {
 	Month   string
 	Revenue float64
 }
+
+type WeeklyRevenue struct {
+	Day     string
+	Revenue float64
+}

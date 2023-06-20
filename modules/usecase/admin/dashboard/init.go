@@ -6,7 +6,7 @@ import (
 )
 
 type DashboardUsecase interface {
-	GetDashboard(filter string) (int64, int64, int64, *[]de.FavouriteProducts, *[]de.MonthlyRevenue, error)
+	GetDashboard(filter string) (int64, int64, int64, *[]de.FavouriteProducts, *[]de.MonthlyRevenue, *[]de.WeeklyRevenue, error)
 }
 
 type dashboardUsecase struct {
