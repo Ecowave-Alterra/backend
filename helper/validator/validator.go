@@ -1,10 +1,10 @@
 package validator
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/go-playground/validator"
-	"github.com/labstack/echo/v4"
 )
 
 func Validation(request interface{}) error {
@@ -25,7 +25,7 @@ func Validation(request interface{}) error {
 					message = fmt.Sprintf("%s tidak valid", e.Field())
 				}
 			}
-			return echo.NewHTTPError(422, message)
+			return errors.New(message)
 		}
 	}
 	return nil
