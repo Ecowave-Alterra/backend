@@ -6,7 +6,7 @@ import (
 )
 
 type DashboardRepo interface {
-	GetDashboard(filter string) (int64, int64, int64, *[]de.FavouriteProducts, error)
+	GetDashboard(filter string) (int64, int64, int64, *[]de.FavouriteProducts, *[]de.MonthlyRevenue, error)
 }
 
 type dashboardRepo struct {
