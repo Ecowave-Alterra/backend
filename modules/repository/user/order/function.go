@@ -31,13 +31,13 @@ func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize i
 			if err != nil {
 				return nil, 0, err
 			}
-			err = or.db.Select("product_image_url").Where("product_id = ?", product.ID).First(&pImg).Error
+			err = or.db.Select("product_image_url").Where("product_id = ?", product.ProductId).First(&pImg).Error
 			if err != nil {
 				return nil, 0, err
 			}
 
 			od := eo.OrderDetail{
-				ProductId:       product.ID,
+				ProductId:       product.ProductId,
 				ProductName:     td.ProductName,
 				Qty:             td.Qty,
 				SubTotalPrice:   td.SubTotalPrice,
