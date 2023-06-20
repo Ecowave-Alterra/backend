@@ -4,6 +4,7 @@ import (
 	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	re "github.com/berrylradianh/ecowave-go/modules/entity/review"
 	te "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
+	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
 func (rr *reviewRepo) GetAllProducts(products *[]pe.Product) ([]pe.Product, error) {
@@ -49,6 +50,22 @@ func (rr *reviewRepo) GetAllTransactionDetails(productID string, transactionDeta
 	}
 
 	return *transactionDetails, nil
+}
+
+func (rr *reviewRepo) GetTransactionByID(transactionID string, transaction *te.Transaction) (te.Transaction, error) {
+	if err := rr.db.Where("id = ?", transactionID).First(&transaction).Error; err != nil {
+		return *transaction, err
+	}
+
+	return *transaction, nil
+}
+
+func (rr *reviewRepo) GetUserByID(userID string, user *ue.User) (ue.User, error) {
+	if err := rr.db.Preload("UserDetail").Where("id = ?", userID).First(&user).Error; err != nil {
+		return *user, err
+	}
+
+	return *user, nil
 }
 
 func (rr *reviewRepo) GetAllReviewByID(reviewID string, review *re.Review) (re.Review, error) {

@@ -4,6 +4,7 @@ import (
 	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	re "github.com/berrylradianh/ecowave-go/modules/entity/review"
 	te "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
+	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
 func (rc *reviewUsecase) GetAllProducts(products *[]pe.Product) ([]pe.Product, error) {
@@ -24,6 +25,14 @@ func (rc *reviewUsecase) GetAllProductByCategory(category string, product *[]pe.
 
 func (rc *reviewUsecase) GetAllTransactionDetails(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error) {
 	return rc.reviewRepo.GetAllTransactionDetails(productID, transactionDetails)
+}
+
+func (rc reviewUsecase) GetTransactionByID(transactionID string, transaction *te.Transaction) (te.Transaction, error) {
+	return rc.reviewRepo.GetTransactionByID(transactionID, transaction)
+}
+
+func (rc reviewUsecase) GetUserByID(userID string, user *ue.User) (ue.User, error) {
+	return rc.reviewRepo.GetUserByID(userID, user)
 }
 
 func (rc *reviewUsecase) GetAllReviewByID(reviewID string, review *re.Review) (re.Review, error) {

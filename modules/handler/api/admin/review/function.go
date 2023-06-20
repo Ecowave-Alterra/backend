@@ -2,11 +2,13 @@ package review
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	re "github.com/berrylradianh/ecowave-go/modules/entity/review"
 	te "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
+	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 	"github.com/labstack/echo/v4"
 )
 
@@ -71,6 +73,9 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 
 	var review re.Review
 	var reviewResponses []re.ReviewResponse
+	var transaction te.Transaction
+	var product pe.Product
+	var user ue.User
 	for _, td := range transactionDetails {
 		if fmt.Sprint(td.RatingProductId) != "" {
 			review, err = rh.reviewUsecase.GetAllReviewByID(fmt.Sprint(td.RatingProductId), &review)
@@ -81,13 +86,43 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 				})
 			}
 
+			log.Println(td.TransactionId)
+			transaction, err := rh.reviewUsecase.GetTransactionByID(fmt.Sprint(td.TransactionId), &transaction)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"Message": "Gagal mengambil data transaksi",
+					"Status":  http.StatusInternalServerError,
+				})
+			}
+
+			product, err := rh.reviewUsecase.GetProductByID(fmt.Sprint(td.ProductId), &product)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"Message": "Gagal mengambil data produk",
+				})
+			}
+
+			user, err := rh.reviewUsecase.GetUserByID(fmt.Sprint(transaction.UserId), &user)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"Message": "Gagal mengambil data user",
+					"Status":  http.StatusInternalServerError,
+				})
+			}
+
 			reviewResponse := re.ReviewResponse{
-				TransactionID: td.TransactionId,
-				Rating:        review.Rating,
-				Comment:       review.Comment,
-				CommentAdmin:  review.CommentAdmin,
-				PhotoUrl:      review.PhotoUrl,
-				VideoUrl:      review.VideoUrl,
+				TransactionID:    fmt.Sprint(td.TransactionId),
+				Name:             user.Username,
+				ProfilePhoto:     user.UserDetail.ProfilePhoto,
+				ProductName:      product.Name,
+				ProductCategory:  product.ProductCategory.Category,
+				CommentUser:      review.Comment,
+				CommentAdmin:     review.CommentAdmin,
+				PhotoUrl:         review.PhotoUrl,
+				VideoUrl:         review.VideoUrl,
+				AvgRating:        product.Rating,
+				ExpeditionRating: transaction.ExpeditionRating,
+				ProductRating:    review.Rating,
 			}
 
 			reviewResponses = append(reviewResponses, reviewResponse)

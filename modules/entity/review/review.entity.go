@@ -21,10 +21,16 @@ type GetAllReviewResponse struct {
 }
 
 type ReviewResponse struct {
-	TransactionID uint
-	Rating        float64
-	Comment       string
-	CommentAdmin  string
-	PhotoUrl      string
-	VideoUrl      string
+	TransactionID    string
+	Name             string
+	ProfilePhoto     string
+	ProductName      string
+	ProductCategory  string
+	CommentUser      string
+	CommentAdmin     string
+	PhotoUrl         string
+	VideoUrl         string
+	AvgRating        float64
+	ExpeditionRating float32
+	ProductRating    float64
 }
