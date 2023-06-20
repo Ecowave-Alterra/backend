@@ -3,7 +3,9 @@ package review
 import (
 	"fmt"
 	"log"
+	"math"
 	"net/http"
+	"strconv"
 
 	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	re "github.com/berrylradianh/ecowave-go/modules/entity/review"
@@ -14,10 +16,35 @@ import (
 
 func (rh *ReviewHandler) GetAllReview(c echo.Context) error {
 	var products []pe.Product
-	products, err := rh.reviewUsecase.GetAllProducts(&products)
+
+	pageParam := c.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	pageSize := 10
+	offset := (page - 1) * pageSize
+
+	products, total, err := rh.reviewUsecase.GetAllProducts(&products, offset, pageSize)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": "Gagal mengambil data produk",
+		})
+	}
+
+	if len(products) == 0 {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Belum ada list produk",
+			"Status":  http.StatusNotFound,
+		})
+	}
+
+	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+	if page > totalPages {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Halaman Tidak Ditemukan",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
@@ -25,7 +52,7 @@ func (rh *ReviewHandler) GetAllReview(c echo.Context) error {
 	var transactionDetails []te.TransactionDetail
 	var reviewResponses []re.GetAllReviewResponse
 	for _, product := range products {
-		transactionDetails, err := rh.reviewUsecase.GetAllTransactionDetails(fmt.Sprint(product.ID), &transactionDetails)
+		transactionDetails, err := rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ID), &transactionDetails)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Gagal mengambil data transaksi detail produk",
@@ -55,19 +82,46 @@ func (rh *ReviewHandler) GetAllReview(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message": "Berhasil mengambil data review produk",
-		"Reviews": reviewResponses,
+		"Message":   "Berhasil mengambil data review produk",
+		"Reviews":   reviewResponses,
+		"Page":      page,
+		"TotalPage": totalPages,
+		"Status":    http.StatusOK,
 	})
 }
 
 func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 	productID := c.Param("id")
 
+	pageParam := c.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	pageSize := 10
+	offset := (page - 1) * pageSize
+
 	var transactionDetails []te.TransactionDetail
-	transactionDetails, err := rh.reviewUsecase.GetAllTransactionDetails(fmt.Sprint(productID), &transactionDetails)
+	transactionDetails, total, err := rh.reviewUsecase.GetAllTransactionDetail(fmt.Sprint(productID), &transactionDetails, offset, pageSize)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"Message": "Gagal mengambil data transaksi detail produk",
+		})
+	}
+
+	if len(transactionDetails) == 0 {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Belum ada list detail transaksi",
+			"Status":  http.StatusNotFound,
+		})
+	}
+
+	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+	if page > totalPages {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Halaman Tidak Ditemukan",
+			"Status":  http.StatusNotFound,
 		})
 	}
 
@@ -87,7 +141,7 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 			}
 
 			log.Println(td.TransactionId)
-			transaction, err := rh.reviewUsecase.GetTransactionByID(fmt.Sprint(td.TransactionId), &transaction)
+			transaction, err := rh.reviewUsecase.GetTransactionByID(td.TransactionId, &transaction)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 					"Message": "Gagal mengambil data transaksi",
@@ -137,8 +191,11 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message": "Berhasil mengambil data review produk",
-		"Reviews": reviewResponses,
+		"Message":   "Berhasil mengambil data review produk",
+		"Reviews":   reviewResponses,
+		"Page":      page,
+		"TotalPage": totalPages,
+		"Status":    http.StatusOK,
 	})
 }
 
@@ -158,7 +215,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		}
 
 		var transactionDetails []te.TransactionDetail
-		transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetails(fmt.Sprint(productID), &transactionDetails)
+		transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(productID), &transactionDetails)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Gagal mengambil data transaksi detail produk",
@@ -206,7 +263,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		var transactionDetails []te.TransactionDetail
 		var reviewResponses []re.GetAllReviewResponse
 		for _, product := range products {
-			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetails(fmt.Sprint(product.ID), &transactionDetails)
+			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ID), &transactionDetails)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 					"Message": "Gagal mengambil data transaksi detail produk",
@@ -256,7 +313,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		var transactionDetails []te.TransactionDetail
 		var reviewResponses []re.GetAllReviewResponse
 		for _, product := range products {
-			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetails(fmt.Sprint(product.ID), &transactionDetails)
+			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ID), &transactionDetails)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 					"Message": "Gagal mengambil data transaksi detail produk",

@@ -7,8 +7,8 @@ import (
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
-func (rc *reviewUsecase) GetAllProducts(products *[]pe.Product) ([]pe.Product, error) {
-	return rc.reviewRepo.GetAllProducts(products)
+func (rc *reviewUsecase) GetAllProducts(products *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error) {
+	return rc.reviewRepo.GetAllProducts(products, offset, pageSize)
 }
 
 func (rc *reviewUsecase) GetProductByID(productId string, product *pe.Product) (pe.Product, error) {
@@ -23,11 +23,15 @@ func (rc *reviewUsecase) GetAllProductByCategory(category string, product *[]pe.
 	return rc.reviewRepo.GetAllProductByCategory(category, product)
 }
 
-func (rc *reviewUsecase) GetAllTransactionDetails(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error) {
-	return rc.reviewRepo.GetAllTransactionDetails(productID, transactionDetails)
+func (rc *reviewUsecase) GetAllTransactionDetailsNoPagination(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error) {
+	return rc.reviewRepo.GetAllTransactionDetailsNoPagination(productID, transactionDetails)
 }
 
-func (rc reviewUsecase) GetTransactionByID(transactionID string, transaction *te.Transaction) (te.Transaction, error) {
+func (rc *reviewUsecase) GetAllTransactionDetail(productID string, transactionDetails *[]te.TransactionDetail, offset, pageSize int) ([]te.TransactionDetail, int64, error) {
+	return rc.reviewRepo.GetAllTransactionDetail(productID, transactionDetails, offset, pageSize)
+}
+
+func (rc reviewUsecase) GetTransactionByID(transactionID uint, transaction *te.Transaction) (te.Transaction, error) {
 	return rc.reviewRepo.GetTransactionByID(transactionID, transaction)
 }
 

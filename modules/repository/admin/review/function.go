@@ -5,14 +5,20 @@ import (
 	re "github.com/berrylradianh/ecowave-go/modules/entity/review"
 	te "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
+	"github.com/labstack/echo/v4"
 )
 
-func (rr *reviewRepo) GetAllProducts(products *[]pe.Product) ([]pe.Product, error) {
-	if err := rr.db.Preload("ProductCategory").Find(&products).Error; err != nil {
-		return nil, err
+func (rr *reviewRepo) GetAllProducts(products *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error) {
+	var count int64
+	if err := rr.db.Model(&pe.Product{}).Count(&count).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(500, err)
 	}
 
-	return *products, nil
+	if err := rr.db.Preload("ProductCategory").Offset(offset).Limit(pageSize).Find(&products).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(404, err)
+	}
+
+	return *products, count, nil
 }
 
 func (rr *reviewRepo) GetProductByID(productId string, product *pe.Product) (pe.Product, error) {
@@ -44,7 +50,7 @@ func (rr *reviewRepo) GetAllProductByCategory(category string, product *[]pe.Pro
 	return *product, nil
 }
 
-func (rr *reviewRepo) GetAllTransactionDetails(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error) {
+func (rr *reviewRepo) GetAllTransactionDetailsNoPagination(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error) {
 	if err := rr.db.Where("product_id = ?", productID).Find(&transactionDetails).Error; err != nil {
 		return nil, err
 	}
@@ -52,7 +58,20 @@ func (rr *reviewRepo) GetAllTransactionDetails(productID string, transactionDeta
 	return *transactionDetails, nil
 }
 
-func (rr *reviewRepo) GetTransactionByID(transactionID string, transaction *te.Transaction) (te.Transaction, error) {
+func (rr *reviewRepo) GetAllTransactionDetail(productID string, transactionDetails *[]te.TransactionDetail, offset, pageSize int) ([]te.TransactionDetail, int64, error) {
+	var count int64
+	if err := rr.db.Model(&te.TransactionDetail{}).Count(&count).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(500, err)
+	}
+
+	if err := rr.db.Where("product_id = ?", productID).Offset(offset).Limit(pageSize).Find(&transactionDetails).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(404, err)
+	}
+
+	return *transactionDetails, count, nil
+}
+
+func (rr *reviewRepo) GetTransactionByID(transactionID uint, transaction *te.Transaction) (te.Transaction, error) {
 	if err := rr.db.Where("id = ?", transactionID).First(&transaction).Error; err != nil {
 		return *transaction, err
 	}
