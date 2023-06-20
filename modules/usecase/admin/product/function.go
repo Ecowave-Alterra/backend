@@ -14,7 +14,7 @@ func (pc *productUseCase) CreateProduct(product *pe.Product) error {
 			return err
 		}
 		if !exists {
-			product.ProductID = productId
+			product.ProductId = productId
 			break
 		}
 	}
@@ -34,7 +34,7 @@ func (pc *productUseCase) GetAllProductNoPagination(products *[]pe.Product) ([]p
 	return pc.productRepo.GetAllProductNoPagination(products)
 }
 
-func (pc *productUseCase) GetProductByID(productId string, product *pe.Product) (pe.Product, error) {
+func (pc *productUseCase) GetProductByID(productId string, product *pe.Product) (*pe.Product, int64, float64, error) {
 	return pc.productRepo.GetProductByID(productId, product)
 }
 
@@ -56,10 +56,6 @@ func (pc *productUseCase) DeleteProduct(productId string, product *pe.Product) e
 
 func (pc *productUseCase) DeleteProductImage(productID string, productImages *[]pe.ProductImage) error {
 	return pc.productRepo.DeleteProductImage(productID, productImages)
-}
-
-func (pc *productUseCase) DeleteProductImageByID(ProductImageID uint, productImage *pe.ProductImage) error {
-	return pc.productRepo.DeleteProductImageByID(ProductImageID, productImage)
 }
 
 func (pc *productUseCase) SearchProduct(search, filter string, offset, pageSize int) (*[]pe.Product, int64, error) {

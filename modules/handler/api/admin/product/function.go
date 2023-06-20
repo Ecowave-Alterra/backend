@@ -59,10 +59,11 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 		}
 
 		productResponse := ep.ProductResponse{
-			ProductID:       product.ProductID,
+			ProductId:       product.ProductId,
 			Name:            product.Name,
 			Category:        product.ProductCategory.Category,
 			Stock:           product.Stock,
+			Weight:          product.Weight,
 			Price:           product.Price,
 			Status:          product.Status,
 			Rating:          product.Rating,
@@ -82,10 +83,10 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 }
 
 func (h *ProductHandler) GetProductByID(c echo.Context) error {
-	var product ep.Product
+	var product *ep.Product
 	productID := c.Param("id")
 
-	product, err := h.productUseCase.GetProductByID(productID, &product)
+	product, totalOrder, totalRevenue, err := h.productUseCase.GetProductByID(productID, product)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
@@ -100,10 +101,13 @@ func (h *ProductHandler) GetProductByID(c echo.Context) error {
 	}
 
 	productResponse := ep.ProductResponse{
-		ProductID:       product.ProductID,
+		ProductId:       product.ProductId,
 		Name:            product.Name,
 		Category:        product.ProductCategory.Category,
 		Stock:           product.Stock,
+		Weight:          product.Weight,
+		TotalOrders:     uint(totalOrder),
+		TotalRevenue:    totalRevenue,
 		Price:           product.Price,
 		Status:          product.Status,
 		Rating:          product.Rating,
@@ -166,10 +170,11 @@ func (h *ProductHandler) SearchProduct(c echo.Context) error {
 			}
 
 			productResponse := ep.ProductResponse{
-				ProductID:       product.ProductID,
+				ProductId:       product.ProductId,
 				Name:            product.Name,
 				Category:        product.ProductCategory.Category,
 				Stock:           product.Stock,
+				Weight:          product.Weight,
 				Price:           product.Price,
 				Status:          product.Status,
 				Rating:          product.Rating,
@@ -216,6 +221,23 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 		})
 	} else {
 		product.Name = name
+	}
+
+	weightStr := c.FormValue("Weight")
+	if weightStr == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Masukkan weight",
+			"Status":  http.StatusBadRequest,
+		})
+	} else {
+		weight, err := strconv.ParseFloat(weightStr, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": "Invalid weight value",
+				"Status":  http.StatusBadRequest,
+			})
+		}
+		product.Weight = weight
 	}
 
 	stockStr := c.FormValue("Stock")
@@ -306,7 +328,8 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 			PhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
 
 			productImage := ep.ProductImage{
-				ProductId:       product.ID,
+				// ProductId:       product.ID,
+				ProductId:       product.ProductId,
 				ProductImageUrl: PhotoUrl,
 			}
 			err = h.productUseCase.CreateProductImage(&productImage)
@@ -343,7 +366,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	var req ep.ProductRequest
 	var product ep.Product
 
-	productBefore, err := h.productUseCase.GetProductByID(productId, &product)
+	productBefore, _, _, err := h.productUseCase.GetProductByID(productId, &product)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
@@ -364,6 +387,20 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 			})
 		}
 		req.ProductCategoryId = uint(productCategoryID)
+	}
+
+	weightStr := c.FormValue("Weight")
+	if weightStr == "" {
+		req.Weight = productBefore.Weight
+	} else {
+		weight, err := strconv.ParseFloat(weightStr, 64)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"Message": "Invalid weight value",
+				"Status":  http.StatusBadRequest,
+			})
+		}
+		req.Weight = weight
 	}
 
 	name := c.FormValue("Name")
@@ -432,7 +469,8 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	}
 
 	var productImages []ep.ProductImage
-	err = h.productUseCase.DeleteProductImage(fmt.Sprint(product.ID), &productImages)
+	// err = h.productUseCase.DeleteProductImage(fmt.Sprint(product.ID), &productImages)
+	err = h.productUseCase.DeleteProductImage(fmt.Sprint(product.ProductId), &productImages)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
@@ -470,7 +508,8 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 			PhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
 
 			productImage := ep.ProductImage{
-				ProductId:       product.ID,
+				// ProductId:       product.ID,
+				ProductId:       product.ProductId,
 				ProductImageUrl: PhotoUrl,
 			}
 			err = h.productUseCase.CreateProductImage(&productImage)
@@ -510,8 +549,8 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 	productId := c.Param("id")
 
-	var product ep.Product
-	product, err := h.productUseCase.GetProductByID(productId, &product)
+	var product *ep.Product
+	product, _, _, err := h.productUseCase.GetProductByID(productId, product)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
@@ -529,18 +568,9 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 				"Status":  http.StatusInternalServerError,
 			})
 		}
-
-		err = h.productUseCase.DeleteProductImageByID(image.ID, &image)
-		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
-			})
-		}
 	}
 
-	err = h.productUseCase.DeleteProduct(productId, &product)
+	err = h.productUseCase.DeleteProduct(productId, product)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
@@ -567,12 +597,13 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 		})
 	}
 
-	csvHeader := []string{"Product_id", "Name", "Category", "Stock", "Price", "Status", "Rating", "Description", "ProductImageUrl"}
+	csvHeader := []string{"Product_id", "Name", "Category", "Stock", "Weight", "Price", "Status", "Rating", "Description", "ProductImageUrl"}
 
 	var productImage ep.ProductImage
 	records := make([][]string, 0)
 	for _, product := range products {
-		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
+		// productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
+		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ProductId), &productImage)
 		if err != nil {
 			code, msg := cs.CustomStatus(err.Error())
 			return c.JSON(code, echo.Map{
@@ -587,10 +618,11 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 		}
 
 		record := []string{
-			product.ProductID,
+			product.ProductId,
 			product.Name,
 			product.ProductCategory.Category,
 			strconv.Itoa(int(product.Stock)),
+			strconv.FormatFloat(product.Weight, 'f', -1, 64),
 			strconv.FormatFloat(product.Price, 'f', -1, 64),
 			product.Status,
 			strconv.FormatFloat(product.Rating, 'f', -1, 64),
