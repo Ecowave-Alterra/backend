@@ -9,6 +9,10 @@ import (
 	authRepo "github.com/berrylradianh/ecowave-go/modules/repository/auth"
 	authUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/auth"
 
+	dashboardHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/dashboard"
+	dashboardRepo "github.com/berrylradianh/ecowave-go/modules/repository/admin/dashboard"
+	dashboardUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/admin/dashboard"
+
 	informationHandlerAdmin "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/information"
 	informationRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/information"
 	informationUsecaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/information"
@@ -83,6 +87,10 @@ func StartApp() *echo.Echo {
 	orderUsecaseUser := orderUsecaseUser.New(orderRepoUser)
 	orderHandlerUser := orderHandlerUser.New(orderUsecaseUser)
 
+	dashboardRepo := dashboardRepo.New(mysql.DB)
+	dashboardUsecase := dashboardUsecase.New(dashboardRepo)
+	dashboardHandler := dashboardHandler.New(dashboardUsecase)
+
 	handler := common.Handler{
 		ProductHandler:          productHandler,
 		ProfileHandler:          profileHandler,
@@ -93,6 +101,7 @@ func StartApp() *echo.Echo {
 		TransactionHandlerUser:  transactionHandlerUser,
 		OrderHandlerUser:        orderHandlerUser,
 		ProductCategoryHandler:  productCategoryHandler,
+		DashboardHandler:        dashboardHandler,
 	}
 
 	router := routes.StartRoute(handler)
