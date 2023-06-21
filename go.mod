@@ -18,10 +18,8 @@ require (
 )
 
 require (
-	cloud.google.com/go/storage v1.30.1
 	github.com/midtrans/midtrans-go v1.3.6
-	google.golang.org/api v0.114.0
-	gorm.io/driver/mysql v1.5.1
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
 require (
@@ -57,5 +55,6 @@ require (
 	google.golang.org/genproto v0.0.0-20230320184635-7606e756e683 // indirect
 	google.golang.org/grpc v1.53.0 // indirect
 	google.golang.org/protobuf v1.29.1 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )

@@ -8,6 +8,9 @@ import (
 type AuthUsecase interface {
 	Login(request *ue.LoginRequest) (*ue.User, string, error)
 	Register(user *ue.RegisterRequest) error
+	ForgotPassword(request ue.ForgotPassRequest) (string, error)
+	VerifOtp(request ue.VerifOtp) error
+	ChangePassword(request ue.RecoveryRequest) error
 }
 
 type authUsecase struct {

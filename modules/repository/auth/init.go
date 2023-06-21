@@ -8,6 +8,11 @@ import (
 type AuthRepo interface {
 	GetUserByEmail(email string) (*ue.User, error)
 	CreateUser(user *ue.RegisterRequest) error
+	UserRecovery(userId uint, codeVer string) error
+	UpdateUserRecovery(userId uint, codeVer string) error
+	GetUserRecovery(userId uint) (ue.UserRecovery, error)
+	ChangePassword(user ue.RecoveryRequest) error
+	DeleteUserRecovery(userId uint) error
 }
 
 type authRepo struct {

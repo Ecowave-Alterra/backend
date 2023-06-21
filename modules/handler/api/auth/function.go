@@ -109,3 +109,80 @@ func (ah *AuthHandler) LoginAdmin() echo.HandlerFunc {
 		})
 	}
 }
+
+func (ah *AuthHandler) ForgotPassword() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		var request ue.ForgotPassRequest
+		if err := c.Bind(&request); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+				"Status":  http.StatusBadRequest,
+				"Message": err.Error(),
+			})
+		}
+
+		email, err := ah.authUsecase.ForgotPassword(request)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"Status":  http.StatusInternalServerError,
+				"Message": err.Error(),
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Status":  http.StatusOK,
+			"Message": "Berhasil mengirim kode otp",
+			"Email":   email,
+		})
+	}
+}
+func (ah *AuthHandler) VerifOtp() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		var request ue.VerifOtp
+		if err := c.Bind(&request); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+				"Status":  http.StatusBadRequest,
+				"Message": err.Error(),
+			})
+		}
+
+		err := ah.authUsecase.VerifOtp(request)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"Status":  http.StatusInternalServerError,
+				"Message": err.Error(),
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Status":  http.StatusOK,
+			"Message": "Berhasil memverifikasi",
+		})
+	}
+}
+func (ah *AuthHandler) ChangePassword() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		var request ue.RecoveryRequest
+		if err := c.Bind(&request); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, map[string]interface{}{
+				"Status":  http.StatusBadRequest,
+				"Message": err.Error(),
+			})
+		}
+
+		err := ah.authUsecase.ChangePassword(request)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"Status":  http.StatusInternalServerError,
+				"Message": err.Error(),
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Status":  http.StatusOK,
+			"Message": "Berhasil mengganti password",
+		})
+	}
+}

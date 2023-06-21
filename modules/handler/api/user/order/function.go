@@ -18,7 +18,7 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 
@@ -34,7 +34,7 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
