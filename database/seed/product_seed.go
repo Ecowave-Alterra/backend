@@ -10,6 +10,7 @@ func CreateProduct() []*productEntity.Product {
 	products := []*productEntity.Product{
 		{
 			ProductId:         "a3325f33-e01a-4e40-9ca7-5d84c4337094",
+			Name:              "Product Name 1",
 			ProductCategoryId: 1,
 			Stock:             10,
 			Weight:            3000,
