@@ -27,7 +27,6 @@ type Order struct {
 	PaymentMethod      string
 	PaymentStatus      string
 	ExpeditionName     string
-	ExpeditionStatus   string
 	VoucherId          uint
 	Discount           float64
 	TotalPrice         float64

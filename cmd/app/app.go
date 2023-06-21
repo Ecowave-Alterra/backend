@@ -9,6 +9,10 @@ import (
 	authRepo "github.com/berrylradianh/ecowave-go/modules/repository/auth"
 	authUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/auth"
 
+	dashboardHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/dashboard"
+	dashboardRepo "github.com/berrylradianh/ecowave-go/modules/repository/admin/dashboard"
+	dashboardUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/admin/dashboard"
+
 	informationHandlerAdmin "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/information"
 	informationRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/information"
 	informationUsecaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/information"
@@ -37,6 +41,14 @@ import (
 	orderRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/order"
 	orderUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/order"
 
+	profileHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/profile"
+	profileRepo "github.com/berrylradianh/ecowave-go/modules/repository/user/profile"
+	profileUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/user/profile"
+
+	ecommerceHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/ecommerce"
+	ecommerceRepo "github.com/berrylradianh/ecowave-go/modules/repository/user/ecommerce"
+	ecommerceUseCase "github.com/berrylradianh/ecowave-go/modules/usecase/user/ecommerce"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -59,6 +71,14 @@ func StartApp() *echo.Echo {
 	productUsecase := productUseCase.New(productRepo)
 	productHandler := productHandler.New(productUsecase)
 
+	ecommerceRepo := ecommerceRepo.New(mysql.DB)
+	ecommerceUsecase := ecommerceUseCase.New(ecommerceRepo)
+	ecommerceHandler := ecommerceHandler.New(ecommerceUsecase)
+
+	profileRepo := profileRepo.New(mysql.DB)
+	profileUsecase := profileUsecase.New(profileRepo)
+	profileHandler := profileHandler.New(profileUsecase)
+
 	informationRepoUser := informationRepoUser.New(mysql.DB)
 	informationUsecaseUser := informationUsecaseUser.New(informationRepoUser)
 	informationHandlerUser := informationHandlerUser.New(informationUsecaseUser)
@@ -75,7 +95,13 @@ func StartApp() *echo.Echo {
 	orderUsecaseUser := orderUsecaseUser.New(orderRepoUser)
 	orderHandlerUser := orderHandlerUser.New(orderUsecaseUser)
 
+	dashboardRepo := dashboardRepo.New(mysql.DB)
+	dashboardUsecase := dashboardUsecase.New(dashboardRepo)
+	dashboardHandler := dashboardHandler.New(dashboardUsecase)
+
 	handler := common.Handler{
+		ProductHandler:          productHandler,
+		ProfileHandler:          profileHandler,
 		AuthHandler:             authHandler,
 		InformationHandlerAdmin: informationHandlerAdmin,
 		InformationHandlerUser:  informationHandlerUser,
@@ -83,7 +109,8 @@ func StartApp() *echo.Echo {
 		TransactionHandlerUser:  transactionHandlerUser,
 		OrderHandlerUser:        orderHandlerUser,
 		ProductCategoryHandler:  productCategoryHandler,
-		ProductHandler:          productHandler,
+		DashboardHandler:        dashboardHandler,
+		EcommerceHandler:        ecommerceHandler,
 	}
 
 	router := routes.StartRoute(handler)

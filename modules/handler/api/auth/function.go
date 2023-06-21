@@ -58,7 +58,7 @@ func (ah *AuthHandler) LoginUser() echo.HandlerFunc {
 		}
 
 		authResponse := ue.AuthResponse{
-			ID:    int(user.ID),
+			ID:    user.ID,
 			Email: user.Email,
 			Token: token,
 		}
@@ -97,7 +97,7 @@ func (ah *AuthHandler) LoginAdmin() echo.HandlerFunc {
 		}
 
 		authResponse := ue.AuthResponse{
-			ID:    int(user.ID),
+			ID:    user.ID,
 			Email: user.Email,
 			Token: token,
 		}

@@ -58,7 +58,7 @@ func (oh *OrderHandler) Tracking() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 
@@ -76,13 +76,11 @@ func (oh *OrderHandler) ConfirmOrder() echo.HandlerFunc {
 		co := eo.ConfirmOrder{}
 		c.Bind(&co)
 
-		id := co.TransactionId
-		err := oh.orderUsecase.ConfirmOrder(id)
+		err := oh.orderUsecase.ConfirmOrder(co)
 		if err != nil {
-
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 
@@ -104,7 +102,7 @@ func (oh *OrderHandler) CancelOrder() echo.HandlerFunc {
 
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 

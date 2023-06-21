@@ -17,7 +17,7 @@ func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize i
 	if err != nil {
 		return nil, 0, err
 	}
-	err = or.db.Preload("TransactionDetails").Where("status_transaction = ? AND user_id = ?", filter, idUser).Find(&transaction).Offset(offset).Limit(pageSize).Error
+	err = or.db.Preload("TransactionDetails").Preload("RatingProduct").Where("status_transaction = ? AND user_id = ?", filter, idUser).Find(&transaction).Offset(offset).Limit(pageSize).Error
 	if err != nil {
 		return nil, 0, err
 	}
@@ -36,7 +36,7 @@ func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize i
 				Qty:             td.Qty,
 				SubTotalPrice:   td.SubTotalPrice,
 				ProductImageUrl: pImg.ProductImageUrl,
-				RatingProductId: td.RatingProductId,
+				RatingProductId: uint(td.RatingProduct.Rating),
 			}
 			OrderDetail = append(OrderDetail, od)
 		}
@@ -59,7 +59,6 @@ func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize i
 			PaymentMethod:      val.PaymentMethod,
 			PaymentStatus:      val.PaymentStatus,
 			ExpeditionName:     val.ExpeditionName,
-			ExpeditionStatus:   val.ExpeditionStatus,
 			VoucherId:          val.VoucherId,
 			Discount:           val.Discount,
 			TotalPrice:         val.TotalPrice,
