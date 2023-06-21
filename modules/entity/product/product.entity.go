@@ -7,10 +7,10 @@ import (
 )
 
 type Product struct {
-	ProductId         string `gorm:"primarykey" json:"ProductId"`
-	CreatedAt         time.Time
-	UpdatedAt         *time.Time
-	DeletedAt         *gorm.DeletedAt
+	ProductId         string          `gorm:"primarykey" json:"ProductId"`
+	CreatedAt         time.Time       `json:"-"`
+	UpdatedAt         *time.Time      `json:"-"`
+	DeletedAt         *gorm.DeletedAt `json:"-"`
 	Name              string          `validate:"required,max=10"`
 	Stock             uint            `validate:"required"`
 	Price             float64         `validate:"required"`
