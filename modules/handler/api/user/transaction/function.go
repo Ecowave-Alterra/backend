@@ -27,7 +27,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 
@@ -52,7 +52,7 @@ func (th *TransactionHandler) MidtransNotifications() echo.HandlerFunc {
 
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 
@@ -75,7 +75,7 @@ func (th *TransactionHandler) GetPoint() echo.HandlerFunc {
 
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 
@@ -96,7 +96,7 @@ func (th *TransactionHandler) GetPaymentStatus() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 
@@ -127,7 +127,7 @@ func (th *TransactionHandler) GetVoucherUser() echo.HandlerFunc {
 
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
@@ -161,7 +161,7 @@ func (th *TransactionHandler) ShippingOptions() echo.HandlerFunc {
 
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 

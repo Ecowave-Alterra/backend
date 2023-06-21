@@ -25,7 +25,12 @@ func (tr *transactionRepo) CreateTransaction(transaction *et.Transaction) error 
 		}
 
 		stock := product.Stock - val.Qty
-		err = tr.db.Model(&ep.Product{}).Where("product_id = ?", val.ProductId).Update("stock", stock).Error
+		if stock == 0 {
+			err = tr.db.Model(&ep.Product{}).Where("product_id = ?", val.ProductId).Updates(ep.Product{Stock: stock, Status: "habis"}).Error
+		} else {
+			err = tr.db.Model(&ep.Product{}).Where("product_id = ?", val.ProductId).Update("stock", stock).Error
+		}
+
 		if err != nil {
 			return err
 		}
@@ -66,6 +71,18 @@ func (tr *transactionRepo) GetPaymentStatus(id string) (string, error) {
 	status := transaction.PaymentStatus
 
 	return status, nil
+
+}
+
+func (tr *transactionRepo) GetStock(id string) (uint, error) {
+	var product ep.Product
+
+	if err := tr.db.Where("product_id = ?", id).First(&product).Error; err != nil {
+		return 0, err
+	}
+	stock := product.Stock
+
+	return stock, nil
 
 }
 
