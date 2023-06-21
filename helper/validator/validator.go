@@ -21,6 +21,8 @@ func Validation(request interface{}) error {
 					message = fmt.Sprintf("Masukkan %s", e.Field())
 				} else if e.Tag() == "email" {
 					message = "Email yang anda masukkan tidak valid"
+				} else if e.Tag() == "max" && e.Field() == "Phone" {
+					message = "Nomor telepon tidak boleh lebih dari 13 digit"
 				} else if e.Field() == "Phone" || e.Tag() == "min" || e.Tag() == "max" || e.Tag() == "numeric" {
 					message = fmt.Sprintf("%s tidak valid", e.Field())
 				}

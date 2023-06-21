@@ -9,14 +9,12 @@ import (
 func CreateProduct() []*productEntity.Product {
 	products := []*productEntity.Product{
 		{
-			ProductId:         "859679ad-888b-41ac-a663-4a619acc4ae3",
+			ProductId:         "a3325f33-e01a-4e40-9ca7-5d84c4337094",
 			ProductCategoryId: 1,
-			Name:              "Product Name 1",
 			Stock:             10,
 			Weight:            3000,
 			Price:             30000,
 			Status:            "tersedia",
-			Rating:            0.00,
 			Description:       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
 			CreatedAt:         time.Now(),
 			UpdatedAt:         nil,
