@@ -37,7 +37,7 @@ func (pr *profileRepo) UpdateUserProfile(userRequest *ut.UserRequest, id int) er
 }
 
 func (pr *profileRepo) UpdateUserDetailProfile(userDetailRequest *ut.UserDetailRequest, id int) error {
-	if err := pr.db.Raw("UPDATE user_details SET name = ?, phone = ?, profile_photo_url = ? WHERE user_id = ?", userDetailRequest.Name, userDetailRequest.Phone, userDetailRequest.ProfilePhoto, id).Scan(&userDetailRequest).Error; err != nil {
+	if err := pr.db.Raw("UPDATE user_details SET name = ?, phone = ?, profile_photo = ? WHERE user_id = ?", userDetailRequest.Name, userDetailRequest.Phone, userDetailRequest.ProfilePhoto, id).Scan(&userDetailRequest).Error; err != nil {
 		return err
 	}
 
