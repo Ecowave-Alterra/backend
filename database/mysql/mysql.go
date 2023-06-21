@@ -25,7 +25,6 @@ func Init() {
 	InitialMigration()
 	seed.DBSeed(DB)
 }
-
 func InitDB() {
 	var err error
 

@@ -41,6 +41,10 @@ import (
 	orderRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/order"
 	orderUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/order"
 
+	profileHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/profile"
+	profileRepo "github.com/berrylradianh/ecowave-go/modules/repository/user/profile"
+	profileUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/user/profile"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -63,6 +67,10 @@ func StartApp() *echo.Echo {
 	productUsecase := productUseCase.New(productRepo)
 	productHandler := productHandler.New(productUsecase)
 
+	profileRepo := profileRepo.New(mysql.DB)
+	profileUsecase := profileUsecase.New(profileRepo)
+	profileHandler := profileHandler.New(profileUsecase)
+
 	informationRepoUser := informationRepoUser.New(mysql.DB)
 	informationUsecaseUser := informationUsecaseUser.New(informationRepoUser)
 	informationHandlerUser := informationHandlerUser.New(informationUsecaseUser)
@@ -84,6 +92,8 @@ func StartApp() *echo.Echo {
 	dashboardHandler := dashboardHandler.New(dashboardUsecase)
 
 	handler := common.Handler{
+		ProductHandler:          productHandler,
+		ProfileHandler:          profileHandler,
 		AuthHandler:             authHandler,
 		InformationHandlerAdmin: informationHandlerAdmin,
 		InformationHandlerUser:  informationHandlerUser,
@@ -91,7 +101,6 @@ func StartApp() *echo.Echo {
 		TransactionHandlerUser:  transactionHandlerUser,
 		OrderHandlerUser:        orderHandlerUser,
 		ProductCategoryHandler:  productCategoryHandler,
-		ProductHandler:          productHandler,
 		DashboardHandler:        dashboardHandler,
 	}
 
