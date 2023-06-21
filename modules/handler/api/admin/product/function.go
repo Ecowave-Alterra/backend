@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
 	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
@@ -597,46 +596,9 @@ func (h *ProductHandler) DownloadCSVFile(c echo.Context) error {
 		})
 	}
 
-	csvHeader := []string{"Product_id", "Name", "Category", "Stock", "Weight", "Price", "Status", "Rating", "Description", "ProductImageUrl"}
-
-	var productImage ep.ProductImage
-	records := make([][]string, 0)
-	for _, product := range products {
-		// productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ID), &productImage)
-		productImages, err := h.productUseCase.GetProductImageURLById(fmt.Sprint(product.ProductId), &productImage)
-		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
-			})
-		}
-
-		var imageURLs []string
-		for _, image := range productImages {
-			imageURLs = append(imageURLs, image.ProductImageUrl)
-		}
-
-		record := []string{
-			product.ProductId,
-			product.Name,
-			product.ProductCategory.Category,
-			strconv.Itoa(int(product.Stock)),
-			strconv.FormatFloat(product.Weight, 'f', -1, 64),
-			strconv.FormatFloat(product.Price, 'f', -1, 64),
-			product.Status,
-			strconv.FormatFloat(product.Rating, 'f', -1, 64),
-			product.Description,
-			strings.Join(imageURLs, ", "),
-		}
-
-		records = append(records, record)
-	}
-
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Message": "Berhasil membuat file CSV",
 		"Status":  http.StatusOK,
-		"Header":  csvHeader,
-		"Records": records,
+		"Data":    products,
 	})
 }
