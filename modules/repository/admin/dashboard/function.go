@@ -6,7 +6,7 @@ import (
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
-func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de.FavouriteProducts, *[]de.MonthlyRevenue, *[]de.WeeklyRevenue, *[]de.YearlyRevenue, error) {
+func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de.FavouriteProducts, *[]de.MonthlyRevenue, *[]de.WeeklyRevenue, *[]de.YearlyRevenue, *[]de.TopReviews, error) {
 	var totalRevenue int64
 	var totalOrder int64
 	var totalUser int64
@@ -14,23 +14,23 @@ func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de
 	var yearlyRevenue *[]de.YearlyRevenue
 	var weeklyRevenue *[]de.WeeklyRevenue
 	var top3Order *[]de.FavouriteProducts
-	// var top3Review int64
+	var top3Review *[]de.TopReviews
 
 	err := dr.db.Model(&te.Transaction{}).Select("COALESCE(SUM(total_price), 0) as total_income").
 		Where("transactions.canceled_reason = ''").
 		Row().Scan(&totalRevenue)
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, nil, err
 	}
 
 	err = dr.db.Model(&te.Transaction{}).Count(&totalOrder).Error
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, nil, err
 	}
 
 	err = dr.db.Model(&ue.User{}).Where("role_id = ?", 2).Count(&totalUser).Error
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, nil, err
 	}
 
 	// query := "SELECT p.Name, SUM(td.Qty) AS TotalQty
@@ -51,7 +51,7 @@ func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de
 		Order("TotalOrders DESC").
 		Limit(3).Scan(&top3Order).Error
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, nil, err
 	}
 
 	// query := "SELECT CASE MONTH(transactions.created_at)
@@ -92,7 +92,7 @@ func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de
 		Order("MONTH(transactions.created_at)").
 		Scan(&monthlyRevenue).Error
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, nil, err
 	}
 
 	// query := "SELECT DAYNAME(created_at) AS day, SUM(total_price) AS revenue
@@ -106,7 +106,7 @@ func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de
 		Order("DAYOFWEEK(created_at)").
 		Scan(&weeklyRevenue).Error
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, nil, err
 	}
 
 	// SELECT YEAR(transactions.created_at) AS year, SUM(transactions.total_price) AS revenue
@@ -122,8 +122,20 @@ func (dr *dashboardRepo) GetDashboard(filter string) (int64, int64, int64, *[]de
 		Order("YEAR(created_at)").
 		Scan(&yearlyRevenue).Error
 	if err != nil {
-		return 0, 0, 0, nil, nil, nil, nil, err
+		return 0, 0, 0, nil, nil, nil, nil, nil, err
 	}
 
-	return totalRevenue, totalOrder, totalUser, top3Order, monthlyRevenue, weeklyRevenue, yearlyRevenue, nil
+	err = dr.db.Model(&te.Transaction{}).
+		Select("products.name AS Name, COUNT(transaction_details.qty) AS TotalReviews").
+		Joins("JOIN transaction_details ON transactions.id = transaction_details.transaction_id").
+		Joins("JOIN rating_products ON rating_products.transaction_detail_id = transaction_details.id").
+		Joins("JOIN products ON products.product_id = transaction_details.product_id").
+		Group("products.name").
+		Order("TotalReviews DESC").
+		Limit(3).Scan(&top3Review).Error
+	if err != nil {
+		return 0, 0, 0, nil, nil, nil, nil, nil, err
+	}
+
+	return totalRevenue, totalOrder, totalUser, top3Order, monthlyRevenue, weeklyRevenue, yearlyRevenue, top3Review, nil
 }
