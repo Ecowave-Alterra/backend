@@ -15,11 +15,11 @@ func CreateProductImage() []*productEntity.ProductImage {
 			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 		{
-			ProductId:       "859679ad-888b-41ac-a663-4a619acc4ae3",
+			ProductId:       "ba08266c-0926-484e-a610-c2a48ac6179d",
 			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 		{
-			ProductId:       "859679ad-888b-41ac-a663-4a619acc4ae3",
+			ProductId:       "ba08266c-0926-484e-a610-c2a48ac6179d",
 			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 	}

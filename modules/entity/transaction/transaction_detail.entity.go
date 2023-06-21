@@ -6,7 +6,7 @@ type TransactionDetail struct {
 	*gorm.Model
 
 	TransactionId   uint
-	ProductId       string  `json:"ProductId" form:"ProductId" validate:"required"`
+	ProductId       string  `gorm:"size:255"  json:"ProductId" form:"ProductId" validate:"required"`
 	ProductName     string  `json:"ProductName" form:"ProductName" validate:"required"`
 	RatingProductId uint    `json:"RatingProductId" form:"RatingProductId"`
 	Qty             uint    `json:"Qty" form:"Qty" validate:"required"`
