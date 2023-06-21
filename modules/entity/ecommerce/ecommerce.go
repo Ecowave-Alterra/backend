@@ -1,13 +1,13 @@
 package ecommerce
 
 type ReviewResponse struct {
-	Name            string  `json:"Name"`
-	ProfilePhotoUrl string  `json:"ProfilePhotoUrl"`
-	Rating          float64 `json:"Rating"`
-	Comment         string  `json:"Comment"`
-	CommentAdmin    string  `json:"Comment_admin"`
-	PhotoURL        string  `json:"Photo_url"`
-	VideoURL        string  `json:"Video_url"`
+	Name         string  `json:"Name"`
+	ProfilePhoto string  `json:"ProfilePhoto"`
+	Rating       float64 `json:"Rating"`
+	Comment      string  `json:"Comment"`
+	CommentAdmin string  `json:"Comment_admin"`
+	PhotoURL     string  `json:"Photo_url"`
+	VideoURL     string  `json:"Video_url"`
 }
 
 type ProductResponse struct {

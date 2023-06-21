@@ -7,20 +7,20 @@ import (
 func CreateProductImage() []*productEntity.ProductImage {
 	product_images := []*productEntity.ProductImage{
 		{
-			ProductId:       1,
-			ProductImageUrl: "https://picsum.photos/200/300",
+			ProductId:       "f71ff306-ebd7-45e5-9607-5b908dd1c423",
+			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 		{
-			ProductId:       1,
-			ProductImageUrl: "https://picsum.photos/200/300",
+			ProductId:       "f71ff306-ebd7-45e5-9607-5b908dd1c423",
+			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 		{
-			ProductId:       2,
-			ProductImageUrl: "https://picsum.photos/200/300",
+			ProductId:       "ba08266c-0926-484e-a610-c2a48ac6179d",
+			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 		{
-			ProductId:       2,
-			ProductImageUrl: "https://picsum.photos/200/300",
+			ProductId:       "ba08266c-0926-484e-a610-c2a48ac6179d",
+			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
 	}
 
