@@ -313,27 +313,10 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 			})
 		}
 
-		csvHeader := []string{"InformationId", "Title", "Content", "Status", "ViewCount", "BookmarkCount", "PhotoContentUrl"}
-
-		records := make([][]string, 0)
-		for _, info := range *informations {
-			record := []string{
-				info.InformationId,
-				info.Title,
-				info.Content,
-				info.Status,
-				strconv.Itoa(int(info.ViewCount)),
-				strconv.Itoa(int(info.BookmarkCount)),
-				info.PhotoContentUrl,
-			}
-			records = append(records, record)
-		}
-
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"Message": "Berhasil membuat file CSV",
 			"Status":  http.StatusOK,
-			"Header":  csvHeader,
-			"Records": records,
+			"Data":    informations,
 		})
 	}
 }
