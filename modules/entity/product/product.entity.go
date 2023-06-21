@@ -2,9 +2,7 @@ package product
 
 import (
 	"time"
-
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
-
 	"gorm.io/gorm"
 )
 
