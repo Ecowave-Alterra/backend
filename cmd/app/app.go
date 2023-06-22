@@ -49,6 +49,10 @@ import (
 	reviewRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/review"
 	reviewUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/review"
 
+	ecommerceHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/ecommerce"
+	ecommerceRepo "github.com/berrylradianh/ecowave-go/modules/repository/user/ecommerce"
+	ecommerceUseCase "github.com/berrylradianh/ecowave-go/modules/usecase/user/ecommerce"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -70,6 +74,10 @@ func StartApp() *echo.Echo {
 	productRepo := productRepo.New(mysql.DB)
 	productUsecase := productUseCase.New(productRepo)
 	productHandler := productHandler.New(productUsecase)
+
+	ecommerceRepo := ecommerceRepo.New(mysql.DB)
+	ecommerceUsecase := ecommerceUseCase.New(ecommerceRepo)
+	ecommerceHandler := ecommerceHandler.New(ecommerceUsecase)
 
 	profileRepo := profileRepo.New(mysql.DB)
 	profileUsecase := profileUsecase.New(profileRepo)
@@ -111,6 +119,7 @@ func StartApp() *echo.Echo {
 		ReviewHandlerUser:       reviewHandlerUser,
 		ProductCategoryHandler:  productCategoryHandler,
 		DashboardHandler:        dashboardHandler,
+		EcommerceHandler:        ecommerceHandler,
 	}
 
 	router := routes.StartRoute(handler)

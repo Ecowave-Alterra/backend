@@ -7,6 +7,7 @@ import (
 	pch "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/product_category"
 	avh "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/voucher"
 	ah "github.com/berrylradianh/ecowave-go/modules/handler/api/auth"
+	ecommerceHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/ecommerce"
 	uih "github.com/berrylradianh/ecowave-go/modules/handler/api/user/information"
 	ohu "github.com/berrylradianh/ecowave-go/modules/handler/api/user/order"
 
@@ -27,4 +28,5 @@ type Handler struct {
 	ProductCategoryHandler  *pch.ProductCategoryHandler
 	ProductHandler          *ph.ProductHandler
 	DashboardHandler        *dh.DashboardHandler
+	EcommerceHandler        *ecommerceHandler.EcommerceHandler
 }
