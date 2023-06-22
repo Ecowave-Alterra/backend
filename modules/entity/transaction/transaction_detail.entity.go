@@ -7,7 +7,6 @@ import (
 
 type TransactionDetail struct {
 	*gorm.Model
-
 	TransactionId uint
 	ProductId     string           `gorm:"size:255"  json:"ProductId" form:"ProductId" validate:"required"`
 	ProductName   string           `json:"ProductName" form:"ProductName" validate:"required"`

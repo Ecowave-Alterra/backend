@@ -1,19 +1,21 @@
 package user
 
 import (
+	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	"gorm.io/gorm"
 )
 
 type User struct {
 	*gorm.Model   `json:"-"`
 	RoleId        uint
-	Email         string        `json:"Email" form:"Email" validate:"required,email"`
-	GoogleId      string        `json:"GoogleId" form:"GoogleId"`
-	Username      string        `json:"Username" form:"Username" validate:"required"`
-	Password      string        `json:"Password" form:"Password" validate:"required,min=8"`
-	UserDetail    UserDetail    `gorm:"foreignKey:UserId"`
-	UserAddresses []UserAddress `gorm:"foreignKey:UserId"`
-	UserRecovery  UserRecovery  `gorm:"foreignKey:UserId" json:"-"`
+	Email         string           `json:"Email" form:"Email" validate:"required,email"`
+	GoogleId      string           `json:"GoogleId" form:"GoogleId"`
+	Username      string           `json:"Username" form:"Username" validate:"required"`
+	Password      string           `json:"Password" form:"Password" validate:"required,min=8"`
+	UserDetail    UserDetail       `gorm:"foreignKey:UserId"`
+	UserAddresses []UserAddress    `gorm:"foreignKey:UserId"`
+	UserRecovery  UserRecovery     `gorm:"foreignKey:UserId" json:"-"`
+	Transactions  []et.Transaction `gorm:"foreignKey:UserId"`
 }
 
 type RegisterRequest struct {

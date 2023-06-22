@@ -45,6 +45,10 @@ import (
 	profileRepo "github.com/berrylradianh/ecowave-go/modules/repository/user/profile"
 	profileUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/user/profile"
 
+	reviewHandlerUser "github.com/berrylradianh/ecowave-go/modules/handler/api/user/review"
+	reviewRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/review"
+	reviewUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/review"
+
 	ecommerceHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/ecommerce"
 	ecommerceRepo "github.com/berrylradianh/ecowave-go/modules/repository/user/ecommerce"
 	ecommerceUseCase "github.com/berrylradianh/ecowave-go/modules/usecase/user/ecommerce"
@@ -95,6 +99,10 @@ func StartApp() *echo.Echo {
 	orderUsecaseUser := orderUsecaseUser.New(orderRepoUser)
 	orderHandlerUser := orderHandlerUser.New(orderUsecaseUser)
 
+	reviewRepoUser := reviewRepoUser.New(mysql.DB)
+	reviewUsecaseUser := reviewUsecaseUser.New(reviewRepoUser)
+	reviewHandlerUser := reviewHandlerUser.New(reviewUsecaseUser)
+
 	dashboardRepo := dashboardRepo.New(mysql.DB)
 	dashboardUsecase := dashboardUsecase.New(dashboardRepo)
 	dashboardHandler := dashboardHandler.New(dashboardUsecase)
@@ -108,6 +116,7 @@ func StartApp() *echo.Echo {
 		VoucherHandlerAdmin:     voucherHandlerAdmin,
 		TransactionHandlerUser:  transactionHandlerUser,
 		OrderHandlerUser:        orderHandlerUser,
+		ReviewHandlerUser:       reviewHandlerUser,
 		ProductCategoryHandler:  productCategoryHandler,
 		DashboardHandler:        dashboardHandler,
 		EcommerceHandler:        ecommerceHandler,
