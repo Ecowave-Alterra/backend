@@ -9,5 +9,5 @@ type Role struct {
 	*gorm.Model
 
 	Role  string `json:"Role" form:"Role"`
-	Users ut.User
+	Users []ut.User
 }

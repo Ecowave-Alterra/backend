@@ -53,20 +53,22 @@ func ShippingOptions(ship *er.RajaongkirRequest) (interface{}, error) {
 
 	for _, val := range rajaongkirReq {
 		for _, v := range val.Rajaongkir.Results {
-			res := er.Results{
-				Code: v.Code,
-				Name: v.Name,
-			}
+
 			for _, c := range v.Costs {
-				res.Service = c.Service
-				res.Description = c.Description
-				for _, cs := range c.Cost {
-					res.Value = cs.Value
-					res.Etd = cs.Etd
+				if strings.Contains(c.Description, "Reg") {
+					res := er.Results{
+						Code:        v.Code,
+						Name:        v.Name,
+						Service:     c.Service,
+						Description: c.Description,
+					}
+					for _, cs := range c.Cost {
+						res.Value = cs.Value
+						res.Etd = cs.Etd
+					}
+					result = append(result, res)
 				}
 			}
-
-			result = append(result, res)
 		}
 	}
 	return result, nil

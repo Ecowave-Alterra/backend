@@ -9,6 +9,10 @@ import (
 	authRepo "github.com/berrylradianh/ecowave-go/modules/repository/auth"
 	authUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/auth"
 
+	dashboardHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/dashboard"
+	dashboardRepo "github.com/berrylradianh/ecowave-go/modules/repository/admin/dashboard"
+	dashboardUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/admin/dashboard"
+
 	informationHandlerAdmin "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/information"
 	informationRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/information"
 	informationUsecaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/information"
@@ -41,6 +45,14 @@ import (
 	profileRepo "github.com/berrylradianh/ecowave-go/modules/repository/user/profile"
 	profileUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/user/profile"
 
+	reviewHandlerUser "github.com/berrylradianh/ecowave-go/modules/handler/api/user/review"
+	reviewRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/review"
+	reviewUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/review"
+
+	ecommerceHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/ecommerce"
+	ecommerceRepo "github.com/berrylradianh/ecowave-go/modules/repository/user/ecommerce"
+	ecommerceUseCase "github.com/berrylradianh/ecowave-go/modules/usecase/user/ecommerce"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -63,6 +75,10 @@ func StartApp() *echo.Echo {
 	productUsecase := productUseCase.New(productRepo)
 	productHandler := productHandler.New(productUsecase)
 
+	ecommerceRepo := ecommerceRepo.New(mysql.DB)
+	ecommerceUsecase := ecommerceUseCase.New(ecommerceRepo)
+	ecommerceHandler := ecommerceHandler.New(ecommerceUsecase)
+
 	profileRepo := profileRepo.New(mysql.DB)
 	profileUsecase := profileUsecase.New(profileRepo)
 	profileHandler := profileHandler.New(profileUsecase)
@@ -83,6 +99,14 @@ func StartApp() *echo.Echo {
 	orderUsecaseUser := orderUsecaseUser.New(orderRepoUser)
 	orderHandlerUser := orderHandlerUser.New(orderUsecaseUser)
 
+	reviewRepoUser := reviewRepoUser.New(mysql.DB)
+	reviewUsecaseUser := reviewUsecaseUser.New(reviewRepoUser)
+	reviewHandlerUser := reviewHandlerUser.New(reviewUsecaseUser)
+
+	dashboardRepo := dashboardRepo.New(mysql.DB)
+	dashboardUsecase := dashboardUsecase.New(dashboardRepo)
+	dashboardHandler := dashboardHandler.New(dashboardUsecase)
+
 	handler := common.Handler{
 		ProductHandler:          productHandler,
 		ProfileHandler:          profileHandler,
@@ -92,7 +116,10 @@ func StartApp() *echo.Echo {
 		VoucherHandlerAdmin:     voucherHandlerAdmin,
 		TransactionHandlerUser:  transactionHandlerUser,
 		OrderHandlerUser:        orderHandlerUser,
+		ReviewHandlerUser:       reviewHandlerUser,
 		ProductCategoryHandler:  productCategoryHandler,
+		DashboardHandler:        dashboardHandler,
+		EcommerceHandler:        ecommerceHandler,
 	}
 
 	router := routes.StartRoute(handler)
