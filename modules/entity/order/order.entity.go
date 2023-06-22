@@ -32,16 +32,17 @@ type Order struct {
 	TotalPrice         float64
 	EstimationDay      string
 	PaymentUrl         string
+	ExpeditionRating   float32
 	CanceledReason     string
 	OrderDetail        []OrderDetail
 	Address            eu.UserAddress
 }
 
 type OrderDetail struct {
-	// ProductId       string
 	ProductId       string
 	Qty             uint
 	SubTotalPrice   float64
 	ProductName     string
 	ProductImageUrl string
+	RatingProductId uint
 }
