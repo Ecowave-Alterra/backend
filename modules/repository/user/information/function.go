@@ -5,11 +5,18 @@ import (
 	eu "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
-func (ir *informationRepo) GetAllInformations() (*[]ie.UserInformationResponse, error) {
+func (ir *informationRepo) GetAllInformations(offset int, pageSize int) (*[]ie.UserInformationResponse, int64, error) {
 	var informations []ie.Information
 	var informationsRes []ie.UserInformationResponse
-	if err := ir.db.Where("status = ?", "Terbit").Find(&informations).Error; err != nil {
-		return nil, err
+	var count int64
+
+	err := ir.db.Where("status = ?", "Terbit").Find(&informations).Count(&count).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	err = ir.db.Where("status = ?", "Terbit").Find(&informations).Offset(offset).Limit(pageSize).Error
+	if err != nil {
+		return nil, 0, err
 	}
 
 	for _, val := range informations {
@@ -17,29 +24,13 @@ func (ir *informationRepo) GetAllInformations() (*[]ie.UserInformationResponse, 
 			InformationId:   val.InformationId,
 			Title:           val.Title,
 			PhotoContentUrl: val.PhotoContentUrl,
+			Content:         val.Content,
 			Date:            val.CreatedAt,
 		}
 		informationsRes = append(informationsRes, result)
 	}
 
-	return &informationsRes, nil
-}
-
-func (ir *informationRepo) GetDetailInformations(id string) (*ie.UserInformationDetailResponse, error) {
-	var informations ie.Information
-
-	if err := ir.db.Where("information_id = ?", id).First(&informations).Error; err != nil {
-		return nil, err
-	}
-
-	informationDetail := ie.UserInformationDetailResponse{
-		Title:           informations.Title,
-		PhotoContentUrl: informations.PhotoContentUrl,
-		Date:            informations.CreatedAt,
-		Content:         informations.Content,
-	}
-
-	return &informationDetail, nil
+	return &informationsRes, count, nil
 }
 
 func (ir *informationRepo) UpdatePoint(id uint, point uint) error {

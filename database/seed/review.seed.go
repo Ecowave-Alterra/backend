@@ -1,24 +1,44 @@
 package seed
 
-import er "github.com/berrylradianh/ecowave-go/modules/entity/review"
+import (
+	er "github.com/berrylradianh/ecowave-go/modules/entity/review"
+)
 
 func CreateReview() []*er.RatingProduct {
-	reviews := []*er.RatingProduct{
+	ratingProducts := []*er.RatingProduct{
 		{
-			Rating:              5.0,
-			Comment:             "Kualitas bagus. Harga terjangkau",
-			PhotoUrl:            "https://storage.googleapis.com/ecowave/img/products/bottle.png",
-			VideoUrl:            "https://storage.cloud.google.com/ecowave/video/reviews/video_2023-06-13_11-52-24.mp4",
+			Rating:              4.5,
+			Comment:             "Bagus",
+			CommentAdmin:        "Terimakasih Reviewnya",
+			PhotoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.png",
+			VideoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.mp4",
 			TransactionDetailId: 1,
 		},
 		{
-			Rating:              3.7,
-			Comment:             "Barang agak berbeda dengan deskripsi dan foto",
-			PhotoUrl:            "https://storage.googleapis.com/ecowave/img/products/bottle.png",
-			VideoUrl:            "https://storage.cloud.google.com/ecowave/video/reviews/video_2023-06-13_11-52-24.mp4",
+			Rating:              3,
+			Comment:             "Lumayan",
+			CommentAdmin:        "Terimakasih Reviewnya",
+			PhotoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.png",
+			VideoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.mp4",
 			TransactionDetailId: 2,
+		},
+		{
+			Rating:              2.5,
+			Comment:             "Jelek",
+			CommentAdmin:        "Terimakasih Reviewnya",
+			PhotoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.png",
+			VideoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.mp4",
+			TransactionDetailId: 3,
+		},
+		{
+			Rating:              4.5,
+			Comment:             "Perfect",
+			CommentAdmin:        "Terimakasih Reviewnya",
+			PhotoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.png",
+			VideoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.mp4",
+			TransactionDetailId: 4,
 		},
 	}
 
-	return reviews
+	return ratingProducts
 }

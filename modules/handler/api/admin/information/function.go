@@ -1,17 +1,13 @@
 package information
 
 import (
-	"database/sql"
-	"encoding/csv"
-	"log"
 	"math"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
-	vld "github.com/berrylradianh/ecowave-go/helper/validator"
+	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 	"github.com/labstack/echo/v4"
 )
@@ -29,9 +25,10 @@ func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 
 		informations, total, err := ih.informationUsecase.GetAllInformations(offset, pageSize)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusInternalServerError,
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
@@ -44,9 +41,9 @@ func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 		}
 
 		if informations == nil || len(*informations) == 0 {
-			return c.JSON(http.StatusOK, map[string]interface{}{
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
 				"Message": "Belum ada list informasi",
-				"Status":  http.StatusOK,
+				"Status":  http.StatusNotFound,
 			})
 		}
 
@@ -62,19 +59,14 @@ func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 func (ih *InformationHandler) GetInformationById() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var information *ie.Information
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "ID harus berupa angka",
-				"Status":  http.StatusBadRequest,
-			})
-		}
+		id := c.Param("id")
 
-		information, err = ih.informationUsecase.GetInformationById(id)
+		information, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusInternalServerError,
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
@@ -89,61 +81,36 @@ func (ih *InformationHandler) CreateInformation() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		cloudstorage.Folder = "img/informations/"
 
-		fileHeader, err := c.FormFile("PhotoContentUrl")
-		if err != nil {
-			return c.JSON(http.StatusUnprocessableEntity, map[string]interface{}{
-				"Message": "Mohon maaf, Anda harus mengungga foto",
-				"Status":  http.StatusUnprocessableEntity,
-			})
-		}
+		fileHeader, _ := c.FormFile("PhotoContentUrl")
+		title := c.FormValue("Title")
+		content := c.FormValue("Content")
+		status := c.FormValue("Status")
 
-		if err := vld.ValidateFileExtension(fileHeader); err != nil {
-			return c.JSON(http.StatusUnsupportedMediaType, map[string]interface{}{
-				"Message": err.Error(),
-				"Status":  http.StatusUnsupportedMediaType,
-			})
-		}
-
-		maxFileSize := 4 * 1024 * 1024
-		if err := vld.ValidateFileSize(fileHeader, int64(maxFileSize)); err != nil {
-			return c.JSON(http.StatusRequestEntityTooLarge, map[string]interface{}{
-				"Message": err.Error(),
-				"Status":  http.StatusRequestEntityTooLarge,
-			})
-		}
-
-		PhotoUrl, err := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"Message": "Gagal upload image",
-				"Status":  http.StatusInternalServerError,
-			})
-		}
-
-		information := &ie.Information{
-			Title:           c.FormValue("Title"),
-			Content:         c.FormValue("Content"),
-			PhotoContentUrl: PhotoUrl,
-			Status:          c.FormValue("Status"),
-		}
-
-		err = ih.informationUsecase.CreateInformation(information)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusInternalServerError,
-			})
-		}
-
-		if strings.EqualFold(information.Status, "Draft") {
-			return c.JSON(http.StatusOK, map[string]interface{}{
+		if strings.EqualFold(status, "Draft") {
+			err := ih.informationUsecase.CreateInformationDraft(fileHeader, title, content, status)
+			if err != nil {
+				code, msg := cs.CustomStatus(err.Error())
+				return c.JSON(code, echo.Map{
+					"Status":  code,
+					"Message": msg,
+				})
+			}
+			return c.JSON(http.StatusCreated, map[string]interface{}{
 				"Message": "Anda berhasil menambahkan informasi ke dalam draft",
-				"Status":  http.StatusOK,
+				"Status":  http.StatusCreated,
 			})
 		} else {
-			return c.JSON(http.StatusOK, map[string]interface{}{
+			err := ih.informationUsecase.CreateInformation(fileHeader, title, content, status)
+			if err != nil {
+				code, msg := cs.CustomStatus(err.Error())
+				return c.JSON(code, echo.Map{
+					"Status":  code,
+					"Message": msg,
+				})
+			}
+			return c.JSON(http.StatusCreated, map[string]interface{}{
 				"Message": "Anda berhasil menerbitkan informasi baru",
-				"Status":  http.StatusOK,
+				"Status":  http.StatusCreated,
 			})
 		}
 	}
@@ -153,92 +120,37 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		cloudstorage.Folder = "img/informations/"
 
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "ID harus berupa angka",
-				"Status":  http.StatusBadRequest,
-			})
-		}
+		id := c.Param("id")
 
 		informationBefore, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
-			return c.JSON(http.StatusNotFound, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusNotFound,
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
 		information, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
-			return c.JSON(http.StatusNotFound, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusNotFound,
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
 		title := c.FormValue("Title")
 		content := c.FormValue("Content")
 		status := c.FormValue("Status")
-		fileHeader, err := c.FormFile("PhotoContentUrl")
+		fileHeader, _ := c.FormFile("PhotoContentUrl")
 
-		if err := vld.ValidateFileExtension(fileHeader); err != nil {
-			return c.JSON(http.StatusUnsupportedMediaType, map[string]interface{}{
-				"Message": err.Error(),
-				"Status":  http.StatusUnsupportedMediaType,
-			})
-		}
-
-		maxFileSize := 4 * 1024 * 1024
-		if err := vld.ValidateFileSize(fileHeader, int64(maxFileSize)); err != nil {
-			return c.JSON(http.StatusRequestEntityTooLarge, map[string]interface{}{
-				"Message": err.Error(),
-				"Status":  http.StatusRequestEntityTooLarge,
-			})
-		}
-
-		if title != "" {
-			information.Title = title
-		}
-		if content != "" {
-			information.Content = content
-		}
-		if status != "" {
-			information.Status = status
-		}
-		if fileHeader != nil {
-			if informationBefore.PhotoContentUrl != "" {
-				fileName, _ := cloudstorage.GetFileName(informationBefore.PhotoContentUrl)
-				if err != nil {
-					return c.JSON(http.StatusInternalServerError, echo.Map{
-						"Message": "Gagal mendapatkan nama file",
-						"Status":  http.StatusInternalServerError,
-					})
-				}
-				err = cloudstorage.DeleteImage(fileName)
-				if err != nil {
-					return c.JSON(http.StatusInternalServerError, echo.Map{
-						"Message": "Gagal menghapus file pada cloud storage",
-						"Status":  http.StatusInternalServerError,
-					})
-				}
-			}
-
-			PhotoUrl, err := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-					"Message": "Gagal upload image",
-					"Status":  http.StatusInternalServerError,
-				})
-			}
-			information.PhotoContentUrl = PhotoUrl
-		}
-
-		err = ih.informationUsecase.UpdateInformation(int(information.InformationId), information)
+		err = ih.informationUsecase.UpdateInformation(informationBefore, information, fileHeader, title, content, status)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": err,
-				"Status":  http.StatusBadRequest,
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
@@ -267,51 +179,36 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 func (ih *InformationHandler) DeleteInformation() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var information *ie.Information
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "ID harus berupa angka",
-				"Status":  http.StatusBadRequest,
-			})
-		}
+		id := c.Param("id")
 
-		information, err = ih.informationUsecase.GetInformationById(id)
+		information, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
-			if err == sql.ErrNoRows {
-				return c.JSON(http.StatusNotFound, echo.Map{
-					"Message": err.Error(),
-					"Status":  http.StatusNotFound,
-				})
-			}
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": "Gagal mendapatkan informasi",
-				"Status":  http.StatusInternalServerError,
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
 		photoContentURL := information.PhotoContentUrl
 		if photoContentURL != "" {
-			fileName, err := cloudstorage.GetFileName(photoContentURL)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"Message": "Gagal mendapatkan nama file",
-					"Status":  http.StatusInternalServerError,
-				})
-			}
+			fileName := cloudstorage.GetFileName(photoContentURL)
 			err = cloudstorage.DeleteImage(fileName)
 			if err != nil {
-				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"Message": "Gagal menghapus file pada cloud storage",
-					"Status":  http.StatusInternalServerError,
+				code, msg := cs.CustomStatus(err.Error())
+				return c.JSON(code, echo.Map{
+					"Status":  code,
+					"Message": msg,
 				})
 			}
 		}
 
-		err = ih.informationUsecase.DeleteInformation(int(information.InformationId))
+		err = ih.informationUsecase.DeleteInformation(information.InformationId)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusBadRequest,
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
@@ -343,7 +240,7 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 		for param := range c.QueryParams() {
 			if !validParams[param] {
 				return c.JSON(http.StatusBadRequest, echo.Map{
-					"Message": "Masukkan paramter dengan benar",
+					"Message": "Masukkan parameter dengan benar",
 					"Status":  http.StatusBadRequest,
 				})
 			}
@@ -351,16 +248,41 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 
 		informations, total, err := ih.informationUsecase.SearchInformations(search, filter, offset, pageSize)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusInternalServerError,
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
-		if len(*informations) == 0 {
-			return c.JSON(http.StatusOK, echo.Map{
+		draftInformations := make([]ie.Information, 0)
+		for _, info := range *informations {
+			if strings.EqualFold(info.Status, "Draft") {
+				draftInformations = append(draftInformations, info)
+			}
+		}
+
+		terbittInformations := make([]ie.Information, 0)
+		for _, info := range *informations {
+			if strings.EqualFold(info.Status, "Terbit") {
+				terbittInformations = append(terbittInformations, info)
+			}
+		}
+
+		if len(terbittInformations) == 0 && strings.EqualFold(filter, "Terbit") {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Message": "Belum ada informasi yang terbit",
+				"Status":  http.StatusNotFound,
+			})
+		} else if len(draftInformations) == 0 && strings.EqualFold(filter, "Draft") {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Message": "Belum ada informasi dalam draft",
+				"Status":  http.StatusNotFound,
+			})
+		} else if len(*informations) == 0 {
+			return c.JSON(http.StatusNotFound, echo.Map{
 				"Message": "Informasi yang anda cari tidak ditemukan",
-				"Status":  http.StatusOK,
+				"Status":  http.StatusNotFound,
 			})
 		} else {
 			if page > int(math.Ceil(float64(total)/float64(pageSize))) {
@@ -384,69 +306,17 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		informations, err := ih.informationUsecase.GetAllInformationsNoPagination()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusInternalServerError,
-			})
-		}
-
-		file, err := os.Create("information-data.csv")
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusInternalServerError,
-			})
-		}
-
-		defer func() {
-			if closeErr := file.Close(); closeErr != nil {
-				log.Println("Error closing file:", closeErr)
-			}
-		}()
-
-		writer := csv.NewWriter(file)
-		defer writer.Flush()
-
-		csvHeader := []string{"InformationId", "Title", "Content", "Status", "ViewCount", "BookmarkCount", "PhotoContentUrl"}
-		err = writer.Write(csvHeader)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusInternalServerError,
-			})
-		}
-
-		for _, info := range *informations {
-			record := []string{
-				strconv.Itoa(int(info.InformationId)),
-				info.Title,
-				info.Content,
-				info.Status,
-				strconv.Itoa(int(info.ViewCount)),
-				strconv.Itoa(int(info.BookmarkCount)),
-				info.PhotoContentUrl,
-			}
-
-			err = writer.Write(record)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"Message": err.Error(),
-					"Status":  http.StatusInternalServerError,
-				})
-			}
-		}
-
-		writer.Flush()
-		if err := writer.Error(); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"Message": err.Error(),
-				"Status":  http.StatusInternalServerError,
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
 			})
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Message": "Berhasil membuat file csv",
+			"Message": "Berhasil membuat file CSV",
 			"Status":  http.StatusOK,
+			"Data":    informations,
 		})
 	}
 }

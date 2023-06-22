@@ -31,7 +31,42 @@ type LoginRequest struct {
 }
 
 type AuthResponse struct {
-	ID    int    `json:"Id" form:"Id"`
+	ID    uint   `json:"Id" form:"Id"`
 	Email string `json:"Email" form:"Email"`
 	Token string `json:"Token" form:"Token"`
+}
+
+type UserLogin struct {
+	Email    string `json:"Email" form:"Email" validate:"required,email"`
+	Password string `json:"Password" form:"Password" validate:"required"`
+}
+
+type UserResponseLogin struct {
+	Email    string
+	Username string
+	Token    string
+}
+
+type UserRequest struct {
+	Email    string `json:"Email" form:"Email" validate:"email"`
+	Username string `json:"Username" form:"Username"`
+}
+
+type UserResponse struct {
+	Id           uint   `json:"Id"`
+	GoogleId     string `json:"GoogleId"`
+	RoleId       uint   `json:"RoleId"`
+	Name         string `json:"Name"`
+	Username     string `json:"Username"`
+	Email        string `json:"Email"`
+	Phone        string `json:"Phone"`
+	Point        uint   `json:"Point"`
+	ProfilePhoto string `json:"ProfilePhoto"`
+	Addresses    []UserAddressResponse
+}
+
+type UserPasswordRequest struct {
+	OldPassword        string `json:"OldPassword" form:"OldPassword" validate:"required"`
+	Password           string `json:"Password" form:"Password" validate:"required"`
+	ConfirmNewPassword string `json:"ConfirmNewPassword" form:"ConfirmNewPassword" validate:"required"`
 }

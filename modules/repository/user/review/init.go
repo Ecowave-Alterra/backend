@@ -10,8 +10,8 @@ import (
 type ReviewRepo interface {
 	CountTransactionDetail(transactionId string) (int, error)
 	GetIdTransaction(transactionId string) (int, error)
-	GetProductId(transactionId string) ([]int, error)
-	GetIdTransactionDetail(idTransaction, productId int) (int, error)
+	GetProductId(transactionId string) ([]string, error)
+	GetIdTransactionDetail(idTransaction int, productId string) (int, error)
 
 	CreateRatingProduct(ratingProduct *er.RatingProduct) error
 	UpdateExpeditionRating(ratingExpedition float32, transactionId string) error

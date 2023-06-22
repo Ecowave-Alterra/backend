@@ -32,7 +32,7 @@ Ecowave Backend adalah sebuah aplikasi backend yang ditulis menggunakan bahasa p
     DB_CONNECTION=mysql
     DB_HOST=127.0.0.1
     DB_PORT=3306
-    DB_NAME=ecowave
+    DB_NAME=ecowave_db
     DB_USERNAME=root
     DB_PASSWORD=
     ```
