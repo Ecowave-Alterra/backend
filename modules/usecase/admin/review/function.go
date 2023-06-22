@@ -11,16 +11,20 @@ func (rc *reviewUsecase) GetAllProducts(products *[]pe.Product, offset, pageSize
 	return rc.reviewRepo.GetAllProducts(products, offset, pageSize)
 }
 
-func (rc *reviewUsecase) GetProductByID(productId string, product *pe.Product) (pe.Product, error) {
-	return rc.reviewRepo.GetProductByID(productId, product)
+func (rc *reviewUsecase) GetProductByIDNoPagination(productId string, product *pe.Product) (pe.Product, error) {
+	return rc.reviewRepo.GetProductByIDNoPagination(productId, product)
 }
 
-func (rc *reviewUsecase) GetProductByName(name string, product *[]pe.Product) ([]pe.Product, error) {
-	return rc.reviewRepo.GetProductByName(name, product)
+func (rc *reviewUsecase) GetProductByID(productId string, product *pe.Product, offset, pageSize int) (*pe.Product, int64, error) {
+	return rc.reviewRepo.GetProductByID(productId, product, offset, pageSize)
 }
 
-func (rc *reviewUsecase) GetAllProductByCategory(category string, product *[]pe.Product) ([]pe.Product, error) {
-	return rc.reviewRepo.GetAllProductByCategory(category, product)
+func (rc *reviewUsecase) GetProductByName(name string, product *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error) {
+	return rc.reviewRepo.GetProductByName(name, product, offset, pageSize)
+}
+
+func (rc *reviewUsecase) GetAllProductByCategory(category string, product *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error) {
+	return rc.reviewRepo.GetAllProductByCategory(category, product, offset, pageSize)
 }
 
 func (rc *reviewUsecase) GetAllTransactionDetailsNoPagination(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error) {

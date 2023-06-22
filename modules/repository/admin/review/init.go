@@ -10,9 +10,10 @@ import (
 
 type ReviewRepo interface {
 	GetAllProducts(products *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error)
-	GetProductByID(productId string, product *pe.Product) (pe.Product, error)
-	GetProductByName(name string, product *[]pe.Product) ([]pe.Product, error)
-	GetAllProductByCategory(category string, product *[]pe.Product) ([]pe.Product, error)
+	GetProductByIDNoPagination(productId string, product *pe.Product) (pe.Product, error)
+	GetProductByID(productId string, product *pe.Product, offset, pageSize int) (*pe.Product, int64, error)
+	GetProductByName(name string, product *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error)
+	GetAllProductByCategory(category string, product *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error)
 	GetAllTransactionDetailsNoPagination(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error)
 	GetAllTransactionDetail(productID string, transactionDetails *[]te.TransactionDetail, offset, pageSize int) ([]te.TransactionDetail, int64, error)
 	GetTransactionByID(transactionID uint, transaction *te.Transaction) (te.Transaction, error)

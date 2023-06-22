@@ -21,7 +21,7 @@ func (rr *reviewRepo) GetAllProducts(products *[]pe.Product, offset, pageSize in
 	return *products, count, nil
 }
 
-func (rr *reviewRepo) GetProductByID(productId string, product *pe.Product) (pe.Product, error) {
+func (rr *reviewRepo) GetProductByIDNoPagination(productId string, product *pe.Product) (pe.Product, error) {
 	if err := rr.db.
 		Preload("ProductCategory").
 		Where("id = ?", productId).
@@ -32,22 +32,49 @@ func (rr *reviewRepo) GetProductByID(productId string, product *pe.Product) (pe.
 	return *product, nil
 }
 
-func (rr *reviewRepo) GetProductByName(name string, product *[]pe.Product) ([]pe.Product, error) {
-	if err := rr.db.Where("name LIKE ?", "%"+name+"%").Preload("ProductCategory").
-		Find(&product).Error; err != nil {
-		return nil, err
+func (rr *reviewRepo) GetProductByID(productId string, product *pe.Product, offset, pageSize int) (*pe.Product, int64, error) {
+	var count int64
+	if err := rr.db.Model(&pe.Product{}).Where("product_id LIKE ?", "%"+productId+"%").Count(&count).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(500, err)
 	}
 
-	return *product, nil
+	if err := rr.db.Preload("ProductCategory").Offset(offset).Limit(pageSize).Where("product_id LIKE ?", "%"+productId+"%").Find(&product).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(404, err)
+	}
+
+	return product, count, nil
 }
 
-func (rr *reviewRepo) GetAllProductByCategory(category string, product *[]pe.Product) ([]pe.Product, error) {
-	if err := rr.db.Preload("ProductCategory").
-		Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&product).Error; err != nil {
-		return nil, err
+func (rr *reviewRepo) GetProductByName(name string, product *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error) {
+	var count int64
+	if err := rr.db.Model(&pe.Product{}).Where("name LIKE ?", "%"+name+"%").Count(&count).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(500, err)
 	}
 
-	return *product, nil
+	if err := rr.db.Preload("ProductCategory").Offset(offset).Limit(pageSize).Where("name LIKE ?", "%"+name+"%").Find(&product).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(404, err)
+	}
+
+	return *product, count, nil
+}
+
+func (rr *reviewRepo) GetAllProductByCategory(category string, product *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error) {
+	var count int64
+	if err := rr.db.Model(&pe.Product{}).Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Count(&count).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(500, err)
+	}
+
+	if err := rr.db.Preload("ProductCategory").Offset(offset).Limit(pageSize).Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&product).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(404, err)
+	}
+
+	return *product, count, nil
+	// if err := rr.db.Preload("ProductCategory").
+	// 	Where("product_category_id IN (SELECT id FROM product_categories WHERE category = ?)", category).Find(&product).Error; err != nil {
+	// 	return nil, err
+	// }
+
+	// return *product, nil
 }
 
 func (rr *reviewRepo) GetAllTransactionDetailsNoPagination(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error) {

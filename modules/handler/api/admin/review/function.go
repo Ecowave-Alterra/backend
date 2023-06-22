@@ -146,7 +146,7 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 				})
 			}
 
-			product, err := rh.reviewUsecase.GetProductByID(fmt.Sprint(td.ProductId), &product)
+			product, err := rh.reviewUsecase.GetProductByIDNoPagination(fmt.Sprint(td.ProductId), &product)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 					"Message": "Gagal mengambil data produk",
@@ -196,14 +196,23 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 }
 
 func (rh *ReviewHandler) SearchReview(c echo.Context) error {
+	pageParam := c.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	pageSize := 10
+	offset := (page - 1) * pageSize
+
 	param := c.QueryParam("param")
 
 	switch param {
 	case "id":
 		productID := c.QueryParam("id")
 
-		var product pe.Product
-		product, err := rh.reviewUsecase.GetProductByID(fmt.Sprint(productID), &product)
+		var product *pe.Product
+		product, total, err := rh.reviewUsecase.GetProductByID(fmt.Sprint(productID), product, offset, pageSize)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Gagal mengambil data produk",
@@ -234,6 +243,14 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 			})
 		}
 
+		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+		if page > totalPages {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Message": "Halaman Tidak Ditemukan",
+				"Status":  http.StatusNotFound,
+			})
+		}
+
 		reviewResponse := re.GetAllReviewResponse{
 			ProductID: product.ID,
 			Name:      product.Name,
@@ -242,14 +259,16 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Reviews": reviewResponse,
-			"Status":  http.StatusOK,
+			"Reviews":   reviewResponse,
+			"Page":      page,
+			"TotalPage": totalPages,
+			"Status":    http.StatusOK,
 		})
 	case "name":
 		productName := c.QueryParam("name")
 		var products []pe.Product
 
-		products, err := rh.reviewUsecase.GetProductByName(productName, &products)
+		products, total, err := rh.reviewUsecase.GetProductByName(productName, &products, offset, pageSize)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Gagal mengambil data produk",
@@ -292,15 +311,25 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 			})
 		}
 
+		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+		if page > totalPages {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Message": "Halaman Tidak Ditemukan",
+				"Status":  http.StatusNotFound,
+			})
+		}
+
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Reviews": reviewResponses,
-			"Status":  http.StatusOK,
+			"Reviews":   reviewResponses,
+			"Page":      page,
+			"TotalPage": totalPages,
+			"Status":    http.StatusOK,
 		})
 	case "category":
 		productCategory := c.QueryParam("category")
 		var products []pe.Product
 
-		products, err := rh.reviewUsecase.GetAllProductByCategory(productCategory, &products)
+		products, total, err := rh.reviewUsecase.GetAllProductByCategory(productCategory, &products, offset, pageSize)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Gagal mengambil data produk",
@@ -343,9 +372,19 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 			})
 		}
 
+		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+		if page > totalPages {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"Message": "Halaman Tidak Ditemukan",
+				"Status":  http.StatusNotFound,
+			})
+		}
+
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Reviews": reviewResponses,
-			"Status":  http.StatusOK,
+			"Reviews":   reviewResponses,
+			"Page":      page,
+			"TotalPage": totalPages,
+			"Status":    http.StatusOK,
 		})
 	}
 
