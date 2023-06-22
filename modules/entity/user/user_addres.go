@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type UserAddress struct {
 	*gorm.Model  `json:"-"`
+	UserId       uint
 	Recipient    string `json:"Recipient" form:"Recipient" validate:"required"`
 	Phone        string `json:"Phone" form:"Phone" validate:"required,min=10,max=13"`
 	ProvinceId   string `json:"ProvinceId" form:"ProvinceId" validate:"required"`
@@ -14,7 +15,6 @@ type UserAddress struct {
 	Note         string `json:"Note" form:"Note"`
 	Mark         string `json:"Mark" form:"Mark"`
 	IsPrimary    bool   `json:"IsPrimary" form:"IsPrimary"`
-	UserId       uint   `json:"UserId" form:"UserId"`
 }
 
 type UserAddressRequest struct {

@@ -21,18 +21,35 @@ type RegisterRequest struct {
 	Email    string `json:"Email" form:"Email" validate:"required,email"`
 	Username string `json:"Username" form:"Username" validate:"required"`
 	Phone    string `json:"Phone" form:"Phone" validate:"required,min=10,max=15,numeric"`
-	Password string `json:"Password" form:"Password" validate:"required"`
+	Password string `json:"Password" form:"Password" validate:"required,min=8"`
+}
+type RegisterGoogleRequest struct {
+	Email    string `json:"Email" form:"Email" validate:"required,email"`
+	GoogleId string `json:"GoogleId" form:"GoogleId"`
+	Name     string `json:"Name" form:"Name" validate:"required"`
+	Username string `json:"Username" form:"Username" validate:"required"`
+	Phone    string `json:"Phone" form:"Phone" validate:"required,min=10,max=15,numeric"`
 }
 
 type LoginRequest struct {
 	Email    string `json:"Email" form:"Email" validate:"required,email"`
 	Password string `json:"Password" form:"Password" validate:"required"`
 }
+type LoginGoogleRequest struct {
+	GoogleId string `json:"GoogleId" form:"GoogleId"`
+}
 
 type AuthResponse struct {
-	ID    uint   `json:"Id" form:"Id"`
-	Email string `json:"Email" form:"Email"`
-	Token string `json:"Token" form:"Token"`
+	ID            uint   `json:"Id" form:"Id"`
+	GoogleId      string `json:"GoogleId" form:"GoogleId"`
+	Email         string `json:"Email" form:"Email" validate:"required,email"`
+	Username      string `json:"Username" form:"Username" validate:"required"`
+	Name          string `json:"Name" form:"Name"`
+	Point         uint   `json:"Point" form:"Point"`
+	Phone         string `json:"Phone" form:"Phone" validate:"required,min=10,max=13"`
+	ProfilePhoto  string `json:"ProfilePhoto" form:"ProfilePhoto"`
+	UserAddresses UserAddress
+	Token         string `json:"Token" form:"Token"`
 }
 
 type UserLogin struct {
