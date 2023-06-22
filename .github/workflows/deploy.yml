@@ -1,9 +1,9 @@
-name: Deploy to GCP
+name: Test Deploy
 
 on:
   push:
     branches:
-      - development
+      - fixDeployment
 
 env:
   PROJECT_ID: temporal-potion-388712
@@ -38,4 +38,4 @@ jobs:
             --allow-unauthenticated \
             --min-instances 1 \
             --max-instances 10 \
-            --set-env-vars DB_CONNECTION=mysql,APP_PORT=${{ secrets.APP_PORT }},DB_HOST=${{ secrets.DB_HOST }},DB_PORT=${{ secrets.DB_PORT }},DB_NAME=${{ secrets.DB_NAME }},DB_USERNAME=${{ secrets.DB_USERNAME }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},SECRET_KEY=${{ secrets.SECRET_KEY }}
+            --set-env-vars DB_CONNECTION=mysql,APP_PORT=${{ secrets.APP_PORT }}, DB_HOST=${{ secrets.DB_HOST }},DB_PORT=${{ secrets.DB_PORT }}, DB_NAME=${{ secrets.DB_NAME }},DB_USERNAME=${{ secrets.DB_USERNAME }}, DB_PASSWORD=${{ secrets.DB_PASSWORD }},SECRET_KEY=${{ secrets.SECRET_KEY }}, RAJAONGKIR_KEY=${{ secrets.RAJAONGKIR_KEY }},MIDTRANS_SERVER_KEY=${{ secrets.MIDTRANS_SERVER_KEY }}, BINDERBYTE_KEY=${{ secrets.BINDERBYTE_KEY }},SMTP_HOST=${{ secrets.SMTP_HOST }}, SMTP_PORT=${{ secrets.SMTP_PORT }},SENDER_NAME=${{ secrets.SENDER_NAME }}, AUTH_EMAIL=${{ secrets.AUTH_EMAIL }},AUTH_PASSWORD=${{ secrets.AUTH_PASSWORD }},
