@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	p "github.com/berrylradianh/ecowave-go/helper/password"
 	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
@@ -67,11 +68,10 @@ func (pc *profileUsecase) UpdatePasswordProfile(user *ut.User, oldPassword strin
 }
 
 func (pc *profileUsecase) GetAllProvince() ([]ut.Province, error) {
-	apiKey := "8bb5248063ed493d90aac0311f8a3edb"
 	url := "https://api.rajaongkir.com/starter/province"
 
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Add("key", apiKey)
+	req.Header.Add("key", os.Getenv("RAJAONGKIR_KEY"))
 
 	res, _ := http.DefaultClient.Do(req)
 	body, _ := ioutil.ReadAll(res.Body)
@@ -95,11 +95,10 @@ func (pc *profileUsecase) GetAllProvince() ([]ut.Province, error) {
 }
 
 func (pc *profileUsecase) GetAllCityByProvince(provinceId string) ([]ut.City, error) {
-	apiKey := "8bb5248063ed493d90aac0311f8a3edb"
 	url := "https://api.rajaongkir.com/starter/city?province=" + provinceId
 
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Add("key", apiKey)
+	req.Header.Add("key", os.Getenv("RAJAONGKIR_KEY"))
 
 	res, _ := http.DefaultClient.Do(req)
 	body, _ := ioutil.ReadAll(res.Body)
