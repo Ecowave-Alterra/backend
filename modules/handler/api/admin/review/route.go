@@ -10,9 +10,9 @@ import (
 func (reviewHandler *ReviewHandler) RegisterRoutes(e *echo.Echo) {
 	// jwtMiddleware := echojwt.JWT([]byte(os.Getenv("SECRET_KEY")))
 
-	reviewGroup := e.Group("/admin/review")
+	reviewGroup := e.Group("/admin/reviews")
 	// reviewGroup.Use(jwtMiddleware)
-	reviewGroup.GET("/", reviewHandler.GetAllReview)
+	reviewGroup.GET("", reviewHandler.GetAllReview)
 	reviewGroup.GET("/:id", reviewHandler.GetReviewByProductID)
 	reviewGroup.GET("/search", reviewHandler.SearchReview)
 }

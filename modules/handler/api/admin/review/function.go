@@ -2,7 +2,6 @@ package review
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"net/http"
 	"strconv"
@@ -75,14 +74,13 @@ func (rh *ReviewHandler) GetAllReview(c echo.Context) error {
 	}
 
 	if reviewResponses == nil {
-		return c.JSON(http.StatusOK, map[string]interface{}{
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"Message": "Belum ada list ulasan",
-			"Status":  http.StatusOK,
+			"Status":  http.StatusNotFound,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message":   "Berhasil mengambil data review produk",
 		"Reviews":   reviewResponses,
 		"Page":      page,
 		"TotalPage": totalPages,
@@ -140,7 +138,6 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 				})
 			}
 
-			log.Println(td.TransactionId)
 			transaction, err := rh.reviewUsecase.GetTransactionByID(td.TransactionId, &transaction)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -191,7 +188,6 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message":   "Berhasil mengambil data review produk",
 		"Reviews":   reviewResponses,
 		"Page":      page,
 		"TotalPage": totalPages,
@@ -211,6 +207,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Gagal mengambil data produk",
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
@@ -219,6 +216,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Gagal mengambil data transaksi detail produk",
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
@@ -230,9 +228,9 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		}
 
 		if count == 0 {
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
 				"Message": "Ulasan yang anda cari tidak ditemukan",
-				"Status":  http.StatusOK,
+				"Status":  http.StatusNotFound,
 			})
 		}
 
@@ -244,8 +242,8 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Message": "Berhasil mengambil data review produk",
 			"Reviews": reviewResponse,
+			"Status":  http.StatusOK,
 		})
 	case "name":
 		productName := c.QueryParam("name")
@@ -267,6 +265,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 					"Message": "Gagal mengambil data transaksi detail produk",
+					"Status":  http.StatusInternalServerError,
 				})
 			}
 			for _, td := range transactionDetails {
@@ -287,15 +286,15 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 			count = 0
 		}
 		if reviewResponses == nil {
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
 				"Message": "Ulasan yang anda cari tidak ditemukan",
-				"Status":  http.StatusOK,
+				"Status":  http.StatusNotFound,
 			})
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Message": "Berhasil mengambil data review produk",
 			"Reviews": reviewResponses,
+			"Status":  http.StatusOK,
 		})
 	case "category":
 		productCategory := c.QueryParam("category")
@@ -317,6 +316,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 					"Message": "Gagal mengambil data transaksi detail produk",
+					"Status":  http.StatusInternalServerError,
 				})
 			}
 			for _, td := range transactionDetails {
@@ -337,19 +337,20 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 			count = 0
 		}
 		if reviewResponses == nil {
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
 				"Message": "Ulasan yang anda cari tidak ditemukan",
-				"Status":  http.StatusOK,
+				"Status":  http.StatusNotFound,
 			})
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Message": "Berhasil mengambil data review produk",
 			"Reviews": reviewResponses,
+			"Status":  http.StatusOK,
 		})
 	}
 
 	return c.JSON(http.StatusBadRequest, map[string]interface{}{
 		"Message": "Invalid search parameter",
+		"Status":  http.StatusBadRequest,
 	})
 }
