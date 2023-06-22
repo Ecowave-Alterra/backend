@@ -2,6 +2,7 @@ package common
 
 import (
 	aih "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/information"
+	oha "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/order"
 	ph "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/product"
 	pch "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/product_category"
 	avh "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/voucher"
@@ -20,4 +21,5 @@ type Handler struct {
 	OrderHandlerUser        *ohu.OrderHandler
 	ProductCategoryHandler  *pch.ProductCategoryHandler
 	ProductHandler          *ph.ProductHandler
+	OrderHandlerAdmin       *oha.OrderHandlerAdmin
 }

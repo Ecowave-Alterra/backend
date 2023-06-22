@@ -1,11 +1,15 @@
 package transaction
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Transaction struct {
 	*gorm.Model
 
-	UserId             uint
+	UserId             uint `validate:"required"`
 	VoucherId          uint `json:"VoucherId" form:"VoucherId"`
 	AddressId          uint `json:"AddressId" form:"AddressId"`
 	StatusTransaction  string
@@ -25,4 +29,14 @@ type Transaction struct {
 	Discount           float64 `json:"Discount" form:"Discount"`
 	TotalPrice         float64
 	TransactionDetails []TransactionDetail `json:"TransactionDetails" form:"TransactionDetails" gorm:"foreignKey:TransactionId"`
+}
+
+type TransactionResponse struct {
+	ReceiptNumber     string
+	TransactionId     string
+	Name              string
+	Unit              uint
+	TotalPrice        float64
+	OrderDate         time.Time
+	StatusTransaction string
 }

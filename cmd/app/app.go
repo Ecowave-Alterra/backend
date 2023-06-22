@@ -37,6 +37,10 @@ import (
 	orderRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/order"
 	orderUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/order"
 
+	orderHandlerAdmin "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/order"
+	orderRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/order"
+	orderUsecaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/order"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -75,6 +79,10 @@ func StartApp() *echo.Echo {
 	orderUsecaseUser := orderUsecaseUser.New(orderRepoUser)
 	orderHandlerUser := orderHandlerUser.New(orderUsecaseUser)
 
+	orderRepoAdmin := orderRepoAdmin.New(mysql.DB)
+	orderUsecaseAdmin := orderUsecaseAdmin.New(orderRepoAdmin)
+	orderHandlerAdmin := orderHandlerAdmin.New(orderUsecaseAdmin)
+
 	handler := common.Handler{
 		AuthHandler:             authHandler,
 		InformationHandlerAdmin: informationHandlerAdmin,
@@ -84,6 +92,7 @@ func StartApp() *echo.Echo {
 		OrderHandlerUser:        orderHandlerUser,
 		ProductCategoryHandler:  productCategoryHandler,
 		ProductHandler:          productHandler,
+		OrderHandlerAdmin:       orderHandlerAdmin,
 	}
 
 	router := routes.StartRoute(handler)
