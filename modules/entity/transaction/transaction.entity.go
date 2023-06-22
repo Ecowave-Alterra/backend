@@ -40,3 +40,29 @@ type TransactionResponse struct {
 	OrderDate         time.Time
 	StatusTransaction string
 }
+
+type TransactionDetailResponse struct {
+	Address            string
+	Voucher            string
+	Name               string
+	PhoneNumber        string
+	ReceiptNumber      string
+	TotalProductPrice  float64
+	TotalShippingPrice float64
+	TotalPrice         float64
+	Point              float64
+	PaymentMethod      string
+	PaymentStatus      string
+	ExpeditionStatus   string
+	CanceledReason     string
+	ExpeditionRating   float32
+	StatusTransaction  string
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+}
+
+type TransactionProductDetailResponse struct {
+	ProductName     string
+	ProductImageUrl string
+	Qty             string
+}

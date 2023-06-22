@@ -53,3 +53,40 @@ func (oh *OrderHandlerAdmin) GetAllOrder(c echo.Context) error {
 		"Status":    http.StatusOK,
 	})
 }
+
+func (oh *OrderHandlerAdmin) GetOrderByID(c echo.Context) error {
+	transaction_id := c.Param("id")
+
+	var transaction te.TransactionDetailResponse
+	transaction, err := oh.orderUseCase.GetOrderByID(transaction_id, &transaction)
+	if err != nil {
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
+		})
+	}
+
+	var products []te.TransactionProductDetailResponse
+	products, err = oh.orderUseCase.GetOrderProducts(transaction_id, &products)
+	if err != nil {
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
+		})
+	}
+
+	orderDetail := struct {
+		Transaction te.TransactionDetailResponse
+		Products    []te.TransactionProductDetailResponse
+	}{
+		Transaction: transaction,
+		Products:    products,
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"Orders": orderDetail,
+		"Status": http.StatusOK,
+	})
+}

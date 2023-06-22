@@ -13,4 +13,5 @@ func (orderHandler *OrderHandlerAdmin) RegisterRoutes(e *echo.Echo) {
 	orderGroup := e.Group("/admin/orders")
 	// orderGroup.Use(jwtMiddleware)
 	orderGroup.GET("", orderHandler.GetAllOrder)
+	orderGroup.GET("/:id", orderHandler.GetOrderByID)
 }
