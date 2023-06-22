@@ -10,7 +10,9 @@ import (
 	ecommerceHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/ecommerce"
 	uih "github.com/berrylradianh/ecowave-go/modules/handler/api/user/information"
 	ohu "github.com/berrylradianh/ecowave-go/modules/handler/api/user/order"
+
 	profileHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/profile"
+	urh "github.com/berrylradianh/ecowave-go/modules/handler/api/user/review"
 	uth "github.com/berrylradianh/ecowave-go/modules/handler/api/user/transaction"
 )
 
@@ -22,6 +24,7 @@ type Handler struct {
 	VoucherHandlerAdmin     *avh.VoucherHandler
 	TransactionHandlerUser  *uth.TransactionHandler
 	OrderHandlerUser        *ohu.OrderHandler
+	ReviewHandlerUser       *urh.ReviewHandler
 	ProductCategoryHandler  *pch.ProductCategoryHandler
 	ProductHandler          *ph.ProductHandler
 	DashboardHandler        *dh.DashboardHandler

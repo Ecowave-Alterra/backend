@@ -1,6 +1,8 @@
 package transaction
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Transaction struct {
 	*gorm.Model

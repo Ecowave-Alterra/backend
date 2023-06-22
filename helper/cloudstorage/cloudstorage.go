@@ -14,6 +14,7 @@ import (
 )
 
 var Folder string
+var FolderVideo string
 
 func UploadToBucket(ctx context.Context, fileHeader *multipart.FileHeader) (string, error) {
 	bucket := "ecowave"
@@ -30,6 +31,40 @@ func UploadToBucket(ctx context.Context, fileHeader *multipart.FileHeader) (stri
 	defer file.Close()
 
 	objectName := Folder + fileHeader.Filename
+	sw := storageClient.Bucket(bucket).Object(objectName).NewWriter(ctx)
+
+	if _, err := io.Copy(sw, file); err != nil {
+		return "", echo.NewHTTPError(500, err)
+	}
+
+	if err := sw.Close(); err != nil {
+		return "", echo.NewHTTPError(500, err)
+	}
+
+	u, err := url.Parse("/" + bucket + "/" + sw.Attrs().Name)
+	if err != nil {
+		return "", echo.NewHTTPError(500, err)
+	}
+
+	PhotoUrl := fmt.Sprintf("https://storage.googleapis.com%s", u.EscapedPath())
+	return PhotoUrl, nil
+}
+
+func UploadVideoToBucket(ctx context.Context, videoHeader *multipart.FileHeader) (string, error) {
+	bucket := "ecowave"
+
+	storageClient, err := storage.NewClient(ctx, option.WithCredentialsFile("storage.json"))
+	if err != nil {
+		return "", echo.NewHTTPError(500, err)
+	}
+
+	file, err := videoHeader.Open()
+	if err != nil {
+		return "", echo.NewHTTPError(500, err)
+	}
+	defer file.Close()
+
+	objectName := FolderVideo + videoHeader.Filename
 	sw := storageClient.Bucket(bucket).Object(objectName).NewWriter(ctx)
 
 	if _, err := io.Copy(sw, file); err != nil {
