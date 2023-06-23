@@ -90,3 +90,61 @@ func (oh *OrderHandlerAdmin) GetOrderByID(c echo.Context) error {
 		"Status": http.StatusOK,
 	})
 }
+
+func (oh *OrderHandlerAdmin) SearchOrder(c echo.Context) error {
+	var transactions *[]te.TransactionResponse
+
+	pageParam := c.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	pageSize := 10
+	offset := (page - 1) * pageSize
+
+	search := c.QueryParam("search")
+	filter := c.QueryParam("filter")
+
+	validParams := map[string]bool{"search": true, "filter": true, "page": true}
+
+	for param := range c.QueryParams() {
+		if !validParams[param] {
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"Message": "Masukkan parameter dengan benar",
+				"Status":  http.StatusBadRequest,
+			})
+		}
+	}
+
+	transactions, total, err := oh.orderUseCase.SearchOrder(search, filter, offset, pageSize)
+	if err != nil {
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
+		})
+	}
+
+	if len(*transactions) == 0 {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Pesanan yang anda cari tidak ditemukan",
+			"Status":  http.StatusNotFound,
+		})
+	}
+
+	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+	if page > totalPages {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"Message": "Halaman Tidak Ditemukan",
+			"Status":  http.StatusNotFound,
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"Orders":    transactions,
+		"Page":      page,
+		"TotalPage": totalPages,
+		"Status":    http.StatusOK,
+	})
+}

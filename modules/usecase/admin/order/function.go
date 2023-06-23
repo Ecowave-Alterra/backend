@@ -15,3 +15,7 @@ func (oc *orderUseCase) GetOrderByID(transactionId string, transaction *te.Trans
 func (oc *orderUseCase) GetOrderProducts(transactionId string, products *[]te.TransactionProductDetailResponse) ([]te.TransactionProductDetailResponse, error) {
 	return oc.orderRepo.GetOrderProducts(transactionId, products)
 }
+
+func (oc *orderUseCase) SearchOrder(search, filter string, offset, pageSize int) (*[]te.TransactionResponse, int64, error) {
+	return oc.orderRepo.SearchOrder(search, filter, offset, pageSize)
+}

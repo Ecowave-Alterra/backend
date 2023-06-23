@@ -14,4 +14,5 @@ func (orderHandler *OrderHandlerAdmin) RegisterRoutes(e *echo.Echo) {
 	// orderGroup.Use(jwtMiddleware)
 	orderGroup.GET("", orderHandler.GetAllOrder)
 	orderGroup.GET("/:id", orderHandler.GetOrderByID)
+	orderGroup.GET("/search", orderHandler.SearchOrder)
 }

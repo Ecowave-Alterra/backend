@@ -40,7 +40,7 @@ func (or *orderRepo) GetOrderByID(transactionId string, transaction *te.Transact
 	return *transaction, nil
 }
 
-func (or orderRepo) GetOrderProducts(transactionId string, products *[]te.TransactionProductDetailResponse) ([]te.TransactionProductDetailResponse, error) {
+func (or *orderRepo) GetOrderProducts(transactionId string, products *[]te.TransactionProductDetailResponse) ([]te.TransactionProductDetailResponse, error) {
 	if err := or.db.Model(&te.TransactionDetail{}).
 		Select("products.name AS ProductName, (SELECT product_image_url FROM product_images WHERE product_id = transaction_details.product_id LIMIT 1) AS ProductImageUrl, transaction_details.qty AS Qty").
 		Joins("JOIN products ON products.product_id = transaction_details.product_id").
@@ -48,4 +48,37 @@ func (or orderRepo) GetOrderProducts(transactionId string, products *[]te.Transa
 		return nil, err
 	}
 	return *products, nil
+}
+
+func (or *orderRepo) SearchOrder(search, filter string, offset, pageSize int) (*[]te.TransactionResponse, int64, error) {
+	var transactions []te.TransactionResponse
+	var count int64
+
+	if err := or.db.Model(&te.Transaction{}).
+		Joins("JOIN users ON  users.id = transactions.user_id").
+		Joins("JOIN user_details ON users.id = user_details.user_id").
+		Where("receipt_number LIKE ? OR user_details.name LIKE ?",
+			"%"+search+"%",
+			"%"+search+"%",
+		).
+		Where("status_transaction LIKE ?", "%"+filter+"%").
+		Count(&count).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(500, err)
+	}
+
+	if err := or.db.Model(&te.Transaction{}).
+		Select("transactions.receipt_number AS ReceiptNumber, transactions.transaction_id AS TransactionId, user_details.name AS Name, (SELECT COUNT(*) FROM transaction_details WHERE transaction_details.transaction_id = transactions.id) AS Unit, total_price AS TotalPrice, transactions.created_at AS OrderDate, status_transaction AS StatusTransaction").
+		Joins("JOIN transaction_details ON transaction_details.transaction_id = transactions.id").
+		Joins("JOIN users ON transactions.user_id = users.id").
+		Joins("JOIN user_details ON users.id = user_details.user_id").
+		Where("receipt_number LIKE ? OR user_details.name LIKE ?",
+			"%"+search+"%",
+			"%"+search+"%",
+		).
+		Where("status_transaction LIKE ?", "%"+filter+"%").
+		Offset(offset).Limit(pageSize).Find(&transactions).Error; err != nil {
+		return nil, 0, echo.NewHTTPError(404, err)
+	}
+
+	return &transactions, count, nil
 }
