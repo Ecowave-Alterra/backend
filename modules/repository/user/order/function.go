@@ -27,7 +27,7 @@ func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize i
 			var pImg ep.ProductImage
 			var product ep.Product
 
-			err = or.db.Select("id").Where("product_id", td.ProductId).First(&product).Error
+			err = or.db.Select("product_id").Where("product_id", td.ProductId).First(&product).Error
 			if err != nil {
 				return nil, 0, err
 			}

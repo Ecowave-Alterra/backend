@@ -43,6 +43,6 @@ func (rc reviewUsecase) GetUserByID(userID string, user *ue.User) (ue.User, erro
 	return rc.reviewRepo.GetUserByID(userID, user)
 }
 
-func (rc *reviewUsecase) GetAllReviewByID(reviewID string, review *re.Review) (re.Review, error) {
+func (rc *reviewUsecase) GetAllReviewByID(reviewID string, review *re.RatingProduct) (re.RatingProduct, error) {
 	return rc.reviewRepo.GetAllReviewByID(reviewID, review)
 }

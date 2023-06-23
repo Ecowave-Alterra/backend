@@ -33,6 +33,12 @@ func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 			})
 		}
 		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+		if page > totalPages {
+			return e.JSON(http.StatusNotFound, echo.Map{
+				"Message": "Halaman Tidak Ditemukan",
+				"Status":  http.StatusNotFound,
+			})
+		}
 
 		return e.JSON(http.StatusOK, map[string]interface{}{
 			"Status":       http.StatusOK,

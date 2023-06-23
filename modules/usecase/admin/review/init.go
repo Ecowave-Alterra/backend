@@ -18,7 +18,7 @@ type ReviewUseCase interface {
 	GetAllTransactionDetail(productID string, transactionDetails *[]te.TransactionDetail, offset, pageSize int) ([]te.TransactionDetail, int64, error)
 	GetTransactionByID(transactionID uint, transaction *te.Transaction) (te.Transaction, error)
 	GetUserByID(userID string, user *ue.User) (ue.User, error)
-	GetAllReviewByID(reviewID string, review *re.Review) (re.Review, error)
+	GetAllReviewByID(reviewID string, review *re.RatingProduct) (re.RatingProduct, error)
 }
 
 type reviewUsecase struct {

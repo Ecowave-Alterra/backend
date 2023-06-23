@@ -114,7 +114,7 @@ func (rr *reviewRepo) GetUserByID(userID string, user *ue.User) (ue.User, error)
 	return *user, nil
 }
 
-func (rr *reviewRepo) GetAllReviewByID(reviewID string, review *re.Review) (re.Review, error) {
+func (rr *reviewRepo) GetAllReviewByID(reviewID string, review *re.RatingProduct) (re.RatingProduct, error) {
 	if err := rr.db.Where("id = ?", reviewID).Find(&review).Error; err != nil {
 		return *review, err
 	}

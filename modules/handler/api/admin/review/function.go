@@ -123,7 +123,7 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 		})
 	}
 
-	var review re.Review
+	var review re.RatingProduct
 	var reviewResponses []re.ReviewResponse
 	var transaction te.Transaction
 	var product pe.Product
