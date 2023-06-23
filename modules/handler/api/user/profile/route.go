@@ -20,7 +20,6 @@ func (ph *ProfileHandler) RegisterRoute(e *echo.Echo) {
 	profileGroup.PUT("/address/:id", ph.UpdateAddressProfile)
 	profileGroup.PUT("/password", ph.UpdatePasswordProfile)
 
-	e.Use(jwtMiddleware)
-	e.GET("/province", ph.GetAllProvince)
-	e.GET("/city", ph.GetAllCityByProvince)
-}
+
+	e.GET("/province", ph.GetAllProvince, jwtMiddleware)
+	e.GET("/city", ph.GetAllCityByProvince, jwtMiddleware)
