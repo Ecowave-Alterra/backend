@@ -55,9 +55,7 @@ func (or *orderRepo) SearchOrder(search, filter string, offset, pageSize int) (*
 	var count int64
 
 	if err := or.db.Model(&te.Transaction{}).
-		Joins("JOIN users ON  users.id = transactions.user_id").
-		Joins("JOIN user_details ON users.id = user_details.user_id").
-		Where("receipt_number LIKE ? OR user_details.name LIKE ?",
+		Where("receipt_number LIKE ? OR transactions.transaction_id LIKE ?",
 			"%"+search+"%",
 			"%"+search+"%",
 		).
@@ -71,7 +69,7 @@ func (or *orderRepo) SearchOrder(search, filter string, offset, pageSize int) (*
 		Joins("JOIN transaction_details ON transaction_details.transaction_id = transactions.id").
 		Joins("JOIN users ON transactions.user_id = users.id").
 		Joins("JOIN user_details ON users.id = user_details.user_id").
-		Where("receipt_number LIKE ? OR user_details.name LIKE ?",
+		Where("receipt_number LIKE ? OR transactions.transaction_id LIKE ?",
 			"%"+search+"%",
 			"%"+search+"%",
 		).
