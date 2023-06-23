@@ -6,8 +6,13 @@ import (
 )
 
 type AuthUsecase interface {
-	Login(request *ue.LoginRequest) (*ue.User, string, error)
+	Login(request *ue.LoginRequest) (interface{}, uint, error)
+	LoginGoogle(request *ue.LoginGoogleRequest) (interface{}, uint, error)
 	Register(user *ue.RegisterRequest) error
+	RegisterGoogle(user *ue.RegisterGoogleRequest) error
+	ForgotPassword(request ue.ForgotPassRequest) (string, error)
+	VerifOtp(request ue.VerifOtp) error
+	ChangePassword(request ue.RecoveryRequest) error
 }
 
 type authUsecase struct {
