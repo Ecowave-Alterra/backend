@@ -13,6 +13,5 @@ func (informationHandler *InformationHandler) RegisterRoutes(e *echo.Echo) {
 	informationGroup := e.Group("/user/information")
 	informationGroup.Use(jwtMiddleware)
 	informationGroup.GET("", informationHandler.GetAllInformations())
-	informationGroup.GET("/:id", informationHandler.GetDetailInformations())
-	informationGroup.POST("/point/:id", informationHandler.UpdatePoint())
+	informationGroup.GET("/point", informationHandler.UpdatePoint())
 }

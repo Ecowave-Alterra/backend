@@ -11,6 +11,7 @@ import (
 	re "github.com/berrylradianh/ecowave-go/modules/entity/role"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
+	ve "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -23,7 +24,6 @@ func Init() {
 	InitialMigration()
 	seed.DBSeed(DB)
 }
-
 func InitDB() {
 	var err error
 
@@ -48,13 +48,17 @@ func InitialMigration() {
 		re.Role{},
 		ue.User{},
 		ue.UserDetail{},
+		ue.UserAddress{},
 		ie.Information{},
+		ve.Voucher{},
 		pe.ProductCategory{},
 		pe.Product{},
 		pe.ProductImage{},
 		et.Transaction{},
 		er.Review{},
 		et.TransactionDetail{},
+		ve.VoucherType{},
+		er.RatingProduct{},
 	)
 	DB.Migrator().HasConstraint(&ue.User{}, "UserDetail")
 	DB.Migrator().HasConstraint(&re.Role{}, "Users")

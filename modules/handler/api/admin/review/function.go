@@ -51,19 +51,19 @@ func (rh *ReviewHandler) GetAllReview(c echo.Context) error {
 	var transactionDetails []te.TransactionDetail
 	var reviewResponses []re.GetAllReviewResponse
 	for _, product := range products {
-		transactionDetails, err := rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ID), &transactionDetails)
+		transactionDetails, err := rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ProductId), &transactionDetails)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Gagal mengambil data transaksi detail produk",
 			})
 		}
 		for _, td := range transactionDetails {
-			if fmt.Sprint(td.RatingProductId) != "" {
+			if fmt.Sprint(td.RatingProduct.ID) != "" {
 				count++
 			}
 		}
 		reviewResponse := re.GetAllReviewResponse{
-			ProductID: product.ID,
+			ProductID: product.ProductId,
 			Name:      product.Name,
 			Category:  product.ProductCategory.Category,
 			ReviewQty: uint(count),
@@ -129,8 +129,8 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 	var product pe.Product
 	var user ue.User
 	for _, td := range transactionDetails {
-		if fmt.Sprint(td.RatingProductId) != "" {
-			review, err = rh.reviewUsecase.GetAllReviewByID(fmt.Sprint(td.RatingProductId), &review)
+		if fmt.Sprint(td.RatingProduct.ID) != "" {
+			review, err = rh.reviewUsecase.GetAllReviewByID(fmt.Sprint(td.RatingProduct.ID), &review)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 					"Message": "Gagal mengambil data ulasan produk",
@@ -231,7 +231,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 
 		count := 0
 		for _, td := range transactionDetails {
-			if fmt.Sprint(td.RatingProductId) != "" {
+			if fmt.Sprint(td.RatingProduct.ID) != "" {
 				count++
 			}
 		}
@@ -252,7 +252,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		}
 
 		reviewResponse := re.GetAllReviewResponse{
-			ProductID: product.ID,
+			ProductID: product.ProductId,
 			Name:      product.Name,
 			Category:  product.ProductCategory.Category,
 			ReviewQty: uint(count),
@@ -280,7 +280,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		var transactionDetails []te.TransactionDetail
 		var reviewResponses []re.GetAllReviewResponse
 		for _, product := range products {
-			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ID), &transactionDetails)
+			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ProductId), &transactionDetails)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 					"Message": "Gagal mengambil data transaksi detail produk",
@@ -288,13 +288,13 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 				})
 			}
 			for _, td := range transactionDetails {
-				if fmt.Sprint(td.RatingProductId) != "" {
+				if fmt.Sprint(td.RatingProduct.ID) != "" {
 					count++
 				}
 			}
 
 			reviewResponse := re.GetAllReviewResponse{
-				ProductID: product.ID,
+				ProductID: product.ProductId,
 				Name:      product.Name,
 				Category:  product.ProductCategory.Category,
 				ReviewQty: uint(count),
@@ -341,7 +341,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		var transactionDetails []te.TransactionDetail
 		var reviewResponses []re.GetAllReviewResponse
 		for _, product := range products {
-			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ID), &transactionDetails)
+			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ProductId), &transactionDetails)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 					"Message": "Gagal mengambil data transaksi detail produk",
@@ -349,13 +349,13 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 				})
 			}
 			for _, td := range transactionDetails {
-				if fmt.Sprint(td.RatingProductId) != "" {
+				if fmt.Sprint(td.RatingProduct.ID) != "" {
 					count++
 				}
 			}
 
 			reviewResponse := re.GetAllReviewResponse{
-				ProductID: product.ID,
+				ProductID: product.ProductId,
 				Name:      product.Name,
 				Category:  product.ProductCategory.Category,
 				ReviewQty: uint(count),

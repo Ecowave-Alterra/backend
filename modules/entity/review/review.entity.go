@@ -14,7 +14,7 @@ type Review struct {
 }
 
 type GetAllReviewResponse struct {
-	ProductID uint
+	ProductID string
 	Name      string
 	Category  string
 	ReviewQty uint

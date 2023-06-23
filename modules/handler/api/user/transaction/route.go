@@ -13,4 +13,11 @@ func (transactionHandler *TransactionHandler) RegisterRoutes(e *echo.Echo) {
 	transactionGroup := e.Group("/user/transaction")
 	transactionGroup.Use(jwtMiddleware)
 	transactionGroup.POST("", transactionHandler.CreateTransaction())
+	transactionGroup.GET("/point", transactionHandler.GetPoint())
+	// transactionGroup.GET("/claim-voucher/:id", transactionHandler.ClaimVoucher())
+	transactionGroup.GET("/voucher", transactionHandler.GetVoucherUser())
+	// transactionGroup.GET("/voucher/:id", transactionHandler.DetailVoucher())
+	transactionGroup.POST("/shipping-options", transactionHandler.ShippingOptions())
+	transactionGroup.POST("/midtrans/notifications", transactionHandler.MidtransNotifications())
+	transactionGroup.GET("/status-payment", transactionHandler.GetPaymentStatus())
 }
