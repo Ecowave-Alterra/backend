@@ -1,9 +1,9 @@
-name: Test to deploy
+name: Deploy to GCP
 
 on:
   push:
     branches:
-      - fixDeployment
+      - development
 
 env:
   PROJECT_ID: temporal-potion-388712
