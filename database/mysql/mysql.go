@@ -49,7 +49,6 @@ func InitialMigration() {
 		re.Role{},
 		ue.User{},
 		ue.UserDetail{},
-		ue.UserRecovery{},
 		ue.UserAddress{},
 		ie.Information{},
 		ve.Voucher{},

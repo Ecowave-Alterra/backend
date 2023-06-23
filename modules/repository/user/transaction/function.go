@@ -126,3 +126,22 @@ func (tr *transactionRepo) CountVoucherUser(idUser uint, idVoucher uint) (uint, 
 	return uint(count), nil
 
 }
+
+// func (tr *transactionRepo) ClaimVoucher(id uint) (ev.Voucher, error) {
+// 	var voucher ev.Voucher
+
+// 	if err := tr.db.Where("id = ?", id).First(&voucher).Error; err != nil {
+// 		return voucher, err
+// 	}
+
+// 	return voucher, nil
+
+// }
+// func (tr *transactionRepo) DetailVoucher(id uint) (ev.Voucher, error) {
+// 	var voucher ev.Voucher
+
+// 	if err := tr.db.Preload("VoucherType").Where("id = ?", id).First(&voucher).Error; err != nil {
+// 		return voucher, err
+// 	}
+// 	return voucher, nil
+// }

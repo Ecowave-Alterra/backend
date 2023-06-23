@@ -4,10 +4,16 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
+	"log"
 	"os"
 )
 
 func Hash(orderid string, statusCode string, grosAmount string) string {
+
+	log.Println(orderid)
+	log.Println(statusCode)
+	log.Println(grosAmount)
+	log.Println(os.Getenv("MIDTRANS_SERVER_KEY"))
 
 	input := orderid + statusCode + grosAmount + os.Getenv("MIDTRANS_SERVER_KEY")
 	inputBytes := []byte(input)
