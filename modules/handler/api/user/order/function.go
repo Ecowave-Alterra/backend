@@ -31,17 +31,26 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 		order, total, err := oh.orderUsecase.GetOrder(filter, idUser, offset, pageSize)
 
 		if err != nil {
-
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
 				"Message": err.Error(),
 			})
 		}
+
 		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
-		if page > totalPages {
-			return e.JSON(http.StatusNotFound, echo.Map{
-				"Message": "Halaman Tidak Ditemukan",
-				"Status":  http.StatusNotFound,
+		if total != 0 {
+			if page > totalPages {
+				return e.JSON(http.StatusNotFound, echo.Map{
+					"Message": "Halaman Tidak Ditemukan",
+					"Status":  http.StatusNotFound,
+				})
+			}
+		} else {
+			page = 0
+			return e.JSON(http.StatusOK, map[string]interface{}{
+				"Status":  200,
+				"Message": "Succes get order",
+				"Order":   order,
 			})
 		}
 
