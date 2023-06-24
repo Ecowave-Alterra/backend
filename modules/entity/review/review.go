@@ -24,6 +24,7 @@ type GetAllReviewResponse struct {
 
 type ReviewResponse struct {
 	TransactionID    string
+	ReceiptNumber    string
 	Name             string
 	ProfilePhoto     string
 	ProductName      string
@@ -33,6 +34,6 @@ type ReviewResponse struct {
 	PhotoUrl         string
 	VideoUrl         string
 	AvgRating        float64
-	ExpeditionRating float32
+	ExpeditionRating float64
 	ProductRating    float64
 }

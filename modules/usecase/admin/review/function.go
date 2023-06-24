@@ -27,7 +27,7 @@ func (rc *reviewUsecase) GetAllProductByCategory(category string, product *[]pe.
 	return rc.reviewRepo.GetAllProductByCategory(category, product, offset, pageSize)
 }
 
-func (rc *reviewUsecase) GetAllTransactionDetailsNoPagination(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error) {
+func (rc *reviewUsecase) GetAllTransactionDetailsNoPagination(productID string, transactionDetails []te.TransactionDetail) ([]te.TransactionDetail, error) {
 	return rc.reviewRepo.GetAllTransactionDetailsNoPagination(productID, transactionDetails)
 }
 
@@ -45,4 +45,8 @@ func (rc reviewUsecase) GetUserByID(userID string, user *ue.User) (ue.User, erro
 
 func (rc *reviewUsecase) GetAllReviewByID(reviewID string, review *re.RatingProduct) (re.RatingProduct, error) {
 	return rc.reviewRepo.GetAllReviewByID(reviewID, review)
+}
+
+func (rc *reviewUsecase) GetProductReviewById(productId string, offset, pageSize int) ([]re.ReviewResponse, int64, error) {
+	return rc.reviewRepo.GetProductReviewById(productId, offset, pageSize)
 }

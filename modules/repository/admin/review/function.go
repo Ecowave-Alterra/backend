@@ -24,7 +24,7 @@ func (rr *reviewRepo) GetAllProducts(products *[]pe.Product, offset, pageSize in
 func (rr *reviewRepo) GetProductByIDNoPagination(productId string, product *pe.Product) (pe.Product, error) {
 	if err := rr.db.
 		Preload("ProductCategory").
-		Where("id = ?", productId).
+		Where("product_id = ?", productId).
 		First(&product).Error; err != nil {
 		return *product, err
 	}
@@ -77,12 +77,12 @@ func (rr *reviewRepo) GetAllProductByCategory(category string, product *[]pe.Pro
 	// return *product, nil
 }
 
-func (rr *reviewRepo) GetAllTransactionDetailsNoPagination(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error) {
-	if err := rr.db.Where("product_id = ?", productID).Find(&transactionDetails).Error; err != nil {
+func (rr *reviewRepo) GetAllTransactionDetailsNoPagination(productID string, transactionDetails []te.TransactionDetail) ([]te.TransactionDetail, error) {
+	if err := rr.db.Where("product_id = ?", productID).Preload("RatingProduct").Find(&transactionDetails).Error; err != nil {
 		return nil, err
 	}
 
-	return *transactionDetails, nil
+	return transactionDetails, nil
 }
 
 func (rr *reviewRepo) GetAllTransactionDetail(productID string, transactionDetails *[]te.TransactionDetail, offset, pageSize int) ([]te.TransactionDetail, int64, error) {
@@ -91,7 +91,7 @@ func (rr *reviewRepo) GetAllTransactionDetail(productID string, transactionDetai
 		return nil, 0, echo.NewHTTPError(500, err)
 	}
 
-	if err := rr.db.Where("product_id = ?", productID).Offset(offset).Limit(pageSize).Find(&transactionDetails).Error; err != nil {
+	if err := rr.db.Where("product_id = ?", productID).Offset(offset).Limit(pageSize).Preload("RatingProduct").Find(&transactionDetails).Error; err != nil {
 		return nil, 0, echo.NewHTTPError(404, err)
 	}
 
@@ -120,4 +120,55 @@ func (rr *reviewRepo) GetAllReviewByID(reviewID string, review *re.RatingProduct
 	}
 
 	return *review, nil
+}
+
+func (rr *reviewRepo) GetProductReviewById(productId string, offset, pageSize int) ([]re.ReviewResponse, int64, error) {
+	var review []re.ReviewResponse
+	var count int64
+
+	// sql := SELECT t.transaction_id AS TransactionID,t.receipt_number AS ReceiptNumber,ud.name AS Name,
+	// ud.profile_photo AS ProfilePhoto, p.name AS ProductName, pc.category AS ProductCategory,
+	// rp.comment AS CommentUser, rp.comment_admin AS CommentAdmin, rp.photo_url AS PhotoUrl,
+	// rp.video_url AS VideoUrl, CASE WHEN (t.expedition_rating * rp.rating) / 2 > 5 THEN 5 ELSE (t.expedition_rating * rp.rating) / 2 END AS AvgRating,
+	// t.expedition_rating AS ExpeditionRating, rp.rating AS ProductRating
+	// FROM transactions t
+	// JOIN users u ON t.user_id = u.id
+	// JOIN user_details ud ON ud.user_id = u.id
+	// JOIN transaction_details td ON td.transaction_id = t.id
+	// JOIN products p ON p.product_id = td.product_id
+	// JOIN product_categories pc ON pc.id = p.product_category_id
+	// JOIN rating_products rp ON rp.transaction_detail_id = td.id
+	// WHERE t.status_transaction = "selesai" AND p.product_id LIKE "%a3325f33-e01a-4e40-9ca7-5d84c4337094%";
+
+	if err := rr.db.Table("transactions AS t").
+		Select("t.transaction_id AS TransactionID, t.receipt_number AS ReceiptNumber, ud.name AS Name, ud.profile_photo AS ProfilePhoto, p.name AS ProductName, pc.category AS ProductCategory, rp.comment AS CommentUser, rp.comment_admin AS CommentAdmin, rp.photo_url AS PhotoUrl, rp.video_url AS VideoUrl, CASE WHEN (t.expedition_rating * rp.rating) / 2 > 5 THEN 5 ELSE (t.expedition_rating * rp.rating) / 2 END AS AvgRating, t.expedition_rating AS ExpeditionRating, rp.rating AS ProductRating").
+		Joins("JOIN users u ON t.user_id = u.id").
+		Joins("JOIN user_details ud ON ud.user_id = u.id").
+		Joins("JOIN transaction_details td ON td.transaction_id = t.id").
+		Joins("JOIN products p ON p.product_id = td.product_id").
+		Joins("JOIN product_categories pc ON pc.id = p.product_category_id").
+		Joins("JOIN rating_products rp ON rp.transaction_detail_id = td.id").
+		Where("t.status_transaction = ? AND p.product_id LIKE ?", "selesai", "%"+productId+"%").
+		Offset(offset).Limit(pageSize).
+		Count(&count).
+		Error; err != nil {
+		return review, 0, err
+	}
+
+	if err := rr.db.Table("transactions AS t").
+		Select("t.transaction_id AS TransactionID, t.receipt_number AS ReceiptNumber, ud.name AS Name, ud.profile_photo AS ProfilePhoto, p.name AS ProductName, pc.category AS ProductCategory, rp.comment AS CommentUser, rp.comment_admin AS CommentAdmin, rp.photo_url AS PhotoUrl, rp.video_url AS VideoUrl, CASE WHEN (t.expedition_rating * rp.rating) / 2 > 5 THEN 5 ELSE (t.expedition_rating * rp.rating) / 2 END AS AvgRating, t.expedition_rating AS ExpeditionRating, rp.rating AS ProductRating").
+		Joins("JOIN users u ON t.user_id = u.id").
+		Joins("JOIN user_details ud ON ud.user_id = u.id").
+		Joins("JOIN transaction_details td ON td.transaction_id = t.id").
+		Joins("JOIN products p ON p.product_id = td.product_id").
+		Joins("JOIN product_categories pc ON pc.id = p.product_category_id").
+		Joins("JOIN rating_products rp ON rp.transaction_detail_id = td.id").
+		Where("t.status_transaction = ? AND p.product_id LIKE ?", "selesai", "%"+productId+"%").
+		Offset(offset).Limit(pageSize).
+		Scan(&review).
+		Error; err != nil {
+		return review, 0, err
+	}
+
+	return review, count, nil
 }

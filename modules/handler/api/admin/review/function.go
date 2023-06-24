@@ -9,7 +9,6 @@ import (
 	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	re "github.com/berrylradianh/ecowave-go/modules/entity/review"
 	te "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
-	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 	"github.com/labstack/echo/v4"
 )
 
@@ -51,14 +50,14 @@ func (rh *ReviewHandler) GetAllReview(c echo.Context) error {
 	var transactionDetails []te.TransactionDetail
 	var reviewResponses []re.GetAllReviewResponse
 	for _, product := range products {
-		transactionDetails, err := rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ProductId), &transactionDetails)
+		transactionDetails, err := rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ProductId), transactionDetails)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Gagal mengambil data transaksi detail produk",
 			})
 		}
 		for _, td := range transactionDetails {
-			if fmt.Sprint(td.RatingProduct.ID) != "" {
+			if td.RatingProduct.Rating != 0 {
 				count++
 			}
 		}
@@ -100,17 +99,16 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 	pageSize := 10
 	offset := (page - 1) * pageSize
 
-	var transactionDetails []te.TransactionDetail
-	transactionDetails, total, err := rh.reviewUsecase.GetAllTransactionDetail(fmt.Sprint(productID), &transactionDetails, offset, pageSize)
+	reviews, total, err := rh.reviewUsecase.GetProductReviewById(productID, offset, pageSize)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"Message": "Gagal mengambil data transaksi detail produk",
+			"Message": "Gagal mengambil data produk",
 		})
 	}
 
-	if len(transactionDetails) == 0 {
+	if len(reviews) == 0 {
 		return c.JSON(http.StatusNotFound, echo.Map{
-			"Message": "Belum ada list detail transaksi",
+			"Message": "Belum ada list produk",
 			"Status":  http.StatusNotFound,
 		})
 	}
@@ -122,73 +120,8 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 			"Status":  http.StatusNotFound,
 		})
 	}
-
-	var review re.RatingProduct
-	var reviewResponses []re.ReviewResponse
-	var transaction te.Transaction
-	var product pe.Product
-	var user ue.User
-	for _, td := range transactionDetails {
-		if fmt.Sprint(td.RatingProduct.ID) != "" {
-			review, err = rh.reviewUsecase.GetAllReviewByID(fmt.Sprint(td.RatingProduct.ID), &review)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-					"Message": "Gagal mengambil data ulasan produk",
-					"Status":  http.StatusInternalServerError,
-				})
-			}
-
-			transaction, err := rh.reviewUsecase.GetTransactionByID(td.TransactionId, &transaction)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-					"Message": "Gagal mengambil data transaksi",
-					"Status":  http.StatusInternalServerError,
-				})
-			}
-
-			product, err := rh.reviewUsecase.GetProductByIDNoPagination(fmt.Sprint(td.ProductId), &product)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-					"Message": "Gagal mengambil data produk",
-				})
-			}
-
-			user, err := rh.reviewUsecase.GetUserByID(fmt.Sprint(transaction.UserId), &user)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-					"Message": "Gagal mengambil data user",
-					"Status":  http.StatusInternalServerError,
-				})
-			}
-
-			reviewResponse := re.ReviewResponse{
-				TransactionID:    fmt.Sprint(td.TransactionId),
-				Name:             user.Username,
-				ProfilePhoto:     user.UserDetail.ProfilePhoto,
-				ProductName:      product.Name,
-				ProductCategory:  product.ProductCategory.Category,
-				CommentUser:      review.Comment,
-				CommentAdmin:     review.CommentAdmin,
-				PhotoUrl:         review.PhotoUrl,
-				VideoUrl:         review.VideoUrl,
-				AvgRating:        product.Rating,
-				ExpeditionRating: transaction.ExpeditionRating,
-				ProductRating:    review.Rating,
-			}
-
-			reviewResponses = append(reviewResponses, reviewResponse)
-		}
-	}
-
-	if reviewResponses == nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"Message": "Gagal mengambil data ulasan produk",
-			"Status":  http.StatusInternalServerError,
-		})
-	}
-
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Reviews":   reviewResponses,
+		"Reviews":   reviews,
 		"Page":      page,
 		"TotalPage": totalPages,
 		"Status":    http.StatusOK,
@@ -221,7 +154,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		}
 
 		var transactionDetails []te.TransactionDetail
-		transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(productID), &transactionDetails)
+		transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ProductId), transactionDetails)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"Message": "Gagal mengambil data transaksi detail produk",
@@ -280,7 +213,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		var transactionDetails []te.TransactionDetail
 		var reviewResponses []re.GetAllReviewResponse
 		for _, product := range products {
-			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ProductId), &transactionDetails)
+			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ProductId), transactionDetails)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 					"Message": "Gagal mengambil data transaksi detail produk",
@@ -341,7 +274,7 @@ func (rh *ReviewHandler) SearchReview(c echo.Context) error {
 		var transactionDetails []te.TransactionDetail
 		var reviewResponses []re.GetAllReviewResponse
 		for _, product := range products {
-			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ProductId), &transactionDetails)
+			transactionDetails, err = rh.reviewUsecase.GetAllTransactionDetailsNoPagination(fmt.Sprint(product.ProductId), transactionDetails)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 					"Message": "Gagal mengambil data transaksi detail produk",

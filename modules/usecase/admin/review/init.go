@@ -14,11 +14,12 @@ type ReviewUseCase interface {
 	GetProductByID(productId string, product *pe.Product, offset, pageSize int) (*pe.Product, int64, error)
 	GetProductByName(name string, product *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error)
 	GetAllProductByCategory(category string, product *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error)
-	GetAllTransactionDetailsNoPagination(productID string, transactionDetails *[]te.TransactionDetail) ([]te.TransactionDetail, error)
+	GetAllTransactionDetailsNoPagination(productID string, transactionDetails []te.TransactionDetail) ([]te.TransactionDetail, error)
 	GetAllTransactionDetail(productID string, transactionDetails *[]te.TransactionDetail, offset, pageSize int) ([]te.TransactionDetail, int64, error)
 	GetTransactionByID(transactionID uint, transaction *te.Transaction) (te.Transaction, error)
 	GetUserByID(userID string, user *ue.User) (ue.User, error)
 	GetAllReviewByID(reviewID string, review *re.RatingProduct) (re.RatingProduct, error)
+	GetProductReviewById(productId string, offset, pageSize int) ([]re.ReviewResponse, int64, error)
 }
 
 type reviewUsecase struct {

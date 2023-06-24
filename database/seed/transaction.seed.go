@@ -39,6 +39,7 @@ func CreateTransaction() []*et.Transaction {
 			Discount:           10000,
 			TotalPrice:         35000,
 			EstimationDay:      "3-6",
+			ExpeditionRating:   4.5,
 			PaymentUrl:         "https://app.sandbox.midtrans.com/snap/v3/redirection/06ca4f27-d7ad-4e87-be48-5da6d6095a64",
 		},
 		{
