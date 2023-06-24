@@ -8,6 +8,37 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func (rr *reviewRepo) GetAllProductReviews(offset, pageSize int) ([]re.GetAllReviewResponse, int64, error) {
+	var reviews []re.GetAllReviewResponse
+	var count int64
+
+	if err := rr.db.Table("products AS p").
+		Select("p.product_id AS ProductID, p.name AS Name, pc.category AS Category, COUNT(rp.rating) AS ReviewQty").
+		Joins("LEFT JOIN product_categories pc ON pc.id = p.product_category_id").
+		Joins("LEFT JOIN transaction_details td ON td.product_id = p.product_id").
+		Joins("LEFT JOIN rating_products rp ON rp.transaction_detail_id = td.id").
+		Group("p.product_id, p.name, pc.category").
+		Offset(offset).Limit(pageSize).
+		Count(&count).
+		Error; err != nil {
+		return nil, 0, err
+	}
+
+	if err := rr.db.Table("products AS p").
+		Select("p.product_id AS ProductID, p.name AS Name, pc.category AS Category, COUNT(rp.rating) AS ReviewQty").
+		Joins("LEFT JOIN product_categories pc ON pc.id = p.product_category_id").
+		Joins("LEFT JOIN transaction_details td ON td.product_id = p.product_id").
+		Joins("LEFT JOIN rating_products rp ON rp.transaction_detail_id = td.id").
+		Group("p.product_id, p.name, pc.category").
+		Offset(offset).Limit(pageSize).
+		Scan(&reviews).
+		Error; err != nil {
+		return nil, 0, err
+	}
+
+	return reviews, count, nil
+}
+
 func (rr *reviewRepo) GetAllProducts(products *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error) {
 	var count int64
 	if err := rr.db.Model(&pe.Product{}).Count(&count).Error; err != nil {

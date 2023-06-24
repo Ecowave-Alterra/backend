@@ -7,6 +7,10 @@ import (
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 )
 
+func (rc *reviewUsecase) GetAllProductReviews(offset, pageSize int) ([]re.GetAllReviewResponse, int64, error) {
+	return rc.reviewRepo.GetAllProductReviews(offset, pageSize)
+}
+
 func (rc *reviewUsecase) GetAllProducts(products *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error) {
 	return rc.reviewRepo.GetAllProducts(products, offset, pageSize)
 }

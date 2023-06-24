@@ -9,6 +9,7 @@ import (
 )
 
 type ReviewUseCase interface {
+	GetAllProductReviews(offset, pageSize int) ([]re.GetAllReviewResponse, int64, error)
 	GetAllProducts(products *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error)
 	GetProductByIDNoPagination(productId string, product *pe.Product) (pe.Product, error)
 	GetProductByID(productId string, product *pe.Product, offset, pageSize int) (*pe.Product, int64, error)

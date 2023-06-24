@@ -12,7 +12,7 @@ func (reviewHandler *ReviewHandler) RegisterRoutes(e *echo.Echo) {
 
 	reviewGroup := e.Group("/admin/reviews")
 	// reviewGroup.Use(jwtMiddleware)
-	reviewGroup.GET("", reviewHandler.GetAllReview)
+	reviewGroup.GET("", reviewHandler.GetAllProductReviews)
 	reviewGroup.GET("/:id", reviewHandler.GetReviewByProductID)
 	reviewGroup.GET("/search", reviewHandler.SearchReview)
 }
