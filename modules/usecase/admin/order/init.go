@@ -10,6 +10,7 @@ type OrderUseCase interface {
 	GetOrderByID(transactionId string, transaction *te.TransactionDetailResponse) (te.TransactionDetailResponse, error)
 	GetOrderProducts(transactionId string, products *[]te.TransactionProductDetailResponse) ([]te.TransactionProductDetailResponse, error)
 	SearchOrder(search, filter string, offset, pageSize int) (*[]te.TransactionResponse, int64, error)
+	UpdateReceiptNumber(transactionId string, receiptNumber string) error
 }
 
 type orderUseCase struct {

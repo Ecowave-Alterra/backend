@@ -19,3 +19,7 @@ func (oc *orderUseCase) GetOrderProducts(transactionId string, products *[]te.Tr
 func (oc *orderUseCase) SearchOrder(search, filter string, offset, pageSize int) (*[]te.TransactionResponse, int64, error) {
 	return oc.orderRepo.SearchOrder(search, filter, offset, pageSize)
 }
+
+func (oc *orderUseCase) UpdateReceiptNumber(transactionId string, receiptNumber string) error {
+	return oc.orderRepo.UpdateReceiptNumber(transactionId, receiptNumber)
+}

@@ -13,7 +13,7 @@ type Transaction struct {
 	VoucherId          uint `json:"VoucherId" form:"VoucherId"`
 	AddressId          uint `json:"AddressId" form:"AddressId"`
 	StatusTransaction  string
-	ReceiptNumber      string
+	ReceiptNumber      string `json:"ReceiptNumber" form:"ReceiptNumber"`
 	TransactionId      string `json:"TransactionId" form:"TransactionId"`
 	TotalProductPrice  float64
 	TotalShippingPrice float64 `json:"TotalShippingPrice" form:"TotalShippingPrice" validate:"required"`

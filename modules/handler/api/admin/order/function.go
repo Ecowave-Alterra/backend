@@ -148,3 +148,29 @@ func (oh *OrderHandlerAdmin) SearchOrder(c echo.Context) error {
 		"Status":    http.StatusOK,
 	})
 }
+
+func (oh *OrderHandlerAdmin) UpdateReceiptNumber(c echo.Context) error {
+	transactionId := c.Param("id")
+	receiptNumber := c.FormValue("ReceiptNumber")
+
+	if receiptNumber == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"Message": "Nomor resi tidak boleh kosong",
+			"Status":  http.StatusBadRequest,
+		})
+	}
+
+	err := oh.orderUseCase.UpdateReceiptNumber(transactionId, receiptNumber)
+	if err != nil {
+		code, msg := cs.CustomStatus(err.Error())
+		return c.JSON(code, echo.Map{
+			"Status":  code,
+			"Message": msg,
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"Message": "Anda berhasil mengubah nomor resi pesanan",
+		"Status":  http.StatusOK,
+	})
+}

@@ -80,3 +80,11 @@ func (or *orderRepo) SearchOrder(search, filter string, offset, pageSize int) (*
 
 	return &transactions, count, nil
 }
+
+func (or *orderRepo) UpdateReceiptNumber(transactionId string, receiptNumber string) error {
+	if err := or.db.Model(&te.Transaction{}).Where("transaction_id = ?", transactionId).Update("receipt_number", receiptNumber).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
