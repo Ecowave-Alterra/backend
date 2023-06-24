@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	te "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	"github.com/labstack/echo/v4"
 )
@@ -24,10 +23,9 @@ func (oh *OrderHandlerAdmin) GetAllOrder(c echo.Context) error {
 
 	transactions, total, err := oh.orderUseCase.GetAllOrder(&transactions, offset, pageSize)
 	if err != nil {
-		code, msg := cs.CustomStatus(err.Error())
-		return c.JSON(code, echo.Map{
-			"Status":  code,
-			"Message": msg,
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"Message": "Gagal mendapatkan data pesanan",
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
@@ -59,10 +57,9 @@ func (oh *OrderHandlerAdmin) GetOrderByID(c echo.Context) error {
 
 	exist, err := oh.orderUseCase.CheckOrderExist(transactionId)
 	if err != nil {
-		code, msg := cs.CustomStatus(err.Error())
-		return c.JSON(code, echo.Map{
-			"Status":  code,
-			"Message": msg,
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"Message": "Pesanan tidak ditemukan",
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
@@ -70,20 +67,18 @@ func (oh *OrderHandlerAdmin) GetOrderByID(c echo.Context) error {
 		var transaction te.TransactionDetailResponse
 		transaction, err := oh.orderUseCase.GetOrderByID(transactionId, &transaction)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"Message": "Gagal mendapatkan data pesanan",
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
 		var products []te.TransactionProductDetailResponse
 		products, err = oh.orderUseCase.GetOrderProducts(transactionId, &products)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"Message": "Gagal mendapatkan data produk",
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
@@ -135,10 +130,9 @@ func (oh *OrderHandlerAdmin) SearchOrder(c echo.Context) error {
 
 	transactions, total, err := oh.orderUseCase.SearchOrder(search, filter, offset, pageSize)
 	if err != nil {
-		code, msg := cs.CustomStatus(err.Error())
-		return c.JSON(code, echo.Map{
-			"Status":  code,
-			"Message": msg,
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"Message": "Gagal mendapatkan data pesanan",
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
@@ -178,10 +172,9 @@ func (oh *OrderHandlerAdmin) UpdateReceiptNumber(c echo.Context) error {
 
 	exist, err := oh.orderUseCase.CheckOrderExist(transactionId)
 	if err != nil {
-		code, msg := cs.CustomStatus(err.Error())
-		return c.JSON(code, echo.Map{
-			"Status":  code,
-			"Message": msg,
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"Message": "Pesanan tidak ditemukan",
+			"Status":  http.StatusBadRequest,
 		})
 	}
 
@@ -189,20 +182,18 @@ func (oh *OrderHandlerAdmin) UpdateReceiptNumber(c echo.Context) error {
 		var transaction te.TransactionDetailResponse
 		transaction, err := oh.orderUseCase.GetOrderByID(transactionId, &transaction)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"Message": "Gagal mendapatkan data pesanan",
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
 		if transaction.StatusTransaction == "Dikemas" {
 			err = oh.orderUseCase.UpdateReceiptNumber(transactionId, receiptNumber)
 			if err != nil {
-				code, msg := cs.CustomStatus(err.Error())
-				return c.JSON(code, echo.Map{
-					"Status":  code,
-					"Message": msg,
+				return c.JSON(http.StatusInternalServerError, echo.Map{
+					"Message": "Gagal mengubah nomor resi pesanan",
+					"Status":  http.StatusInternalServerError,
 				})
 			}
 

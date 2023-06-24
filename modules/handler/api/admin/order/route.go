@@ -1,17 +1,17 @@
 package order
 
 import (
-	// "os"
+	"os"
 
-	// echojwt "github.com/labstack/echo-jwt"
+	echojwt "github.com/labstack/echo-jwt"
 	"github.com/labstack/echo/v4"
 )
 
 func (orderHandler *OrderHandlerAdmin) RegisterRoutes(e *echo.Echo) {
-	// jwtMiddleware := echojwt.JWT([]byte(os.Getenv("SECRET_KEY")))
+	jwtMiddleware := echojwt.JWT([]byte(os.Getenv("SECRET_KEY")))
 
 	orderGroup := e.Group("/admin/orders")
-	// orderGroup.Use(jwtMiddleware)
+	orderGroup.Use(jwtMiddleware)
 	orderGroup.GET("", orderHandler.GetAllOrder)
 	orderGroup.GET("/:id", orderHandler.GetOrderByID)
 	orderGroup.GET("/search", orderHandler.SearchOrder)
