@@ -26,17 +26,9 @@ func (rh *ReviewHandler) GetAllProducts(c echo.Context) error {
 		})
 	}
 
-	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
-	if page > totalPages {
-		return c.JSON(http.StatusNotFound, echo.Map{
-			"Message": "Halaman Tidak Ditemukan",
-			"Status":  http.StatusNotFound,
-		})
-	}
-
 	if len(products) == 0 {
 		return c.JSON(http.StatusNotFound, echo.Map{
-			"Message": "Belum ada list review",
+			"Message": "Belum ada list product",
 			"Status":  http.StatusNotFound,
 		})
 	}
@@ -44,7 +36,7 @@ func (rh *ReviewHandler) GetAllProducts(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Reviews":   products,
 		"Page":      page,
-		"TotalPage": totalPages,
+		"TotalPage": int(math.Ceil(float64(total) / float64(pageSize))),
 		"Status":    http.StatusOK,
 	})
 }
@@ -69,14 +61,6 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 		})
 	}
 
-	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
-	if page > totalPages {
-		return c.JSON(http.StatusNotFound, echo.Map{
-			"Message": "Halaman Tidak Ditemukan",
-			"Status":  http.StatusNotFound,
-		})
-	}
-
 	if len(reviews) == 0 {
 		return c.JSON(http.StatusNotFound, echo.Map{
 			"Message": "Belum ada list review",
@@ -87,7 +71,7 @@ func (rh *ReviewHandler) GetReviewByProductID(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"Reviews":   reviews,
 		"Page":      page,
-		"TotalPage": totalPages,
+		"TotalPage": int(math.Ceil(float64(total) / float64(pageSize))),
 		"Status":    http.StatusOK,
 	})
 }
