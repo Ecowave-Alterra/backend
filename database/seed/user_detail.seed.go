@@ -7,9 +7,16 @@ import (
 func CreateUserDetail() []*ue.UserDetail {
 	userDetail := []*ue.UserDetail{
 		{
-			Name:         "User 1",
+			Name:         "Administrator",
 			Point:        0,
 			Phone:        "08917283129283",
+			ProfilePhoto: "https://storage.googleapis.com/ecowave/img/users/profile/profile.png",
+			UserId:       1,
+		},
+		{
+			Name:         "User 1",
+			Point:        0,
+			Phone:        "08917283109283",
 			ProfilePhoto: "https://storage.googleapis.com/ecowave/img/users/profile/profile.png",
 			UserId:       2,
 		},
