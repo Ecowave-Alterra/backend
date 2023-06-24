@@ -55,10 +55,9 @@ func (oh *OrderHandlerAdmin) GetAllOrder(c echo.Context) error {
 }
 
 func (oh *OrderHandlerAdmin) GetOrderByID(c echo.Context) error {
-	transaction_id := c.Param("id")
+	transactionId := c.Param("id")
 
-	var transaction te.TransactionDetailResponse
-	transaction, err := oh.orderUseCase.GetOrderByID(transaction_id, &transaction)
+	exist, err := oh.orderUseCase.CheckOrderExist(transactionId)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
@@ -67,27 +66,44 @@ func (oh *OrderHandlerAdmin) GetOrderByID(c echo.Context) error {
 		})
 	}
 
-	var products []te.TransactionProductDetailResponse
-	products, err = oh.orderUseCase.GetOrderProducts(transaction_id, &products)
-	if err != nil {
-		code, msg := cs.CustomStatus(err.Error())
-		return c.JSON(code, echo.Map{
-			"Status":  code,
-			"Message": msg,
+	if exist {
+		var transaction te.TransactionDetailResponse
+		transaction, err := oh.orderUseCase.GetOrderByID(transactionId, &transaction)
+		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
+			})
+		}
+
+		var products []te.TransactionProductDetailResponse
+		products, err = oh.orderUseCase.GetOrderProducts(transactionId, &products)
+		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
+			})
+		}
+
+		orderDetail := struct {
+			Transaction te.TransactionDetailResponse
+			Products    []te.TransactionProductDetailResponse
+		}{
+			Transaction: transaction,
+			Products:    products,
+		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Orders": orderDetail,
+			"Status": http.StatusOK,
 		})
 	}
 
-	orderDetail := struct {
-		Transaction te.TransactionDetailResponse
-		Products    []te.TransactionProductDetailResponse
-	}{
-		Transaction: transaction,
-		Products:    products,
-	}
-
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Orders": orderDetail,
-		"Status": http.StatusOK,
+	return c.JSON(http.StatusBadRequest, echo.Map{
+		"Message": "Gagal mengambil detail pesanan",
+		"Status":  http.StatusBadRequest,
 	})
 }
 
@@ -160,7 +176,7 @@ func (oh *OrderHandlerAdmin) UpdateReceiptNumber(c echo.Context) error {
 		})
 	}
 
-	err := oh.orderUseCase.UpdateReceiptNumber(transactionId, receiptNumber)
+	exist, err := oh.orderUseCase.CheckOrderExist(transactionId)
 	if err != nil {
 		code, msg := cs.CustomStatus(err.Error())
 		return c.JSON(code, echo.Map{
@@ -169,8 +185,36 @@ func (oh *OrderHandlerAdmin) UpdateReceiptNumber(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"Message": "Anda berhasil mengubah nomor resi pesanan",
-		"Status":  http.StatusOK,
+	if exist {
+		var transaction te.TransactionDetailResponse
+		transaction, err := oh.orderUseCase.GetOrderByID(transactionId, &transaction)
+		if err != nil {
+			code, msg := cs.CustomStatus(err.Error())
+			return c.JSON(code, echo.Map{
+				"Status":  code,
+				"Message": msg,
+			})
+		}
+
+		if transaction.StatusTransaction == "Dikemas" {
+			err = oh.orderUseCase.UpdateReceiptNumber(transactionId, receiptNumber)
+			if err != nil {
+				code, msg := cs.CustomStatus(err.Error())
+				return c.JSON(code, echo.Map{
+					"Status":  code,
+					"Message": msg,
+				})
+			}
+
+			return c.JSON(http.StatusOK, map[string]interface{}{
+				"Message": "Anda berhasil mengubah nomor resi pesanan",
+				"Status":  http.StatusOK,
+			})
+		}
+	}
+
+	return c.JSON(http.StatusBadRequest, echo.Map{
+		"Message": "Gagal mengubah nomor resi pesanan",
+		"Status":  http.StatusBadRequest,
 	})
 }

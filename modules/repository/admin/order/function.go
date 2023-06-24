@@ -5,6 +5,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func (or *orderRepo) CheckOrderExist(transactionId string) (bool, error) {
+	var count int64
+	result := or.db.Model(&te.Transaction{}).Where("transaction_id = ?", transactionId).Count(&count)
+	if result.Error != nil {
+		return false, echo.NewHTTPError(500, result.Error)
+	}
+
+	exists := count > 0
+	return exists, nil
+}
+
 func (or *orderRepo) GetAllOrder(transactions *[]te.TransactionResponse, offset, pageSize int) ([]te.TransactionResponse, int64, error) {
 	var count int64
 	if err := or.db.Model(&te.Transaction{}).Count(&count).Error; err != nil {
@@ -27,13 +38,13 @@ func (or *orderRepo) GetAllOrder(transactions *[]te.TransactionResponse, offset,
 
 func (or *orderRepo) GetOrderByID(transactionId string, transaction *te.TransactionDetailResponse) (te.TransactionDetailResponse, error) {
 	if err := or.db.Model(&te.Transaction{}).
-		Select("user_addresses.address AS Address, voucher_types.type AS Voucher, user_details.name AS Name, user_Addresses.phone_number AS PhoneNumber, receipt_number AS ReceiptNumber, total_product_price AS TotalPrice, total_shipping_price AS TotalShippingPrice, transactions.point AS Point, payment_method AS PaymentMethod, payment_status AS PaymentStatus, expedition_status AS ExpeditionStatus, canceled_reason AS CanceledReason, expedition_rating AS ExpeditionRating, transactions.created_at AS CreatedAt, transactions.updated_at AS UpdatedAt").
+		Select("user_addresses.address AS Address, voucher_types.type AS Voucher, user_details.name AS Name, user_Addresses.phone_number AS PhoneNumber, receipt_number AS ReceiptNumber, total_product_price AS TotalProductPrice, total_shipping_price AS TotalShippingPrice, total_price AS TotalPrice, transactions.point AS Point, payment_method AS PaymentMethod, payment_status AS PaymentStatus, expedition_status AS ExpeditionStatus, canceled_reason AS CanceledReason, expedition_rating AS ExpeditionRating, status_transaction AS StatusTransaction, transactions.created_at AS CreatedAt, transactions.updated_at AS UpdatedAt").
 		Joins("JOIN vouchers ON vouchers.id = transactions.voucher_id").
 		Joins("JOIN voucher_types ON  voucher_types.id = vouchers.voucher_type_id").
 		Joins("JOIN users ON  users.id = transactions.user_id").
 		Joins("JOIN user_details ON users.id = user_details.user_id").
 		Joins("JOIN user_addresses ON transactions.address_id = user_addresses.id").
-		Where("transactions.id = ?", transactionId).
+		Where("transaction_id = ?", transactionId).
 		Scan(&transaction).Error; err != nil {
 		return *transaction, err
 	}
@@ -41,10 +52,15 @@ func (or *orderRepo) GetOrderByID(transactionId string, transaction *te.Transact
 }
 
 func (or *orderRepo) GetOrderProducts(transactionId string, products *[]te.TransactionProductDetailResponse) ([]te.TransactionProductDetailResponse, error) {
+	var transaction te.Transaction
+	if err := or.db.Model(&te.Transaction{}).Where("transaction_id = ?", transactionId).First(&transaction).Error; err != nil {
+		return nil, err
+	}
+
 	if err := or.db.Model(&te.TransactionDetail{}).
 		Select("products.name AS ProductName, (SELECT product_image_url FROM product_images WHERE product_id = transaction_details.product_id LIMIT 1) AS ProductImageUrl, transaction_details.qty AS Qty").
 		Joins("JOIN products ON products.product_id = transaction_details.product_id").
-		Where("transaction_details.transaction_id = ?", transactionId).Scan(&products).Error; err != nil {
+		Where("transaction_details.transaction_id = ?", transaction.ID).Scan(&products).Error; err != nil {
 		return nil, err
 	}
 	return *products, nil
@@ -82,7 +98,7 @@ func (or *orderRepo) SearchOrder(search, filter string, offset, pageSize int) (*
 }
 
 func (or *orderRepo) UpdateReceiptNumber(transactionId string, receiptNumber string) error {
-	if err := or.db.Model(&te.Transaction{}).Where("transaction_id = ?", transactionId).Update("receipt_number", receiptNumber).Error; err != nil {
+	if err := or.db.Model(&te.Transaction{}).Where("transaction_id = ? AND status_transaction LIKE \"Dikemas\"", transactionId).Updates(te.Transaction{ReceiptNumber: receiptNumber, StatusTransaction: "Dikirim"}).Error; err != nil {
 		return err
 	}
 

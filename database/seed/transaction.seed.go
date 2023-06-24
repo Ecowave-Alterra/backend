@@ -48,7 +48,6 @@ func CreateTransaction() []*et.Transaction {
 			VoucherId:          1,
 			AddressId:          2,
 			StatusTransaction:  "Dikemas",
-			ReceiptNumber:      "jne516541255500",
 			TransactionId:      "eco22023061514070656",
 			TotalProductPrice:  30000,
 			TotalShippingPrice: 20000,
