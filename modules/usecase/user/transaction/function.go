@@ -16,8 +16,17 @@ import (
 )
 
 func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (string, string, error) {
-	var productCost float64
 
+	user, err := tu.transactionRepo.GetUserById(transaction.UserId)
+	if err != nil {
+		return "", "", err
+	}
+
+	if user.RoleId == 1 {
+		return "", "", errors.New("Tidak boleh melakukan transaksi")
+	}
+
+	var productCost float64
 	for _, cost := range transaction.TransactionDetails {
 		stock, err := tu.transactionRepo.GetStock(cost.ProductId)
 		if err != nil {
