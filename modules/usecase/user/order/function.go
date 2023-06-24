@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	b "github.com/berrylradianh/ecowave-go/helper/binderbyte"
+	vld "github.com/berrylradianh/ecowave-go/helper/validator"
 	eo "github.com/berrylradianh/ecowave-go/modules/entity/order"
 )
 
@@ -31,9 +32,13 @@ func (oc *orderUsecase) Tracking(resi string, courier string) (interface{}, erro
 
 	return res, nil
 }
-func (oc *orderUsecase) ConfirmOrder(id string) error {
+func (oc *orderUsecase) ConfirmOrder(confirmOrder eo.ConfirmOrder) error {
 
-	statusTransaction, err := oc.orderRepo.GetStatusOrder(id)
+	if err := vld.Validation(confirmOrder); err != nil {
+		return err
+	}
+
+	statusTransaction, err := oc.orderRepo.GetStatusOrder(confirmOrder.TransactionId)
 	if err != nil {
 		return err
 	}
@@ -42,7 +47,7 @@ func (oc *orderUsecase) ConfirmOrder(id string) error {
 		return errors.New("Tidak bisa mengonfirmasi pesanan sebelum barang Dikirim")
 	}
 
-	err = oc.orderRepo.ConfirmOrder(id)
+	err = oc.orderRepo.ConfirmOrder(confirmOrder.TransactionId)
 	if err != nil {
 		return err
 	}
@@ -51,6 +56,9 @@ func (oc *orderUsecase) ConfirmOrder(id string) error {
 }
 func (oc *orderUsecase) CancelOrder(co eo.CanceledOrder) error {
 
+	if err := vld.Validation(co); err != nil {
+		return err
+	}
 	statusTransaction, err := oc.orderRepo.GetStatusOrder(co.TransactionId)
 	if err != nil {
 		return err

@@ -9,14 +9,14 @@ func CreateUserDetail() []*ue.UserDetail {
 		{
 			Name:         "Administrator",
 			Point:        0,
-			Phone:        "0897162534215",
+			Phone:        "08917283129283",
 			ProfilePhoto: "https://storage.googleapis.com/ecowave/img/users/profile/profile.png",
 			UserId:       1,
 		},
 		{
 			Name:         "User 1",
 			Point:        0,
-			Phone:        "08917283129283",
+			Phone:        "08917283109283",
 			ProfilePhoto: "https://storage.googleapis.com/ecowave/img/users/profile/profile.png",
 			UserId:       2,
 		},

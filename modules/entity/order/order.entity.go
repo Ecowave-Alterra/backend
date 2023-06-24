@@ -27,22 +27,22 @@ type Order struct {
 	PaymentMethod      string
 	PaymentStatus      string
 	ExpeditionName     string
-	ExpeditionStatus   string
 	VoucherId          uint
 	Discount           float64
 	TotalPrice         float64
 	EstimationDay      string
 	PaymentUrl         string
+	ExpeditionRating   float32
 	CanceledReason     string
 	OrderDetail        []OrderDetail
 	Address            eu.UserAddress
 }
 
 type OrderDetail struct {
-	// ProductId       string
 	ProductId       string
 	Qty             uint
 	SubTotalPrice   float64
 	ProductName     string
 	ProductImageUrl string
+	RatingProductId uint
 }

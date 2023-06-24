@@ -9,6 +9,10 @@ import (
 	authRepo "github.com/berrylradianh/ecowave-go/modules/repository/auth"
 	authUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/auth"
 
+	dashboardHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/dashboard"
+	dashboardRepo "github.com/berrylradianh/ecowave-go/modules/repository/admin/dashboard"
+	dashboardUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/admin/dashboard"
+
 	informationHandlerAdmin "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/information"
 	informationRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/information"
 	informationUsecaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/information"
@@ -40,6 +44,22 @@ import (
 	orderHandlerAdmin "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/order"
 	orderRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/order"
 	orderUsecaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/order"
+	
+	profileHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/profile"
+	profileRepo "github.com/berrylradianh/ecowave-go/modules/repository/user/profile"
+	profileUsecase "github.com/berrylradianh/ecowave-go/modules/usecase/user/profile"
+
+	reviewHandlerUser "github.com/berrylradianh/ecowave-go/modules/handler/api/user/review"
+	reviewRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/review"
+	reviewUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/review"
+
+	reviewHandlerAdmin "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/review"
+	reviewRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/review"
+	reviewUseCaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/review"
+
+	ecommerceHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/ecommerce"
+	ecommerceRepo "github.com/berrylradianh/ecowave-go/modules/repository/user/ecommerce"
+	ecommerceUseCase "github.com/berrylradianh/ecowave-go/modules/usecase/user/ecommerce"
 
 	"github.com/labstack/echo/v4"
 )
@@ -63,6 +83,14 @@ func StartApp() *echo.Echo {
 	productUsecase := productUseCase.New(productRepo)
 	productHandler := productHandler.New(productUsecase)
 
+	ecommerceRepo := ecommerceRepo.New(mysql.DB)
+	ecommerceUsecase := ecommerceUseCase.New(ecommerceRepo)
+	ecommerceHandler := ecommerceHandler.New(ecommerceUsecase)
+
+	profileRepo := profileRepo.New(mysql.DB)
+	profileUsecase := profileUsecase.New(profileRepo)
+	profileHandler := profileHandler.New(profileUsecase)
+
 	informationRepoUser := informationRepoUser.New(mysql.DB)
 	informationUsecaseUser := informationUsecaseUser.New(informationRepoUser)
 	informationHandlerUser := informationHandlerUser.New(informationUsecaseUser)
@@ -82,17 +110,33 @@ func StartApp() *echo.Echo {
 	orderRepoAdmin := orderRepoAdmin.New(mysql.DB)
 	orderUsecaseAdmin := orderUsecaseAdmin.New(orderRepoAdmin)
 	orderHandlerAdmin := orderHandlerAdmin.New(orderUsecaseAdmin)
+	reviewRepoUser := reviewRepoUser.New(mysql.DB)
+	reviewUsecaseUser := reviewUsecaseUser.New(reviewRepoUser)
+	reviewHandlerUser := reviewHandlerUser.New(reviewUsecaseUser)
+
+	reviewRepoAdmin := reviewRepoAdmin.New(mysql.DB)
+	reviewUseCaseAdmin := reviewUseCaseAdmin.New(reviewRepoAdmin)
+	reviewHandlerAdmin := reviewHandlerAdmin.New(reviewUseCaseAdmin)
+
+	dashboardRepo := dashboardRepo.New(mysql.DB)
+	dashboardUsecase := dashboardUsecase.New(dashboardRepo)
+	dashboardHandler := dashboardHandler.New(dashboardUsecase)
 
 	handler := common.Handler{
+		ProductHandler:          productHandler,
+		ProfileHandler:          profileHandler,
 		AuthHandler:             authHandler,
 		InformationHandlerAdmin: informationHandlerAdmin,
 		InformationHandlerUser:  informationHandlerUser,
 		VoucherHandlerAdmin:     voucherHandlerAdmin,
 		TransactionHandlerUser:  transactionHandlerUser,
 		OrderHandlerUser:        orderHandlerUser,
+		ReviewHandlerUser:       reviewHandlerUser,
 		ProductCategoryHandler:  productCategoryHandler,
-		ProductHandler:          productHandler,
 		OrderHandlerAdmin:       orderHandlerAdmin,
+		DashboardHandler:        dashboardHandler,
+		EcommerceHandler:        ecommerceHandler,
+		ReviewHandlerAdmin:      reviewHandlerAdmin,
 	}
 
 	router := routes.StartRoute(handler)

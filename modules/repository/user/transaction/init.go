@@ -2,19 +2,21 @@ package transaction
 
 import (
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
+	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 	ev "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
+
 	"gorm.io/gorm"
 )
 
 type TransactionRepo interface {
 	CreateTransaction(transaction *et.Transaction) error
 	GetPoint(id uint) (uint, error)
-	// ClaimVoucher(id uint) (ev.Voucher, error)
+	GetStock(id string) (uint, error)
 	CountVoucherUser(idUser uint, idVoucher uint) (uint, error)
 	GetVoucherUser(id uint, offset int, pageSize int) ([]ev.Voucher, int64, error)
-	// DetailVoucher(id uint) (ev.Voucher, error)
 	UpdateTransaction(transaction et.Transaction) error
 	GetPaymentStatus(id string) (string, error)
+	GetUserById(id uint) (*ue.User, error)
 }
 
 type transactionRepo struct {

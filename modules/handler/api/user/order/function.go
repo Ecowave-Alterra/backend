@@ -18,7 +18,7 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 		if err != nil {
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 
@@ -34,10 +34,26 @@ func (oh *OrderHandler) GetOrder() echo.HandlerFunc {
 
 			return e.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
+
 		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+		if total != 0 {
+			if page > totalPages {
+				return e.JSON(http.StatusNotFound, echo.Map{
+					"Message": "Halaman Tidak Ditemukan",
+					"Status":  http.StatusNotFound,
+				})
+			}
+		} else {
+			page = 0
+			return e.JSON(http.StatusOK, map[string]interface{}{
+				"Status":  200,
+				"Message": "Succes get order",
+				"Order":   order,
+			})
+		}
 
 		return e.JSON(http.StatusOK, map[string]interface{}{
 			"Status":    200,
@@ -58,7 +74,7 @@ func (oh *OrderHandler) Tracking() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 
@@ -76,13 +92,11 @@ func (oh *OrderHandler) ConfirmOrder() echo.HandlerFunc {
 		co := eo.ConfirmOrder{}
 		c.Bind(&co)
 
-		id := co.TransactionId
-		err := oh.orderUsecase.ConfirmOrder(id)
+		err := oh.orderUsecase.ConfirmOrder(co)
 		if err != nil {
-
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 
@@ -104,7 +118,7 @@ func (oh *OrderHandler) CancelOrder() echo.HandlerFunc {
 
 			return c.JSON(http.StatusBadRequest, echo.Map{
 				"Status":  400,
-				"Message": err,
+				"Message": err.Error(),
 			})
 		}
 
