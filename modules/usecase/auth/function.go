@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	fp "github.com/berrylradianh/ecowave-go/helper/forgorpassword"
+	fp "github.com/berrylradianh/ecowave-go/helper/forgotpassword"
 	pw "github.com/berrylradianh/ecowave-go/helper/password"
 	vld "github.com/berrylradianh/ecowave-go/helper/validator"
 	"github.com/berrylradianh/ecowave-go/middleware/jwt"

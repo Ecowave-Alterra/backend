@@ -11,7 +11,6 @@ func (informationHandler *InformationHandler) RegisterRoutes(e *echo.Echo) {
 	jwtMiddleware := echojwt.JWT([]byte(os.Getenv("SECRET_KEY")))
 
 	informationGroup := e.Group("/user/information")
-	informationGroup.Use(jwtMiddleware)
 	informationGroup.GET("", informationHandler.GetAllInformations())
-	informationGroup.GET("/point", informationHandler.UpdatePoint())
+	informationGroup.GET("/point", informationHandler.UpdatePoint(), jwtMiddleware)
 }

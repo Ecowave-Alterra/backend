@@ -49,6 +49,10 @@ import (
 	reviewRepoUser "github.com/berrylradianh/ecowave-go/modules/repository/user/review"
 	reviewUsecaseUser "github.com/berrylradianh/ecowave-go/modules/usecase/user/review"
 
+	reviewHandlerAdmin "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/review"
+	reviewRepoAdmin "github.com/berrylradianh/ecowave-go/modules/repository/admin/review"
+	reviewUseCaseAdmin "github.com/berrylradianh/ecowave-go/modules/usecase/admin/review"
+
 	ecommerceHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/ecommerce"
 	ecommerceRepo "github.com/berrylradianh/ecowave-go/modules/repository/user/ecommerce"
 	ecommerceUseCase "github.com/berrylradianh/ecowave-go/modules/usecase/user/ecommerce"
@@ -103,6 +107,10 @@ func StartApp() *echo.Echo {
 	reviewUsecaseUser := reviewUsecaseUser.New(reviewRepoUser)
 	reviewHandlerUser := reviewHandlerUser.New(reviewUsecaseUser)
 
+	reviewRepoAdmin := reviewRepoAdmin.New(mysql.DB)
+	reviewUseCaseAdmin := reviewUseCaseAdmin.New(reviewRepoAdmin)
+	reviewHandlerAdmin := reviewHandlerAdmin.New(reviewUseCaseAdmin)
+
 	dashboardRepo := dashboardRepo.New(mysql.DB)
 	dashboardUsecase := dashboardUsecase.New(dashboardRepo)
 	dashboardHandler := dashboardHandler.New(dashboardUsecase)
@@ -120,6 +128,7 @@ func StartApp() *echo.Echo {
 		ProductCategoryHandler:  productCategoryHandler,
 		DashboardHandler:        dashboardHandler,
 		EcommerceHandler:        ecommerceHandler,
+		ReviewHandlerAdmin:      reviewHandlerAdmin,
 	}
 
 	router := routes.StartRoute(handler)

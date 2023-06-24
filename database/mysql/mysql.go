@@ -5,14 +5,13 @@ import (
 
 	"github.com/berrylradianh/ecowave-go/config"
 	"github.com/berrylradianh/ecowave-go/database/seed"
+	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	er "github.com/berrylradianh/ecowave-go/modules/entity/review"
 	re "github.com/berrylradianh/ecowave-go/modules/entity/role"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 	ve "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
-
-	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -57,10 +56,13 @@ func InitialMigration() {
 		pe.Product{},
 		pe.ProductImage{},
 		et.Transaction{},
+		er.RatingProduct{},
 		et.TransactionDetail{},
 		ve.VoucherType{},
 		er.RatingProduct{},
 	)
 	DB.Migrator().HasConstraint(&ue.User{}, "UserDetail")
 	DB.Migrator().HasConstraint(&re.Role{}, "Users")
+	DB.Migrator().HasConstraint(&pe.Product{}, "TransactionDetail")
+	DB.Migrator().HasConstraint(&er.RatingProduct{}, "TransactionDetail")
 }

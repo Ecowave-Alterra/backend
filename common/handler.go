@@ -5,6 +5,7 @@ import (
 	aih "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/information"
 	ph "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/product"
 	pch "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/product_category"
+	arh "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/review"
 	avh "github.com/berrylradianh/ecowave-go/modules/handler/api/admin/voucher"
 	ah "github.com/berrylradianh/ecowave-go/modules/handler/api/auth"
 	ecommerceHandler "github.com/berrylradianh/ecowave-go/modules/handler/api/user/ecommerce"
@@ -25,6 +26,7 @@ type Handler struct {
 	TransactionHandlerUser  *uth.TransactionHandler
 	OrderHandlerUser        *ohu.OrderHandler
 	ReviewHandlerUser       *urh.ReviewHandler
+	ReviewHandlerAdmin      *arh.ReviewHandler
 	ProductCategoryHandler  *pch.ProductCategoryHandler
 	ProductHandler          *ph.ProductHandler
 	DashboardHandler        *dh.DashboardHandler

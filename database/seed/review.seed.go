@@ -5,40 +5,40 @@ import (
 )
 
 func CreateReview() []*er.RatingProduct {
-	ratingProducts := []*er.RatingProduct{
+	reviews := []*er.RatingProduct{
 		{
 			Rating:              4.5,
 			Comment:             "Bagus",
-			CommentAdmin:        "Terimakasih Reviewnya",
-			PhotoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.png",
-			VideoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.mp4",
+			CommentAdmin:        "Terimakasih reviewnya",
+			PhotoUrl:            "https://storage.googleapis.com/ecowave/img/review.png",
+			VideoUrl:            "https://storage.googleapis.com/ecowave/img/review.mp4",
 			TransactionDetailId: 1,
-		},
-		{
-			Rating:              3,
-			Comment:             "Lumayan",
-			CommentAdmin:        "Terimakasih Reviewnya",
-			PhotoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.png",
-			VideoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.mp4",
-			TransactionDetailId: 2,
 		},
 		{
 			Rating:              2.5,
 			Comment:             "Jelek",
-			CommentAdmin:        "Terimakasih Reviewnya",
-			PhotoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.png",
-			VideoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.mp4",
+			CommentAdmin:        "Terimakasih reviewnya",
+			PhotoUrl:            "https://storage.googleapis.com/ecowave/img/review.png",
+			VideoUrl:            "https://storage.googleapis.com/ecowave/img/review.mp4",
+			TransactionDetailId: 2,
+		},
+		{
+			Rating:              5,
+			Comment:             "Sangat bagus!!!",
+			CommentAdmin:        "Terimakasih reviewnya",
+			PhotoUrl:            "https://storage.googleapis.com/ecowave/img/review.png",
+			VideoUrl:            "https://storage.googleapis.com/ecowave/img/review.mp4",
 			TransactionDetailId: 3,
 		},
 		{
-			Rating:              4.5,
-			Comment:             "Perfect",
-			CommentAdmin:        "Terimakasih Reviewnya",
-			PhotoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.png",
-			VideoUrl:            "https://storage.googleapis.com/ecowave/video/reviews/review.mp4",
+			Rating:              4,
+			Comment:             "Bahannya berkualitas",
+			CommentAdmin:        "Terimakasih reviewnya",
+			PhotoUrl:            "https://storage.googleapis.com/ecowave/img/review.png",
+			VideoUrl:            "https://storage.googleapis.com/ecowave/img/review.mp4",
 			TransactionDetailId: 4,
 		},
 	}
 
-	return ratingProducts
+	return reviews
 }

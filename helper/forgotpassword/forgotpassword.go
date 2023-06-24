@@ -1,4 +1,4 @@
-package forgorpassword
+package forgotpassword
 
 import (
 	"os"

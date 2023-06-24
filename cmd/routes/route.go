@@ -24,5 +24,6 @@ func StartRoute(handler common.Handler) *echo.Echo {
 	handler.EcommerceHandler.RegisterRoutes(e)
 	handler.DashboardHandler.RegisterRoutes(e)
 	handler.ProfileHandler.RegisterRoute(e)
+	handler.ReviewHandlerAdmin.RegisterRoutes(e)
 	return e
 }
