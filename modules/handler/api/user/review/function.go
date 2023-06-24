@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
+	midjwt "github.com/berrylradianh/ecowave-go/middleware/jwt"
 	"github.com/labstack/echo/v4"
 )
 
@@ -85,8 +86,10 @@ func (rh *ReviewHandler) CreateReview(c echo.Context) error {
 		}
 	}
 
-	idUserTemp := 2
-	if err := rh.reviewUsecase.UpdatePoint(idUserTemp); err != nil {
+	var claims = midjwt.GetClaims2(c)
+	var userId = claims["user_id"].(float64)
+
+	if err := rh.reviewUsecase.UpdatePoint(int(userId)); err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"Message": "Gagal mengubah point user",
 			"Status":  http.StatusInternalServerError,

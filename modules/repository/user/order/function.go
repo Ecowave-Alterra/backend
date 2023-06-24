@@ -25,23 +25,18 @@ func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize i
 	for _, val := range transaction {
 		for _, td := range val.TransactionDetails {
 			var pImg ep.ProductImage
-			var product ep.Product
-
-			err = or.db.Select("product_id").Where("product_id", td.ProductId).First(&product).Error
-			if err != nil {
-				return nil, 0, err
-			}
-			err = or.db.Select("product_image_url").Where("product_id = ?", product.ProductId).First(&pImg).Error
+			err = or.db.Select("product_image_url").Where("product_id = ?", td.ProductId).First(&pImg).Error
 			if err != nil {
 				return nil, 0, err
 			}
 
 			od := eo.OrderDetail{
-				ProductId:       product.ProductId,
+				ProductId:       td.ProductId,
 				ProductName:     td.ProductName,
 				Qty:             td.Qty,
 				SubTotalPrice:   td.SubTotalPrice,
 				ProductImageUrl: pImg.ProductImageUrl,
+				RatingProductId: uint(td.RatingProduct.Rating),
 			}
 			OrderDetail = append(OrderDetail, od)
 		}
@@ -70,6 +65,7 @@ func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize i
 			CanceledReason:     val.CanceledReason,
 			EstimationDay:      val.EstimationDay,
 			PaymentUrl:         val.PaymentUrl,
+			ExpeditionRating:   val.ExpeditionRating,
 			OrderDetail:        OrderDetail,
 			Address:            address,
 		}

@@ -16,8 +16,17 @@ import (
 )
 
 func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (string, string, error) {
-	var productCost float64
 
+	user, err := tu.transactionRepo.GetUserById(transaction.UserId)
+	if err != nil {
+		return "", "", err
+	}
+
+	if user.RoleId == 1 {
+		return "", "", errors.New("Tidak boleh melakukan transaksi")
+	}
+
+	var productCost float64
 	for _, cost := range transaction.TransactionDetails {
 		stock, err := tu.transactionRepo.GetStock(cost.ProductId)
 		if err != nil {
@@ -67,7 +76,22 @@ func (tu *transactionUsecase) MidtransNotifications(midtransRequest *em.Midtrans
 	}
 	if midtransRequest.TransactionStatus == "settlement" {
 		transaction.StatusTransaction = "Dikemas"
+		transaction.PaymentStatus = midtransRequest.TransactionStatus
 	}
+	if midtransRequest.TransactionStatus == "pending" {
+		transaction.PaymentStatus = midtransRequest.TransactionStatus
+	}
+	if midtransRequest.TransactionStatus == "expire" {
+		transaction.StatusTransaction = "Dibatalkan"
+		transaction.CanceledReason = "pembayaran kadaluarsa"
+		transaction.PaymentStatus = midtransRequest.TransactionStatus
+	}
+	if midtransRequest.TransactionStatus == "failure" {
+		transaction.StatusTransaction = "Dibatalkan"
+		transaction.CanceledReason = "pembayaran gagal"
+		transaction.PaymentStatus = midtransRequest.TransactionStatus
+	}
+
 	err := tu.transactionRepo.UpdateTransaction(transaction)
 	if err != nil {
 		return errors.New("Invalid Transaction")

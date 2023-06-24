@@ -34,7 +34,7 @@ func CreateTransaction() []*et.Transaction {
 			TotalShippingPrice: 20000,
 			Point:              5000,
 			PaymentMethod:      "ovo",
-			PaymentStatus:      "",
+			PaymentStatus:      "settlement",
 			ExpeditionName:     "jne",
 			Discount:           10000,
 			TotalPrice:         35000,
@@ -53,7 +53,7 @@ func CreateTransaction() []*et.Transaction {
 			TotalShippingPrice: 20000,
 			Point:              5000,
 			PaymentMethod:      "ovo",
-			PaymentStatus:      "",
+			PaymentStatus:      "settlement",
 			ExpeditionName:     "jne",
 
 			Discount:      10000,
@@ -72,7 +72,7 @@ func CreateTransaction() []*et.Transaction {
 			TotalShippingPrice: 20000,
 			Point:              5000,
 			PaymentMethod:      "ovo",
-			PaymentStatus:      "",
+			PaymentStatus:      "settlement",
 			ExpeditionName:     "jne",
 
 			Discount:      10000,
@@ -91,7 +91,7 @@ func CreateTransaction() []*et.Transaction {
 			TotalShippingPrice: 20000,
 			Point:              5000,
 			PaymentMethod:      "ovo",
-			PaymentStatus:      "",
+			PaymentStatus:      "expired",
 			ExpeditionName:     "jne",
 
 			Discount:       10000,

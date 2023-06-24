@@ -30,6 +30,10 @@ func CreateProductImage() []*productEntity.ProductImage {
 			ProductId:       "ba08266c-0926-484e-a610-c2a48ac6179d",
 			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
 		},
+		{
+			ProductId:       "a3325f33-e01a-4e40-9ca7-5d84c4337094",
+			ProductImageUrl: "https://storage.googleapis.com/ecowave/img/products/bottle.png",
+		},
 	}
 
 	return product_images
