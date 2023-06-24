@@ -52,7 +52,6 @@ type TransactionDetailResponse struct {
 	Point              float64
 	PaymentMethod      string
 	PaymentStatus      string
-	ExpeditionStatus   string
 	CanceledReason     string
 	ExpeditionRating   float32
 	StatusTransaction  string

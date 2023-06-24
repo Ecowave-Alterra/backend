@@ -38,7 +38,7 @@ func (or *orderRepo) GetAllOrder(transactions *[]te.TransactionResponse, offset,
 
 func (or *orderRepo) GetOrderByID(transactionId string, transaction *te.TransactionDetailResponse) (te.TransactionDetailResponse, error) {
 	if err := or.db.Model(&te.Transaction{}).
-		Select("user_addresses.address AS Address, voucher_types.type AS Voucher, user_details.name AS Name, user_Addresses.phone_number AS PhoneNumber, receipt_number AS ReceiptNumber, total_product_price AS TotalProductPrice, total_shipping_price AS TotalShippingPrice, total_price AS TotalPrice, transactions.point AS Point, payment_method AS PaymentMethod, payment_status AS PaymentStatus, expedition_status AS ExpeditionStatus, canceled_reason AS CanceledReason, expedition_rating AS ExpeditionRating, status_transaction AS StatusTransaction, transactions.created_at AS CreatedAt, transactions.updated_at AS UpdatedAt").
+		Select("user_addresses.address AS Address, voucher_types.type AS Voucher, user_details.name AS Name, user_addresses.phone AS PhoneNumber, receipt_number AS ReceiptNumber, total_product_price AS TotalProductPrice, total_shipping_price AS TotalShippingPrice, total_price AS TotalPrice, transactions.point AS Point, payment_method AS PaymentMethod, payment_status AS PaymentStatus, canceled_reason AS CanceledReason, expedition_rating AS ExpeditionRating, status_transaction AS StatusTransaction, transactions.created_at AS CreatedAt, transactions.updated_at AS UpdatedAt").
 		Joins("JOIN vouchers ON vouchers.id = transactions.voucher_id").
 		Joins("JOIN voucher_types ON  voucher_types.id = vouchers.voucher_type_id").
 		Joins("JOIN users ON  users.id = transactions.user_id").
