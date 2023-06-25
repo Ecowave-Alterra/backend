@@ -86,11 +86,3 @@ func (vr *voucherRepo) FilterVoucher(filter string, offset, pageSize int) (*[]ve
 
 	return &vouchers, count, nil
 }
-
-// func (vr *voucherRepo) FilterVoucher(voucherType string, vouchers *[]ve.Voucher) ([]ve.Voucher, error) {
-// 	if err := vr.db.Preload("VoucherType").Where("voucher_type_id IN (SELECT id FROM voucher_types WHERE type = ?)", voucherType).Find(&vouchers).Error; err != nil {
-// 		return nil, err
-// 	}
-
-// 	return *vouchers, nil
-// }

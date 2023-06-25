@@ -2,8 +2,6 @@ package review
 
 import (
 	er "github.com/berrylradianh/ecowave-go/modules/entity/review"
-
-	// et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	"gorm.io/gorm"
 )
 

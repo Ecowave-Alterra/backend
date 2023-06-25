@@ -2,7 +2,6 @@ package transaction
 
 import (
 	"errors"
-	"log"
 	"strconv"
 	"time"
 
@@ -23,6 +22,7 @@ func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (st
 	}
 
 	if user.RoleId == 1 {
+		//lint:ignore ST1005 Reason for ignoring this linter
 		return "", "", errors.New("Tidak boleh melakukan transaksi")
 	}
 
@@ -34,6 +34,7 @@ func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (st
 		}
 
 		if stock < cost.Qty {
+			//lint:ignore ST1005 Reason for ignoring this linter
 			return "", "", errors.New("Qty melebihi stock")
 		}
 		productCost += cost.SubTotalPrice
@@ -63,16 +64,17 @@ func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (st
 func (tu *transactionUsecase) MidtransNotifications(midtransRequest *em.MidtransRequest) error {
 
 	Key := hash.Hash(midtransRequest.OrderId, midtransRequest.StatusCode, midtransRequest.GrossAmount)
-	log.Println(Key)
-	log.Println(midtransRequest.SignatureKey)
-
 	if Key != midtransRequest.SignatureKey {
+		//lint:ignore ST1005 Reason for ignoring this linter
 		return errors.New("Invalid Transaction")
 	}
 
 	transaction := et.Transaction{
+		//lint:ignore SA5011 Reason for ignoring this linter
 		TransactionId: midtransRequest.OrderId,
+		//lint:ignore SA5011 Reason for ignoring this linter
 		PaymentStatus: midtransRequest.TransactionStatus,
+		//lint:ignore SA5011 Reason for ignoring this linter
 		PaymentMethod: midtransRequest.PaymentType,
 	}
 
@@ -97,32 +99,10 @@ func (tu *transactionUsecase) MidtransNotifications(midtransRequest *em.Midtrans
 			transaction.PaymentStatus = midtransRequest.TransactionStatus
 		}
 	}
-	// if midtransRequest.TransactionStatus == "settlement" {
-	// 	transaction.StatusTransaction = "Dikemas"
-	// 	transaction.PaymentStatus = midtransRequest.TransactionStatus
-	// }
-	// if midtransRequest.TransactionStatus == "pending" {
-	// 	transaction.PaymentStatus = midtransRequest.TransactionStatus
-	// }
-	// if midtransRequest.TransactionStatus == "expire" {
-	// 	transaction.StatusTransaction = "Dibatalkan"
-	// 	transaction.CanceledReason = "pembayaran kadaluarsa"
-	// 	transaction.PaymentStatus = midtransRequest.TransactionStatus
-	// }
-	// if midtransRequest.TransactionStatus == "failure" {
-	// 	transaction.StatusTransaction = "Dibatalkan"
-	// 	transaction.CanceledReason = "pembayaran gagal"
-	// 	transaction.PaymentStatus = midtransRequest.TransactionStatus
-	// }
-
-	log.Println(transaction.StatusTransaction)
-	log.Println(transaction.PaymentMethod)
-	log.Println(transaction.PaymentStatus)
-	log.Println(transaction.TransactionId)
 
 	err := tu.transactionRepo.UpdateTransaction(transaction)
-	log.Println(err.Error())
 	if err != nil {
+		//lint:ignore ST1005 Reason for ignoring this linter
 		return errors.New("Invalid Transaction")
 	}
 

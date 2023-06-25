@@ -77,42 +77,6 @@ func (dr *dashboardRepo) GetYearlyRevenue() (*[]de.ChartResponse, error) {
 func (dr *dashboardRepo) GetMonthlyRevenue() (*[]de.ChartResponse, error) {
 	var monthlyRevenue *[]de.ChartResponse
 
-	// 	SELECT
-	// months.month_name AS Bulan,
-	//   COALESCE(SUM(transactions.total_price), 0) AS Pendapatan
-	// FROM
-	//   (
-	//     SELECT 1 AS month_number, 'January' AS month_name
-	//     UNION SELECT 2, 'February'
-	//     UNION SELECT 3, 'March'
-	//     UNION SELECT 4, 'April'
-	//     UNION SELECT 5, 'May'
-	//     UNION SELECT 6, 'June'
-	//     UNION SELECT 7, 'July'
-	//     UNION SELECT 8, 'August'
-	//     UNION SELECT 9, 'September'
-	//     UNION SELECT 10, 'October'
-	//     UNION SELECT 11, 'November'
-	//     UNION SELECT 12, 'December'
-	//   ) AS months
-	// LEFT JOIN (
-	//   SELECT
-	//     MONTH(created_at) AS month_number,
-	//     SUM(total_price) AS total_price
-	//   FROM
-	//     transactions
-	//   WHERE
-	//     YEAR(created_at) = YEAR(CURDATE())
-	//     AND canceled_reason = ''
-	//     AND deleted_at IS NULL
-	//   GROUP BY
-	//     month_number
-	// ) AS transactions ON months.month_number = transactions.month_number
-	// GROUP BY
-	//   months.month_number, months.month_name
-	// ORDER BY
-	//   months.month_number
-
 	err := dr.db.Raw(" SELECT months.month_name AS Label,COALESCE(SUM(transactions.total_price), 0) AS Value FROM ( SELECT 1 AS month_number, 'January' AS month_name UNION SELECT 2, 'February' UNION SELECT 3, 'March' UNION SELECT 4, 'April' UNION SELECT 5, 'May' UNION SELECT 6, 'June' UNION SELECT 7, 'July' UNION SELECT 8, 'August' UNION SELECT 9, 'September' UNION SELECT 10, 'October' UNION SELECT 11, 'November' UNION SELECT 12, 'December') AS months LEFT JOIN (SELECT MONTH(created_at) AS month_number,SUM(total_price) AS total_price FROM transactions WHERE YEAR(created_at) = YEAR(CURDATE()) AND canceled_reason = '' AND deleted_at IS NULL GROUP BY month_number) AS transactions ON months.month_number = transactions.month_number GROUP BY months.month_number, months.month_name ORDER BY months.month_number").
 		Scan(&monthlyRevenue).Error
 	if err != nil {

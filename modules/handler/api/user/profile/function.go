@@ -10,8 +10,6 @@ import (
 	midjwt "github.com/berrylradianh/ecowave-go/middleware/jwt"
 	ut "github.com/berrylradianh/ecowave-go/modules/entity/user"
 
-	// "github.com/go-playground/validator"
-
 	"github.com/labstack/echo/v4"
 )
 

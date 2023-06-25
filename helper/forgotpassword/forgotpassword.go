@@ -17,13 +17,6 @@ func ForgotPassword(receiver string, codeVer string) error {
 		return err
 	}
 
-	// var body bytes.Buffer
-	// t, err := template.ParseFiles("./helper/forgotpassword/email.html")
-	// if err != nil {
-	// 	return err
-	// }
-	// t.Execute(&body, nil)
-
 	bodyHtml := `<!DOCTYPE html>
 	<html lang="en-US">
 	  <head>
