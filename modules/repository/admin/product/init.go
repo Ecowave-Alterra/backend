@@ -12,11 +12,11 @@ type ProductRepo interface {
 	GetAllProduct(products *[]pe.Product, offset, pageSize int) ([]pe.Product, int64, error)
 	GetAllProductNoPagination(products *[]pe.Product) ([]pe.Product, error)
 	GetProductByID(productId string, product *pe.Product) (*pe.Product, int64, float64, error)
-	GetProductImageURLById(productId string, productImage *pe.ProductImage) ([]pe.ProductImage, error)
 	UpdateProduct(productId string, productRequest *pe.ProductRequest) error
 	UpdateProductStock(productId string, stock uint) error
+	CountProductImage(productId string) (int, error)
+	UpdateProductImage(idImage int, productId string, productImageUrl string) error
 	DeleteProduct(productId string, product *pe.Product) error
-	DeleteProductImage(productID string, productImages *[]pe.ProductImage) error
 	SearchProduct(search, filter string, offset, pageSize int) (*[]pe.Product, int64, error)
 }
 

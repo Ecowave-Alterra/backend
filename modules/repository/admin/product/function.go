@@ -98,14 +98,6 @@ func (pr *productRepo) GetProductByID(productId string, product *pe.Product) (*p
 	return product, totalOrder, totalRevenue, nil
 }
 
-func (pr *productRepo) GetProductImageURLById(productId string, productImage *pe.ProductImage) ([]pe.ProductImage, error) {
-	var productImages []pe.ProductImage
-	if err := pr.db.Model(&pe.ProductImage{}).Where("product_id = ?", productId).Find(&productImages).Error; err != nil {
-		return productImages, echo.NewHTTPError(404, err)
-	}
-	return productImages, nil
-}
-
 func (pr *productRepo) UpdateProduct(productId string, req *pe.ProductRequest) error {
 	if err := pr.db.Model(&pe.Product{}).Where("product_id = ?", productId).Updates(pe.Product{ProductCategoryId: req.ProductCategoryId, Name: req.Name, Price: req.Price, Status: req.Status, Description: req.Description}).Error; err != nil {
 		return echo.NewHTTPError(500, err)
@@ -122,6 +114,27 @@ func (pr *productRepo) UpdateProductStock(productId string, stock uint) error {
 	return nil
 }
 
+func (pr *productRepo) CountProductImage(productId string) (int, error) {
+	var productImages *[]pe.ProductImage
+
+	result := pr.db.Where("product_id = ?", productId).Find(&productImages)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	return int(result.RowsAffected), nil
+}
+
+func (pr *productRepo) UpdateProductImage(idImage int, productId string, productImageUrl string) error {
+	var productImage *pe.ProductImage
+
+	if err := pr.db.Model(&productImage).Where("id = ? AND product_id = ?", idImage, productId).Update("product_image_url", &productImageUrl).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (pr *productRepo) DeleteProduct(productId string, product *pe.Product) error {
 	// Hapus terlebih dahulu gambar produk yang terkait
 	if err := pr.db.Where("product_id = ?", productId).Delete(&pe.ProductImage{}).Error; err != nil {
@@ -130,14 +143,6 @@ func (pr *productRepo) DeleteProduct(productId string, product *pe.Product) erro
 
 	// Hapus produk dari tabel products
 	if err := pr.db.Where("product_id = ?", productId).Delete(&product).Error; err != nil {
-		return echo.NewHTTPError(500, err)
-	}
-
-	return nil
-}
-
-func (pr *productRepo) DeleteProductImage(productID string, productImages *[]pe.ProductImage) error {
-	if err := pr.db.Where("product_id = ?", productID).Delete(&productImages).Error; err != nil {
 		return echo.NewHTTPError(500, err)
 	}
 
