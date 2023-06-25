@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_ID: temporal-potion-388712
-  REGION: us-central1
+  REGION: asia-southeast2
   SHORT_SHA: ${{ github.sha }}
 
 jobs:
