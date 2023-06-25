@@ -121,6 +121,7 @@ func (tu *transactionUsecase) MidtransNotifications(midtransRequest *em.Midtrans
 	log.Println(transaction.TransactionId)
 
 	err := tu.transactionRepo.UpdateTransaction(transaction)
+	log.Println(err.Error())
 	if err != nil {
 		return errors.New("Invalid Transaction")
 	}
