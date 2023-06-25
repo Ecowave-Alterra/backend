@@ -74,23 +74,45 @@ func (tu *transactionUsecase) MidtransNotifications(midtransRequest *em.Midtrans
 		PaymentStatus: midtransRequest.TransactionStatus,
 		PaymentMethod: midtransRequest.PaymentType,
 	}
-	if midtransRequest.TransactionStatus == "settlement" {
-		transaction.StatusTransaction = "Dikemas"
-		transaction.PaymentStatus = midtransRequest.TransactionStatus
+
+	if midtransRequest != nil {
+		if midtransRequest.TransactionStatus == "capture" {
+			if midtransRequest.FraudStatus == "challenge" {
+				transaction.PaymentStatus = midtransRequest.FraudStatus
+			} else if midtransRequest.FraudStatus == "accept" {
+				transaction.StatusTransaction = "Dikemas"
+				transaction.PaymentStatus = midtransRequest.FraudStatus
+			}
+		} else if midtransRequest.TransactionStatus == "settlement" {
+			transaction.StatusTransaction = "Dikemas"
+			transaction.PaymentStatus = midtransRequest.TransactionStatus
+		} else if midtransRequest.TransactionStatus == "deny" {
+			transaction.PaymentStatus = midtransRequest.TransactionStatus
+		} else if midtransRequest.TransactionStatus == "cancel" || midtransRequest.TransactionStatus == "failure" {
+			transaction.StatusTransaction = "Dibatalkan"
+			transaction.CanceledReason = "Pembayaran gagal"
+			transaction.PaymentStatus = midtransRequest.TransactionStatus
+		} else if midtransRequest.TransactionStatus == "pending" {
+			transaction.PaymentStatus = midtransRequest.TransactionStatus
+		}
 	}
-	if midtransRequest.TransactionStatus == "pending" {
-		transaction.PaymentStatus = midtransRequest.TransactionStatus
-	}
-	if midtransRequest.TransactionStatus == "expire" {
-		transaction.StatusTransaction = "Dibatalkan"
-		transaction.CanceledReason = "pembayaran kadaluarsa"
-		transaction.PaymentStatus = midtransRequest.TransactionStatus
-	}
-	if midtransRequest.TransactionStatus == "failure" {
-		transaction.StatusTransaction = "Dibatalkan"
-		transaction.CanceledReason = "pembayaran gagal"
-		transaction.PaymentStatus = midtransRequest.TransactionStatus
-	}
+	// if midtransRequest.TransactionStatus == "settlement" {
+	// 	transaction.StatusTransaction = "Dikemas"
+	// 	transaction.PaymentStatus = midtransRequest.TransactionStatus
+	// }
+	// if midtransRequest.TransactionStatus == "pending" {
+	// 	transaction.PaymentStatus = midtransRequest.TransactionStatus
+	// }
+	// if midtransRequest.TransactionStatus == "expire" {
+	// 	transaction.StatusTransaction = "Dibatalkan"
+	// 	transaction.CanceledReason = "pembayaran kadaluarsa"
+	// 	transaction.PaymentStatus = midtransRequest.TransactionStatus
+	// }
+	// if midtransRequest.TransactionStatus == "failure" {
+	// 	transaction.StatusTransaction = "Dibatalkan"
+	// 	transaction.CanceledReason = "pembayaran gagal"
+	// 	transaction.PaymentStatus = midtransRequest.TransactionStatus
+	// }
 
 	err := tu.transactionRepo.UpdateTransaction(transaction)
 	if err != nil {
