@@ -6,8 +6,19 @@ import (
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
 	eu "github.com/berrylradianh/ecowave-go/modules/entity/user"
+	ue "github.com/berrylradianh/ecowave-go/modules/entity/user"
 	ev "github.com/berrylradianh/ecowave-go/modules/entity/voucher"
 )
+
+func (tr *transactionRepo) GetUserById(id uint) (*ue.User, error) {
+	user := &ue.User{}
+	err := tr.db.Where("id = ?", id).First(&user).Error
+	if err != nil {
+		return nil, errors.New("Record Not Found")
+	}
+
+	return user, nil
+}
 
 func (tr *transactionRepo) CreateTransaction(transaction *et.Transaction) error {
 
@@ -126,22 +137,3 @@ func (tr *transactionRepo) CountVoucherUser(idUser uint, idVoucher uint) (uint, 
 	return uint(count), nil
 
 }
-
-// func (tr *transactionRepo) ClaimVoucher(id uint) (ev.Voucher, error) {
-// 	var voucher ev.Voucher
-
-// 	if err := tr.db.Where("id = ?", id).First(&voucher).Error; err != nil {
-// 		return voucher, err
-// 	}
-
-// 	return voucher, nil
-
-// }
-// func (tr *transactionRepo) DetailVoucher(id uint) (ev.Voucher, error) {
-// 	var voucher ev.Voucher
-
-// 	if err := tr.db.Preload("VoucherType").Where("id = ?", id).First(&voucher).Error; err != nil {
-// 		return voucher, err
-// 	}
-// 	return voucher, nil
-// }
