@@ -126,16 +126,8 @@ func (pr *productRepo) CountProductImage(productId string) (int, error) {
 }
 
 func (pr *productRepo) UpdateProductImage(idImage int, productId string, productImageUrl string) error {
-	subquery := pr.db.Model(&pe.ProductImage{}).
-		Select("product_image_url").
-		Where("product_id = ?", productId).
-		Limit(1).
-		Offset(idImage - 1)
-
-	if err := pr.db.Model(&pe.ProductImage{}).
-		Table("product_images").
-		Where("product_id = ? AND product_image_url IN (?)", productId, subquery).
-		Update("product_image_url", productImageUrl).
+	query := "UPDATE product_images SET product_image_url = ? WHERE product_id = ? AND product_image_url IN ( SELECT subquery.product_image_url FROM ( SELECT product_image_url FROM product_images WHERE product_id = ? LIMIT 1 OFFSET ? ) AS subquery)"
+	if err := pr.db.Raw(query, productImageUrl, productId, productId, idImage-1).
 		Error; err != nil {
 		return err
 	}
