@@ -1,106 +1,131 @@
-package order
+package review
 
 import (
-	te "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
-	"github.com/labstack/echo/v4"
+	re "github.com/berrylradianh/ecowave-go/modules/entity/review"
 )
 
-func (or *orderRepo) CheckOrderExist(transactionId string) (bool, error) {
-	var count int64
-	result := or.db.Model(&te.Transaction{}).Where("transaction_id = ?", transactionId).Count(&count)
-	if result.Error != nil {
-		return false, echo.NewHTTPError(500, result.Error)
-	}
-
-	exists := count > 0
-	return exists, nil
-}
-
-func (or *orderRepo) GetAllOrder(transactions *[]te.TransactionResponse, offset, pageSize int) ([]te.TransactionResponse, int64, error) {
-	var count int64
-	if err := or.db.Model(&te.Transaction{}).Count(&count).Error; err != nil {
-		return nil, 0, echo.NewHTTPError(500, err)
-	}
-
-	if err := or.db.Model(&te.Transaction{}).
-		Select("transactions.receipt_number AS ReceiptNumber, transactions.transaction_id AS TransactionId, user_details.name AS Name, (SELECT COUNT(*) FROM transaction_details WHERE transaction_details.transaction_id = transactions.id) AS Unit, total_price AS TotalPrice, transactions.created_at AS OrderDate, status_transaction AS StatusTransaction").
-		Joins("JOIN transaction_details ON transaction_details.transaction_id = transactions.id").
-		Joins("JOIN users ON transactions.user_id = users.id").
-		Joins("JOIN user_details ON users.id = user_details.user_id").
-		Offset(offset).
-		Limit(pageSize).
-		Scan(&transactions).Error; err != nil {
-		return nil, 0, nil
-	}
-
-	return *transactions, count, nil
-}
-
-func (or *orderRepo) GetOrderByID(transactionId string, transaction *te.TransactionDetailResponse) (te.TransactionDetailResponse, error) {
-	if err := or.db.Model(&te.Transaction{}).
-		Select("user_addresses.address AS Address, voucher_types.type AS Voucher, user_details.name AS Name, user_addresses.phone AS PhoneNumber, receipt_number AS ReceiptNumber, total_product_price AS TotalProductPrice, total_shipping_price AS TotalShippingPrice, total_price AS TotalPrice, transactions.point AS Point, payment_method AS PaymentMethod, payment_status AS PaymentStatus, canceled_reason AS CanceledReason, expedition_rating AS ExpeditionRating, expedition_name AS ExpeditionName, status_transaction AS StatusTransaction, transactions.created_at AS CreatedAt, transactions.updated_at AS UpdatedAt").
-		Joins("JOIN vouchers ON vouchers.id = transactions.voucher_id").
-		Joins("JOIN voucher_types ON  voucher_types.id = vouchers.voucher_type_id").
-		Joins("JOIN users ON  users.id = transactions.user_id").
-		Joins("JOIN user_details ON users.id = user_details.user_id").
-		Joins("JOIN user_addresses ON transactions.address_id = user_addresses.id").
-		Where("transaction_id = ?", transactionId).
-		Scan(&transaction).Error; err != nil {
-		return *transaction, err
-	}
-	return *transaction, nil
-}
-
-func (or *orderRepo) GetOrderProducts(transactionId string, products *[]te.TransactionProductDetailResponse) ([]te.TransactionProductDetailResponse, error) {
-	var transaction te.Transaction
-	if err := or.db.Model(&te.Transaction{}).Where("transaction_id = ?", transactionId).First(&transaction).Error; err != nil {
-		return nil, err
-	}
-
-	if err := or.db.Model(&te.TransactionDetail{}).
-		Select("products.name AS ProductName, (SELECT product_image_url FROM product_images WHERE product_id = transaction_details.product_id LIMIT 1) AS ProductImageUrl, transaction_details.qty AS Qty").
-		Joins("JOIN products ON products.product_id = transaction_details.product_id").
-		Where("transaction_details.transaction_id = ?", transaction.ID).Scan(&products).Error; err != nil {
-		return nil, err
-	}
-	return *products, nil
-}
-
-func (or *orderRepo) SearchOrder(search, filter string, offset, pageSize int) (*[]te.TransactionResponse, int64, error) {
-	var transactions []te.TransactionResponse
+func (rr *reviewRepo) GetAllProducts(offset, pageSize int) ([]re.GetAllReviewResponse, int64, error) {
+	var reviews []re.GetAllReviewResponse
 	var count int64
 
-	if err := or.db.Model(&te.Transaction{}).
-		Where("receipt_number LIKE ? OR transactions.transaction_id LIKE ?",
+	// sql := SELECT p.product_id AS ProductID, p.name AS Name, pc.category AS Category, COUNT(rp.rating) AS ReviewQty
+	// FROM products p
+	// LEFT JOIN product_categories pc ON pc.id = p.product_category_id
+	// LEFT JOIN transaction_details td ON td.product_id = p.product_id
+	// LEFT JOIN rating_products rp ON rp.transaction_detail_id = td.id
+	// GROUP BY ProductID, Name, Category;
+
+	if err := rr.db.Table("products AS p").
+		Select("p.product_id AS ProductID, p.name AS Name, pc.category AS Category, COUNT(rp.rating) AS ReviewQty").
+		Joins("LEFT JOIN product_categories pc ON pc.id = p.product_category_id").
+		Joins("LEFT JOIN transaction_details td ON td.product_id = p.product_id").
+		Joins("LEFT JOIN rating_products rp ON rp.transaction_detail_id = td.id").
+		Group("p.product_id, p.name, pc.category").
+		Offset(offset).Limit(pageSize).
+		Count(&count).
+		Error; err != nil {
+		return nil, 0, err
+	}
+
+	if err := rr.db.Table("products AS p").
+		Select("p.product_id AS ProductID, p.name AS Name, pc.category AS Category, COUNT(rp.rating) AS ReviewQty").
+		Joins("LEFT JOIN product_categories pc ON pc.id = p.product_category_id").
+		Joins("LEFT JOIN transaction_details td ON td.product_id = p.product_id").
+		Joins("LEFT JOIN rating_products rp ON rp.transaction_detail_id = td.id").
+		Group("p.product_id, p.name, pc.category").
+		Offset(offset).Limit(pageSize).
+		Scan(&reviews).
+		Error; err != nil {
+		return nil, 0, err
+	}
+
+	return reviews, count, nil
+}
+
+func (rr *reviewRepo) SearchProduct(search string, offset, pageSize int) ([]re.GetAllReviewResponse, int64, error) {
+	var reviews []re.GetAllReviewResponse
+	var count int64
+
+	if err := rr.db.Table("products AS p").
+		Select("p.product_id AS ProductID, p.name AS Name, pc.category AS Category, COUNT(rp.rating) AS ReviewQty").
+		Joins("LEFT JOIN product_categories pc ON pc.id = p.product_category_id").
+		Joins("LEFT JOIN transaction_details td ON td.product_id = p.product_id").
+		Joins("LEFT JOIN rating_products rp ON rp.transaction_detail_id = td.id").
+		Where("p.name LIKE ? OR p.product_id LIKE ? OR pc.category LIKE ?",
 			"%"+search+"%",
 			"%"+search+"%",
-		).
-		Where("status_transaction LIKE ?", "%"+filter+"%").
+			"%"+search+"%").
+		Group("p.product_id, p.name, pc.category").
+		Offset(offset).Limit(pageSize).
 		Count(&count).Error; err != nil {
-		return nil, 0, echo.NewHTTPError(500, err)
+		return nil, 0, err
 	}
 
-	if err := or.db.Model(&te.Transaction{}).
-		Select("transactions.receipt_number AS ReceiptNumber, transactions.transaction_id AS TransactionId, user_details.name AS Name, (SELECT COUNT(*) FROM transaction_details WHERE transaction_details.transaction_id = transactions.id) AS Unit, total_price AS TotalPrice, transactions.created_at AS OrderDate, status_transaction AS StatusTransaction").
-		Joins("JOIN transaction_details ON transaction_details.transaction_id = transactions.id").
-		Joins("JOIN users ON transactions.user_id = users.id").
-		Joins("JOIN user_details ON users.id = user_details.user_id").
-		Where("receipt_number LIKE ? OR transactions.transaction_id LIKE ?",
+	if err := rr.db.Table("products AS p").
+		Select("p.product_id AS ProductID, p.name AS Name, pc.category AS Category, COUNT(rp.rating) AS ReviewQty").
+		Joins("LEFT JOIN product_categories pc ON pc.id = p.product_category_id").
+		Joins("LEFT JOIN transaction_details td ON td.product_id = p.product_id").
+		Joins("LEFT JOIN rating_products rp ON rp.transaction_detail_id = td.id").
+		Where("p.name LIKE ? OR p.product_id LIKE ? OR pc.category LIKE ?",
 			"%"+search+"%",
 			"%"+search+"%",
-		).
-		Where("status_transaction LIKE ?", "%"+filter+"%").
-		Offset(offset).Limit(pageSize).Find(&transactions).Error; err != nil {
-		return nil, 0, echo.NewHTTPError(404, err)
+			"%"+search+"%").
+		Group("p.product_id, p.name, pc.category").
+		Offset(offset).Limit(pageSize).
+		Find(&reviews).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return &transactions, count, nil
+	return reviews, count, nil
 }
 
-func (or *orderRepo) UpdateReceiptNumber(transactionId string, receiptNumber string) error {
-	if err := or.db.Model(&te.Transaction{}).Where("transaction_id = ? AND status_transaction LIKE \"Dikemas\"", transactionId).Updates(te.Transaction{ReceiptNumber: receiptNumber, StatusTransaction: "Dikirim"}).Error; err != nil {
-		return err
+func (rr *reviewRepo) GetProductReviewById(productId string, offset, pageSize int) ([]re.ReviewResponse, int64, error) {
+	var review []re.ReviewResponse
+	var count int64
+
+	// sql := SELECT t.transaction_id AS TransactionID,t.receipt_number AS ReceiptNumber,ud.name AS Name,
+	// ud.profile_photo AS ProfilePhoto, p.name AS ProductName, pc.category AS ProductCategory,
+	// rp.comment AS CommentUser, rp.comment_admin AS CommentAdmin, rp.photo_url AS PhotoUrl,
+	// rp.video_url AS VideoUrl, CASE WHEN (t.expedition_rating * rp.rating) / 2 > 5 THEN 5 ELSE (t.expedition_rating * rp.rating) / 2 END AS AvgRating,
+	// t.expedition_rating AS ExpeditionRating, rp.rating AS ProductRating
+	// FROM transactions t
+	// JOIN users u ON t.user_id = u.id
+	// JOIN user_details ud ON ud.user_id = u.id
+	// JOIN transaction_details td ON td.transaction_id = t.id
+	// JOIN products p ON p.product_id = td.product_id
+	// JOIN product_categories pc ON pc.id = p.product_category_id
+	// JOIN rating_products rp ON rp.transaction_detail_id = td.id
+	// WHERE t.status_transaction = "selesai" AND p.product_id LIKE "%a3325f33-e01a-4e40-9ca7-5d84c4337094%";
+
+	if err := rr.db.Table("transactions AS t").
+		Select("t.transaction_id AS TransactionID, t.receipt_number AS ReceiptNumber, ud.name AS Name, ud.profile_photo AS ProfilePhoto, p.name AS ProductName, pc.category AS ProductCategory, rp.comment AS CommentUser, rp.comment_admin AS CommentAdmin, rp.photo_url AS PhotoUrl, rp.video_url AS VideoUrl, CASE WHEN (t.expedition_rating * rp.rating) / 2 > 5 THEN 5 ELSE (t.expedition_rating * rp.rating) / 2 END AS AvgRating, t.expedition_rating AS ExpeditionRating, rp.rating AS ProductRating").
+		Joins("JOIN users u ON t.user_id = u.id").
+		Joins("JOIN user_details ud ON ud.user_id = u.id").
+		Joins("JOIN transaction_details td ON td.transaction_id = t.id").
+		Joins("JOIN products p ON p.product_id = td.product_id").
+		Joins("JOIN product_categories pc ON pc.id = p.product_category_id").
+		Joins("JOIN rating_products rp ON rp.transaction_detail_id = td.id").
+		Where("t.status_transaction = ? AND p.product_id LIKE ?", "selesai", "%"+productId+"%").
+		Offset(offset).Limit(pageSize).
+		Count(&count).
+		Error; err != nil {
+		return review, 0, err
 	}
 
-	return nil
+	if err := rr.db.Table("transactions AS t").
+		Select("t.transaction_id AS TransactionID, t.receipt_number AS ReceiptNumber, ud.name AS Name, ud.profile_photo AS ProfilePhoto, p.name AS ProductName, pc.category AS ProductCategory, rp.comment AS CommentUser, rp.comment_admin AS CommentAdmin, rp.photo_url AS PhotoUrl, rp.video_url AS VideoUrl, CASE WHEN (t.expedition_rating * rp.rating) / 2 > 5 THEN 5 ELSE (t.expedition_rating * rp.rating) / 2 END AS AvgRating, t.expedition_rating AS ExpeditionRating, rp.rating AS ProductRating").
+		Joins("JOIN users u ON t.user_id = u.id").
+		Joins("JOIN user_details ud ON ud.user_id = u.id").
+		Joins("JOIN transaction_details td ON td.transaction_id = t.id").
+		Joins("JOIN products p ON p.product_id = td.product_id").
+		Joins("JOIN product_categories pc ON pc.id = p.product_category_id").
+		Joins("JOIN rating_products rp ON rp.transaction_detail_id = td.id").
+		Where("t.status_transaction = ? AND p.product_id LIKE ?", "selesai", "%"+productId+"%").
+		Offset(offset).Limit(pageSize).
+		Scan(&review).
+		Error; err != nil {
+		return review, 0, err
+	}
+
+	return review, count, nil
 }

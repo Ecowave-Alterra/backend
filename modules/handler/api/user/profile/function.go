@@ -318,10 +318,7 @@ func (ph *ProfileHandler) GetAllAddressProfile(c echo.Context) error {
 	}
 
 	if addresses == nil || len(*addresses) == 0 {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"Message": "Belum ada list alamat",
-			"Status":  http.StatusNotFound,
-		})
+		addressResponses = []ut.UserAddressResponse{}
 	}
 
 	for _, address := range *addresses {

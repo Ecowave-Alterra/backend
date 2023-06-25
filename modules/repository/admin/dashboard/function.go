@@ -77,25 +77,43 @@ func (dr *dashboardRepo) GetYearlyRevenue() (*[]de.ChartResponse, error) {
 func (dr *dashboardRepo) GetMonthlyRevenue() (*[]de.ChartResponse, error) {
 	var monthlyRevenue *[]de.ChartResponse
 
-	err := dr.db.Model(&te.Transaction{}).
-		Select("CASE MONTH(transactions.created_at) " +
-			"WHEN 1 THEN 'January' " +
-			"WHEN 2 THEN 'February' " +
-			"WHEN 3 THEN 'March' " +
-			"WHEN 4 THEN 'April' " +
-			"WHEN 5 THEN 'May' " +
-			"WHEN 6 THEN 'June' " +
-			"WHEN 7 THEN 'July' " +
-			"WHEN 8 THEN 'August' " +
-			"WHEN 9 THEN 'September' " +
-			"WHEN 10 THEN 'October' " +
-			"WHEN 11 THEN 'November' " +
-			"WHEN 12 THEN 'December' " +
-			"END AS Label, SUM(transactions.total_price) AS Value").
-		Where("YEAR(transactions.created_at) = YEAR(CURDATE())").
-		Where("transactions.canceled_reason = ''").
-		Group("MONTH(transactions.created_at), transactions.created_at").
-		Order("MONTH(transactions.created_at)").
+	// 	SELECT
+	// months.month_name AS Bulan,
+	//   COALESCE(SUM(transactions.total_price), 0) AS Pendapatan
+	// FROM
+	//   (
+	//     SELECT 1 AS month_number, 'January' AS month_name
+	//     UNION SELECT 2, 'February'
+	//     UNION SELECT 3, 'March'
+	//     UNION SELECT 4, 'April'
+	//     UNION SELECT 5, 'May'
+	//     UNION SELECT 6, 'June'
+	//     UNION SELECT 7, 'July'
+	//     UNION SELECT 8, 'August'
+	//     UNION SELECT 9, 'September'
+	//     UNION SELECT 10, 'October'
+	//     UNION SELECT 11, 'November'
+	//     UNION SELECT 12, 'December'
+	//   ) AS months
+	// LEFT JOIN (
+	//   SELECT
+	//     MONTH(created_at) AS month_number,
+	//     SUM(total_price) AS total_price
+	//   FROM
+	//     transactions
+	//   WHERE
+	//     YEAR(created_at) = YEAR(CURDATE())
+	//     AND canceled_reason = ''
+	//     AND deleted_at IS NULL
+	//   GROUP BY
+	//     month_number
+	// ) AS transactions ON months.month_number = transactions.month_number
+	// GROUP BY
+	//   months.month_number, months.month_name
+	// ORDER BY
+	//   months.month_number
+
+	err := dr.db.Raw(" SELECT months.month_name AS Label,COALESCE(SUM(transactions.total_price), 0) AS Value FROM ( SELECT 1 AS month_number, 'January' AS month_name UNION SELECT 2, 'February' UNION SELECT 3, 'March' UNION SELECT 4, 'April' UNION SELECT 5, 'May' UNION SELECT 6, 'June' UNION SELECT 7, 'July' UNION SELECT 8, 'August' UNION SELECT 9, 'September' UNION SELECT 10, 'October' UNION SELECT 11, 'November' UNION SELECT 12, 'December') AS months LEFT JOIN (SELECT MONTH(created_at) AS month_number,SUM(total_price) AS total_price FROM transactions WHERE YEAR(created_at) = YEAR(CURDATE()) AND canceled_reason = '' AND deleted_at IS NULL GROUP BY month_number) AS transactions ON months.month_number = transactions.month_number GROUP BY months.month_number, months.month_name ORDER BY months.month_number").
 		Scan(&monthlyRevenue).Error
 	if err != nil {
 		return nil, err

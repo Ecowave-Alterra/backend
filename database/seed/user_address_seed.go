@@ -7,6 +7,19 @@ import (
 func CreateUserAddress() []*ut.UserAddress {
 	userAddress := []*ut.UserAddress{
 		{
+			Recipient:    "Administrator",
+			Phone:        "08917283129283",
+			ProvinceId:   "11",
+			ProvinceName: "Jawa Timur",
+			CityId:       "255",
+			CityName:     "Malang",
+			Address:      "Sukun",
+			Note:         "Rumah Kuning",
+			Mark:         "Rumah",
+			IsPrimary:    true,
+			UserId:       1,
+		},
+		{
 			Recipient:    "Ibu user1",
 			Phone:        "085123456789",
 			ProvinceId:   "11",
