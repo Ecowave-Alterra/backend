@@ -2,6 +2,7 @@ package information
 
 import (
 	"context"
+	"errors"
 	"log"
 	"mime/multipart"
 
@@ -9,7 +10,6 @@ import (
 	"github.com/berrylradianh/ecowave-go/helper/randomid"
 	vld "github.com/berrylradianh/ecowave-go/helper/validator"
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
-	"github.com/labstack/echo/v4"
 )
 
 func (ic *informationUsecase) GetAllInformationsNoPagination() (*[]ie.Information, error) {
@@ -31,7 +31,8 @@ func (ic *informationUsecase) CreateInformation(fileHeader *multipart.FileHeader
 	var information *ie.Information
 
 	if fileHeader == nil {
-		return echo.NewHTTPError(422, "Mohon maaf anda harus mengunggah file")
+		//lint:ignore ST1005 Reason for ignoring this linter
+		return errors.New("Mohon maaf anda harus mengunggah file")
 	} else {
 		if err := vld.ValidateFileExtension(fileHeader); err != nil {
 			return err
@@ -84,7 +85,8 @@ func (ic *informationUsecase) CreateInformationDraft(fileHeader *multipart.FileH
 	information.Status = status
 
 	if fileHeader == nil && title == "" && content == "" {
-		return echo.NewHTTPError(422, "Masukkan data")
+		//lint:ignore ST1005 Reason for ignoring this linter
+		return errors.New("Masukkan Data")
 	}
 
 	if title == "" {

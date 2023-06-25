@@ -1,11 +1,18 @@
 package product_category
 
 import (
+	"strings"
+
 	vld "github.com/berrylradianh/ecowave-go/helper/validator"
 	pe "github.com/berrylradianh/ecowave-go/modules/entity/product"
 )
 
 func (pcc *productCategoryUsecase) CreateProductCategory(productCategory *pe.ProductCategory) (bool, error) {
+	isEmpty := strings.ReplaceAll(productCategory.Category, " ", "")
+	if isEmpty == "" {
+		productCategory.Category = ""
+	}
+
 	if err := vld.Validation(productCategory); err != nil {
 		return false, err
 	}

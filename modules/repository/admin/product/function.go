@@ -126,9 +126,17 @@ func (pr *productRepo) CountProductImage(productId string) (int, error) {
 }
 
 func (pr *productRepo) UpdateProductImage(idImage int, productId string, productImageUrl string) error {
-	var productImage *pe.ProductImage
+	subquery := pr.db.Model(&pe.ProductImage{}).
+		Select("product_image_url").
+		Where("product_id = ?", productId).
+		Limit(1).
+		Offset(idImage - 1)
 
-	if err := pr.db.Model(&productImage).Where("id = ? AND product_id = ?", idImage, productId).Update("product_image_url", &productImageUrl).Error; err != nil {
+	if err := pr.db.Model(&pe.ProductImage{}).
+		Table("product_images").
+		Where("product_id = ? AND product_image_url IN (?)", productId, subquery).
+		Update("product_image_url", productImageUrl).
+		Error; err != nil {
 		return err
 	}
 

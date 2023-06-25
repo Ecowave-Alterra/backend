@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
-	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
 	ie "github.com/berrylradianh/ecowave-go/modules/entity/information"
 	"github.com/labstack/echo/v4"
 )
@@ -25,33 +24,33 @@ func (ih *InformationHandler) GetAllInformations() echo.HandlerFunc {
 
 		informations, total, err := ih.informationUsecase.GetAllInformations(offset, pageSize)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": err.Error(),
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
 		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
-		if page > totalPages {
-			return c.JSON(http.StatusNotFound, echo.Map{
-				"Message": "Halaman Tidak Ditemukan",
-				"Status":  http.StatusNotFound,
-			})
-		}
-
-		if informations == nil || len(*informations) == 0 {
+		if total != 0 {
+			if page > totalPages {
+				return c.JSON(http.StatusNotFound, echo.Map{
+					"Message": "Halaman Tidak Ditemukan",
+					"Status":  http.StatusNotFound,
+				})
+			}
+		} else {
+			page = 0
 			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"Status":  404,
 				"Message": "Belum ada list informasi",
-				"Status":  http.StatusNotFound,
 			})
 		}
 
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Informations": informations,
+			"Status":       200,
 			"Page":         page,
 			"TotalPage":    totalPages,
-			"Status":       http.StatusOK,
+			"Informations": informations,
 		})
 	}
 }
@@ -63,10 +62,9 @@ func (ih *InformationHandler) GetInformationById() echo.HandlerFunc {
 
 		information, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"Message": err.Error(),
+				"Status":  http.StatusNotFound,
 			})
 		}
 
@@ -89,10 +87,9 @@ func (ih *InformationHandler) CreateInformation() echo.HandlerFunc {
 		if strings.EqualFold(status, "Draft") {
 			err := ih.informationUsecase.CreateInformationDraft(fileHeader, title, content, status)
 			if err != nil {
-				code, msg := cs.CustomStatus(err.Error())
-				return c.JSON(code, echo.Map{
-					"Status":  code,
-					"Message": msg,
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"Message": err.Error(),
+					"Status":  http.StatusInternalServerError,
 				})
 			}
 			return c.JSON(http.StatusCreated, map[string]interface{}{
@@ -102,10 +99,9 @@ func (ih *InformationHandler) CreateInformation() echo.HandlerFunc {
 		} else {
 			err := ih.informationUsecase.CreateInformation(fileHeader, title, content, status)
 			if err != nil {
-				code, msg := cs.CustomStatus(err.Error())
-				return c.JSON(code, echo.Map{
-					"Status":  code,
-					"Message": msg,
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"Message": err.Error(),
+					"Status":  http.StatusInternalServerError,
 				})
 			}
 			return c.JSON(http.StatusCreated, map[string]interface{}{
@@ -124,19 +120,17 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 
 		informationBefore, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": err.Error(),
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
 		information, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": err.Error(),
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
@@ -147,10 +141,9 @@ func (ih *InformationHandler) UpdateInformation() echo.HandlerFunc {
 
 		err = ih.informationUsecase.UpdateInformation(informationBefore, information, fileHeader, title, content, status)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": err.Error(),
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
@@ -183,10 +176,9 @@ func (ih *InformationHandler) DeleteInformation() echo.HandlerFunc {
 
 		information, err := ih.informationUsecase.GetInformationById(id)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"Message": err.Error(),
+				"Status":  http.StatusNotFound,
 			})
 		}
 
@@ -195,20 +187,18 @@ func (ih *InformationHandler) DeleteInformation() echo.HandlerFunc {
 			fileName := cloudstorage.GetFileName(photoContentURL)
 			err = cloudstorage.DeleteImage(fileName)
 			if err != nil {
-				code, msg := cs.CustomStatus(err.Error())
-				return c.JSON(code, echo.Map{
-					"Status":  code,
-					"Message": msg,
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"Message": err.Error(),
+					"Status":  http.StatusInternalServerError,
 				})
 			}
 		}
 
 		err = ih.informationUsecase.DeleteInformation(information.InformationId)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": err.Error(),
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
@@ -248,10 +238,9 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 
 		informations, total, err := ih.informationUsecase.SearchInformations(search, filter, offset, pageSize)
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": err.Error(),
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 
@@ -269,36 +258,49 @@ func (ih *InformationHandler) SearchInformations() echo.HandlerFunc {
 			}
 		}
 
-		if len(terbittInformations) == 0 && strings.EqualFold(filter, "Terbit") {
-			return c.JSON(http.StatusNotFound, echo.Map{
-				"Message": "Belum ada informasi yang terbit",
-				"Status":  http.StatusNotFound,
-			})
-		} else if len(draftInformations) == 0 && strings.EqualFold(filter, "Draft") {
-			return c.JSON(http.StatusNotFound, echo.Map{
-				"Message": "Belum ada informasi dalam draft",
-				"Status":  http.StatusNotFound,
-			})
-		} else if len(*informations) == 0 {
-			return c.JSON(http.StatusNotFound, echo.Map{
-				"Message": "Informasi yang anda cari tidak ditemukan",
-				"Status":  http.StatusNotFound,
-			})
-		} else {
-			if page > int(math.Ceil(float64(total)/float64(pageSize))) {
+		totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
+		if total != 0 {
+			if page > totalPages {
 				return c.JSON(http.StatusNotFound, echo.Map{
 					"Message": "Halaman Tidak Ditemukan",
 					"Status":  http.StatusNotFound,
 				})
 			}
+		} else {
+			page = 0
+			if search == "" {
+				if len(draftInformations) == 0 && strings.EqualFold(filter, "Draft") {
+					return c.JSON(http.StatusNotFound, echo.Map{
+						"Message": "Belum ada informasi dalam draft",
+						"Status":  http.StatusNotFound,
+					})
+				} else if len(terbittInformations) == 0 && strings.EqualFold(filter, "Terbit") {
+					return c.JSON(http.StatusNotFound, echo.Map{
+						"Message": "Belum ada informasi yang terbit",
+						"Status":  http.StatusNotFound,
+					})
+				}
+			} else {
+				return c.JSON(http.StatusNotFound, echo.Map{
+					"Message": "Informasi yang anda cari tidak ditemukan",
+					"Status":  http.StatusNotFound,
+				})
+			}
+		}
 
-			return c.JSON(http.StatusOK, map[string]interface{}{
-				"Informations": informations,
-				"Page":         page,
-				"TotalPage":    int(math.Ceil(float64(total) / float64(pageSize))),
-				"Status":       http.StatusOK,
+		if len(*informations) == 0 {
+			return c.JSON(http.StatusNotFound, map[string]interface{}{
+				"Status":  404,
+				"Message": "Belum ada list informasi",
 			})
 		}
+
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"Informations": informations,
+			"Page":         page,
+			"TotalPage":    totalPages,
+			"Status":       http.StatusOK,
+		})
 	}
 }
 
@@ -306,10 +308,9 @@ func (ih *InformationHandler) DownloadCSVFile() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		informations, err := ih.informationUsecase.GetAllInformationsNoPagination()
 		if err != nil {
-			code, msg := cs.CustomStatus(err.Error())
-			return c.JSON(code, echo.Map{
-				"Status":  code,
-				"Message": msg,
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": err.Error(),
+				"Status":  http.StatusInternalServerError,
 			})
 		}
 

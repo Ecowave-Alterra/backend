@@ -1,7 +1,7 @@
 package validator
 
 import (
-	"fmt"
+	"errors"
 	"mime/multipart"
 	"path/filepath"
 )
@@ -14,7 +14,7 @@ func ValidateVideoExtension(videoHeader *multipart.FileHeader) error {
 
 	if !allowedExtensions[videoExtension] {
 		//lint:ignore ST1005 Reason for ignoring this linter
-		return fmt.Errorf("Mohon maaf, format video yang anda unggah tidak sesuai")
+		return errors.New("Mohon maaf, format video yang anda unggah tidak sesuai")
 	}
 
 	return nil
@@ -24,7 +24,7 @@ func ValidateVideoSize(videoHeader *multipart.FileHeader, maxVideoSize int64) er
 	videoSize := videoHeader.Size
 	if videoSize > maxVideoSize {
 		//lint:ignore ST1005 Reason for ignoring this linter
-		return fmt.Errorf("Mohon maaf, ukuran video Anda melebihi batas maksimum 4MB")
+		return errors.New("Mohon maaf, ukuran video Anda melebihi batas maksimum 4MB")
 	}
 
 	return nil
