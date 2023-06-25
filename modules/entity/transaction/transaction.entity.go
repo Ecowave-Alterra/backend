@@ -54,6 +54,7 @@ type TransactionDetailResponse struct {
 	PaymentStatus      string
 	CanceledReason     string
 	ExpeditionRating   float32
+	ExpeditionName     string
 	StatusTransaction  string
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
