@@ -8,21 +8,21 @@ func CreateTransactionDetail() []*et.TransactionDetail {
 	transaction := []*et.TransactionDetail{
 		{
 			TransactionId: 1,
-			ProductId:     "859679ad-888b-41ac-a663-4a619acc4ae3",
+			ProductId:     "ba08266c-0926-484e-a610-c2a48ac6179d",
 			ProductName:   "Product Name 1",
 			Qty:           1,
 			SubTotalPrice: 30000,
 		},
 		{
 			TransactionId: 2,
-			ProductId:     "859679ad-888b-41ac-a663-4a619acc4ae3",
+			ProductId:     "ba08266c-0926-484e-a610-c2a48ac6179d",
 			ProductName:   "Product Name 1",
 			Qty:           1,
 			SubTotalPrice: 30000,
 		},
 		{
 			TransactionId: 3,
-			ProductId:     "859679ad-888b-41ac-a663-4a619acc4ae3",
+			ProductId:     "ba08266c-0926-484e-a610-c2a48ac6179d",
 			ProductName:   "Product Name 1",
 			Qty:           1,
 			SubTotalPrice: 30000,
