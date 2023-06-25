@@ -14,7 +14,6 @@ func (rr *reviewRepo) GetAllProducts(offset, pageSize int) ([]re.GetAllReviewRes
 		Joins("LEFT JOIN transaction_details td ON td.product_id = p.product_id").
 		Joins("LEFT JOIN rating_products rp ON rp.transaction_detail_id = td.id").
 		Group("p.product_id, p.name, pc.category").
-		Offset(offset).Limit(pageSize).
 		Count(&count).
 		Error; err != nil {
 		return nil, 0, err
@@ -49,7 +48,6 @@ func (rr *reviewRepo) SearchProduct(search string, offset, pageSize int) ([]re.G
 			"%"+search+"%",
 			"%"+search+"%").
 		Group("p.product_id, p.name, pc.category").
-		Offset(offset).Limit(pageSize).
 		Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
@@ -85,7 +83,6 @@ func (rr *reviewRepo) GetProductReviewById(productId string, offset, pageSize in
 		Joins("JOIN product_categories pc ON pc.id = p.product_category_id").
 		Joins("JOIN rating_products rp ON rp.transaction_detail_id = td.id").
 		Where("t.status_transaction = ? AND p.product_id LIKE ?", "selesai", "%"+productId+"%").
-		Offset(offset).Limit(pageSize).
 		Count(&count).
 		Error; err != nil {
 		return review, 0, err
