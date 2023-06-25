@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"errors"
+	"log"
 
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	et "github.com/berrylradianh/ecowave-go/modules/entity/transaction"
@@ -50,8 +51,12 @@ func (tr *transactionRepo) CreateTransaction(transaction *et.Transaction) error 
 }
 
 func (tr *transactionRepo) UpdateTransaction(updateData et.Transaction) error {
-	query := "UPDATE transactions SET status_transaction = ?, payment_method = ?, payment_status = ? WHERE transaction_id = ?"
-	result := tr.db.Exec(query, updateData.StatusTransaction, updateData.PaymentMethod, updateData.PaymentStatus, updateData.TransactionId)
+	log.Println(updateData.StatusTransaction)
+	log.Println(updateData.PaymentMethod)
+	log.Println(updateData.PaymentStatus)
+	log.Println(updateData.TransactionId)
+	query := "UPDATE transactions SET status_transaction = '?', payment_method = '?', payment_status = '?' WHERE transaction_id = '?'"
+	result := tr.db.Raw(query, updateData.StatusTransaction, updateData.PaymentMethod, updateData.PaymentStatus, updateData.TransactionId)
 	// result := tr.db.Model(&et.Transaction{}).Where("transaction_id = ?", updateData.TransactionId).Updates(&updateData)
 
 	if err := result.Error; err != nil {
