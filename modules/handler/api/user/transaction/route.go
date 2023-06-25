@@ -11,11 +11,10 @@ func (transactionHandler *TransactionHandler) RegisterRoutes(e *echo.Echo) {
 	jwtMiddleware := echojwt.JWT([]byte(os.Getenv("SECRET_KEY")))
 
 	transactionGroup := e.Group("/user/transaction")
-	transactionGroup.Use(jwtMiddleware)
-	transactionGroup.POST("", transactionHandler.CreateTransaction())
-	transactionGroup.GET("/point", transactionHandler.GetPoint())
-	transactionGroup.GET("/voucher", transactionHandler.GetVoucherUser())
-	transactionGroup.POST("/shipping-options", transactionHandler.ShippingOptions())
-	transactionGroup.GET("/status-payment", transactionHandler.GetPaymentStatus())
+	transactionGroup.POST("", transactionHandler.CreateTransaction(), jwtMiddleware)
+	transactionGroup.GET("/point", transactionHandler.GetPoint(), jwtMiddleware)
+	transactionGroup.GET("/voucher", transactionHandler.GetVoucherUser(), jwtMiddleware)
+	transactionGroup.POST("/shipping-options", transactionHandler.ShippingOptions(), jwtMiddleware)
+	transactionGroup.GET("/status-payment", transactionHandler.GetPaymentStatus(), jwtMiddleware)
 	transactionGroup.POST("/midtrans/notifications", transactionHandler.MidtransNotifications())
 }
