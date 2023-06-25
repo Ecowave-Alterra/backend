@@ -1,8 +1,10 @@
 package product
 
 import (
+	"context"
 	"fmt"
 	"math"
+
 	"mime/multipart"
 	"net/http"
 	"path/filepath"
@@ -10,6 +12,8 @@ import (
 
 	"github.com/berrylradianh/ecowave-go/helper/cloudstorage"
 	cs "github.com/berrylradianh/ecowave-go/helper/customstatus"
+
+	vld "github.com/berrylradianh/ecowave-go/helper/validator"
 	ep "github.com/berrylradianh/ecowave-go/modules/entity/product"
 	"github.com/labstack/echo/v4"
 )
@@ -53,6 +57,7 @@ func (h *ProductHandler) GetAllProduct(c echo.Context) error {
 	var productResponses []ep.ProductResponse
 	for _, product := range products {
 		var imageURLs []string
+
 		for _, image := range product.ProductImages {
 			imageURLs = append(imageURLs, image.ProductImageUrl)
 		}
@@ -198,7 +203,7 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	productCategoryIDstr := c.FormValue("ProductCategoryId")
 	if productCategoryIDstr == "" {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Masukkan product category ID",
+			"Message": "Field/gambar tidak boleh kosong",
 			"Status":  http.StatusBadRequest,
 		})
 	} else {
@@ -215,7 +220,12 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	name := c.FormValue("Name")
 	if name == "" {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Masukkan name",
+			"Message": "Field/gambar tidak boleh kosong",
+			"Status":  http.StatusBadRequest,
+		})
+	} else if len(name) > 10 {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Mohon maaf, entri Anda melebihi batas maksimum 10 karakter",
 			"Status":  http.StatusBadRequest,
 		})
 	} else {
@@ -225,14 +235,14 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	weightStr := c.FormValue("Weight")
 	if weightStr == "" {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Masukkan weight",
+			"Message": "Field/gambar tidak boleh kosong",
 			"Status":  http.StatusBadRequest,
 		})
 	} else {
 		weight, err := strconv.ParseFloat(weightStr, 64)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Invalid weight value",
+				"Message": "Data yang diisi harus angka",
 				"Status":  http.StatusBadRequest,
 			})
 		}
@@ -242,14 +252,14 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	stockStr := c.FormValue("Stock")
 	if stockStr == "" {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Masukkan stock",
+			"Message": "Field/gambar tidak boleh kosong",
 			"Status":  http.StatusBadRequest,
 		})
 	} else {
 		stock, err := strconv.ParseUint(stockStr, 10, 64)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": err,
+				"Message": "Data yang diisi harus angka",
 				"Status":  http.StatusBadRequest,
 			})
 		}
@@ -264,14 +274,14 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	priceStr := c.FormValue("Price")
 	if priceStr == "" {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Masukkan price",
+			"Message": "Field/gambar tidak boleh kosong",
 			"Status":  http.StatusBadRequest,
 		})
 	} else {
 		price, err := strconv.ParseFloat(priceStr, 64)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": err,
+				"Message": "Data yang diisi harus angka",
 				"Status":  http.StatusBadRequest,
 			})
 		}
@@ -281,7 +291,7 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 	description := c.FormValue("Description")
 	if description == "" {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Masukkan description",
+			"Message": "Field/gambar tidak boleh kosong",
 			"Status":  http.StatusBadRequest,
 		})
 	} else {
@@ -327,7 +337,6 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 			PhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
 
 			productImage := ep.ProductImage{
-				// ProductId:       product.ID,
 				ProductId:       product.ProductId,
 				ProductImageUrl: PhotoUrl,
 			}
@@ -349,7 +358,7 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 
 	if !photoUploaded {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Mohon maaf anda harus mengunggah foto",
+			"Message": "Field/gambar tidak boleh kosong",
 			"Status":  http.StatusBadRequest,
 		})
 	}
@@ -395,7 +404,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		weight, err := strconv.ParseFloat(weightStr, 64)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": "Invalid weight value",
+				"Message": "Data yang diisi harus angka",
 				"Status":  http.StatusBadRequest,
 			})
 		}
@@ -405,6 +414,11 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	name := c.FormValue("Name")
 	if name == "" {
 		req.Name = productBefore.Name
+	} else if len(name) > 10 {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"Message": "Mohon maaf, entri Anda melebihi batas maksimum 10 karakter",
+			"Status":  http.StatusBadRequest,
+		})
 	} else {
 		req.Name = name
 	}
@@ -416,7 +430,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		stock, err := strconv.ParseUint(stockStr, 10, 64)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": err,
+				"Message": "Data yang diisi harus angka",
 				"Status":  http.StatusBadRequest,
 			})
 		}
@@ -435,7 +449,7 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		price, err := strconv.ParseFloat(priceStr, 64)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"Message": err,
+				"Message": "Data yang diisi harus angka",
 				"Status":  http.StatusBadRequest,
 			})
 		}
@@ -467,73 +481,53 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		})
 	}
 
-	var productImages []ep.ProductImage
-	// err = h.productUseCase.DeleteProductImage(fmt.Sprint(product.ID), &productImages)
-	err = h.productUseCase.DeleteProductImage(fmt.Sprint(product.ProductId), &productImages)
+	nProductImage, err := h.productUseCase.CountProductImage(productId)
 	if err != nil {
-		code, msg := cs.CustomStatus(err.Error())
-		return c.JSON(code, echo.Map{
-			"Status":  code,
-			"Message": msg,
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"Message": "Gagal menghitung banyak foto tiap produk",
+			"Status":  http.StatusInternalServerError,
 		})
 	}
 
-	cloudstorage.Folder = "img/products/"
 	var fileHeader *multipart.FileHeader
-	for i := 1; i <= 5; i++ {
+	cloudstorage.Folder = "img/products/"
+
+	for i := 1; i <= nProductImage; i++ {
 		fileHeader, _ = c.FormFile(fmt.Sprintf("PhotoContentUrl%d", i))
 		if fileHeader != nil {
-			fileExtension := filepath.Ext(fileHeader.Filename)
-			allowedExtensions := map[string]bool{
-				".png":  true,
-				".jpeg": true,
-				".jpg":  true,
+			if productBefore.ProductImages[i-1].ProductImageUrl != "" {
+				fileName := cloudstorage.GetFileName(productBefore.ProductImages[i-1].ProductImageUrl)
+				if err != nil {
+					return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+						"Message": "Gagal mendapatkan nama file",
+					})
+				}
+				err := cloudstorage.DeleteImage(fileName)
+				if err != nil {
+					return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+						"Message": "Gagal menghapus file pada cloud storage",
+					})
+				}
 			}
-			if !allowedExtensions[fileExtension] {
-				return c.JSON(http.StatusBadRequest, map[string]interface{}{
-					"Message": "Mohon maaf, format file yang Anda unggah tidak sesuai",
-					"Status":  http.StatusBadRequest,
-				})
+
+			if err := vld.ValidateFileExtension(fileHeader); err != nil {
+				return err
 			}
+
 			maxFileSize := 4 * 1024 * 1024
-			fileSize := fileHeader.Size
-			if fileSize > int64(maxFileSize) {
-				return c.JSON(http.StatusBadRequest, map[string]interface{}{
-					"Message": "Mohon maaf, ukuran file Anda melebihi batas maksimum 4MB",
-					"Status":  http.StatusBadRequest,
-				})
+			if err := vld.ValidateFileSize(fileHeader, int64(maxFileSize)); err != nil {
+				return err
 			}
 
-			PhotoUrl, _ := cloudstorage.UploadToBucket(c.Request().Context(), fileHeader)
+			photoUrl, err := cloudstorage.UploadToBucket(context.Background(), fileHeader)
+			if err != nil {
+				return err
+			}
 
-			productImage := ep.ProductImage{
-				// ProductId:       product.ID,
-				ProductId:       product.ProductId,
-				ProductImageUrl: PhotoUrl,
-			}
-			err = h.productUseCase.CreateProductImage(&productImage)
-			if err != nil {
-				code, msg := cs.CustomStatus(err.Error())
-				return c.JSON(code, echo.Map{
-					"Status":  code,
-					"Message": msg,
-				})
-			}
-		} else {
-			if err != nil {
-				i = 1000
-			}
-		}
-	}
-
-	if fileHeader != nil {
-		for _, image := range productBefore.ProductImages {
-			filename := cloudstorage.GetFileName(image.ProductImageUrl)
-			err = cloudstorage.DeleteImage(filename)
-			if err != nil {
+			if err := h.productUseCase.UpdateProductImage(i, productId, photoUrl); err != nil {
 				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"Message": "Gagal menghapus file pada cloud storage",
 					"Status":  http.StatusInternalServerError,
+					"Message": "fail update product image",
 				})
 			}
 		}
@@ -558,8 +552,14 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 		})
 	}
 
+	cloudstorage.Folder = "img/products/"
 	for _, image := range product.ProductImages {
 		filename := cloudstorage.GetFileName(image.ProductImageUrl)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"Message": "Gagal mendapatkan nama file",
+			})
+		}
 		err = cloudstorage.DeleteImage(filename)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{

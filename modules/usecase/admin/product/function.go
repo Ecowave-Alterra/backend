@@ -38,10 +38,6 @@ func (pc *productUseCase) GetProductByID(productId string, product *pe.Product) 
 	return pc.productRepo.GetProductByID(productId, product)
 }
 
-func (pc *productUseCase) GetProductImageURLById(productId string, productImage *pe.ProductImage) ([]pe.ProductImage, error) {
-	return pc.productRepo.GetProductImageURLById(productId, productImage)
-}
-
 func (pc *productUseCase) UpdateProduct(productId string, productRequest *pe.ProductRequest) error {
 	return pc.productRepo.UpdateProduct(productId, productRequest)
 }
@@ -50,12 +46,16 @@ func (pc *productUseCase) UpdateProductStock(productId string, stock uint) error
 	return pc.productRepo.UpdateProductStock(productId, stock)
 }
 
-func (pc *productUseCase) DeleteProduct(productId string, product *pe.Product) error {
-	return pc.productRepo.DeleteProduct(productId, product)
+func (pc *productUseCase) CountProductImage(productId string) (int, error) {
+	return pc.productRepo.CountProductImage(productId)
 }
 
-func (pc *productUseCase) DeleteProductImage(productID string, productImages *[]pe.ProductImage) error {
-	return pc.productRepo.DeleteProductImage(productID, productImages)
+func (pc *productUseCase) UpdateProductImage(idImage int, productId string, productImageUrl string) error {
+	return pc.productRepo.UpdateProductImage(idImage, productId, productImageUrl)
+}
+
+func (pc *productUseCase) DeleteProduct(productId string, product *pe.Product) error {
+	return pc.productRepo.DeleteProduct(productId, product)
 }
 
 func (pc *productUseCase) SearchProduct(search, filter string, offset, pageSize int) (*[]pe.Product, int64, error) {
