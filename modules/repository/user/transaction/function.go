@@ -48,9 +48,11 @@ func (tr *transactionRepo) CreateTransaction(transaction *et.Transaction) error 
 	}
 	return nil
 }
-func (tr *transactionRepo) UpdateTransaction(updateData et.Transaction) error {
 
-	result := tr.db.Model(&et.Transaction{}).Where("transaction_id = ?", updateData.TransactionId).Updates(&updateData)
+func (tr *transactionRepo) UpdateTransaction(updateData et.Transaction) error {
+	query := "UPDATE transactions SET status_transaction = ?, payment_method = ?, payment_status = ? WHERE transaction_id = ?"
+	result := tr.db.Exec(query, updateData.StatusTransaction, updateData.PaymentMethod, updateData.PaymentStatus, updateData.TransactionId)
+	// result := tr.db.Model(&et.Transaction{}).Where("transaction_id = ?", updateData.TransactionId).Updates(&updateData)
 
 	if err := result.Error; err != nil {
 		return err
