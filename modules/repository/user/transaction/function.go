@@ -55,17 +55,17 @@ func (tr *transactionRepo) UpdateTransaction(updateData et.Transaction) error {
 	log.Println(updateData.PaymentMethod)
 	log.Println(updateData.PaymentStatus)
 	log.Println(updateData.TransactionId)
-	query := "UPDATE transactions SET status_transaction = '?', payment_method = '?', payment_status = '?' WHERE transaction_id = '?'"
-	result := tr.db.Raw(query, updateData.StatusTransaction, updateData.PaymentMethod, updateData.PaymentStatus, updateData.TransactionId)
-	// result := tr.db.Model(&et.Transaction{}).Where("transaction_id = ?", updateData.TransactionId).Updates(&updateData)
+	// query := "UPDATE transactions SET status_transaction = '?', payment_method = '?', payment_status = '?' WHERE transaction_id = '?'"
+	// result := tr.db.Raw(query, updateData.StatusTransaction, updateData.PaymentMethod, updateData.PaymentStatus, updateData.TransactionId)
+	result := tr.db.Model(&et.Transaction{}).Where("transaction_id = ?", updateData.TransactionId).Updates(&updateData)
 
 	if err := result.Error; err != nil {
 		return err
 	}
 
-	if result.RowsAffected < 1 {
-		return errors.New("err")
-	}
+	// if result.RowsAffected < 1 {
+	// 	return errors.New("err")
+	// }
 	return nil
 }
 
