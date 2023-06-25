@@ -63,9 +63,10 @@ func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (st
 func (tu *transactionUsecase) MidtransNotifications(midtransRequest *em.MidtransRequest) error {
 
 	Key := hash.Hash(midtransRequest.OrderId, midtransRequest.StatusCode, midtransRequest.GrossAmount)
+	log.Println(Key)
+	log.Println(midtransRequest.SignatureKey)
 
 	if Key != midtransRequest.SignatureKey {
-		log.Println(midtransRequest.SignatureKey)
 		return errors.New("Invalid Transaction")
 	}
 
@@ -113,6 +114,11 @@ func (tu *transactionUsecase) MidtransNotifications(midtransRequest *em.Midtrans
 	// 	transaction.CanceledReason = "pembayaran gagal"
 	// 	transaction.PaymentStatus = midtransRequest.TransactionStatus
 	// }
+
+	log.Println(transaction.StatusTransaction)
+	log.Println(transaction.PaymentMethod)
+	log.Println(transaction.PaymentStatus)
+	log.Println(transaction.TransactionId)
 
 	err := tu.transactionRepo.UpdateTransaction(transaction)
 	if err != nil {
