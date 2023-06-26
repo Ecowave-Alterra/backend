@@ -11,11 +11,12 @@ type ReviewResponse struct {
 }
 
 type ProductResponse struct {
-	ProductId       string           `json:"ProductId"`
-	Name            string           `json:"Name"`
-	Category        string           `json:"Category"`
-	Stock           int              `json:"Stock"`
-	Price           float64          `json:"Price"`
+	ProductId       string  `json:"ProductId"`
+	Name            string  `json:"Name"`
+	Category        string  `json:"Category"`
+	Stock           int     `json:"Stock"`
+	Price           float64 `json:"Price"`
+	Weight          float64
 	Status          string           `json:"Status"`
 	Description     string           `json:"Description"`
 	ProductImageUrl []string         `json:"ProductImageUrl"`

@@ -21,7 +21,6 @@ func (tr *transactionRepo) GetUserById(id uint) (*ue.User, error) {
 }
 
 func (tr *transactionRepo) CreateTransaction(transaction *et.Transaction) error {
-
 	err := tr.db.Create(&transaction).Error
 	if err != nil {
 		return err

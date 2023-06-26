@@ -10,7 +10,6 @@ import (
 func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize int) (interface{}, int64, error) {
 	var transaction []et.Transaction
 	var order []eo.Order
-	var OrderDetail []eo.OrderDetail
 	var address eu.UserAddress
 	var count int64
 	err := or.db.Preload("TransactionDetails").Where("status_transaction = ? AND user_id = ?", filter, idUser).Find(&transaction).Count(&count).Error
@@ -23,6 +22,7 @@ func (or *orderRepo) GetOrder(filter string, idUser uint, offset int, pageSize i
 	}
 
 	for _, val := range transaction {
+		var OrderDetail []eo.OrderDetail
 		for _, td := range val.TransactionDetails {
 			var pImg ep.ProductImage
 			err = or.db.Select("product_image_url").Where("product_id = ?", td.ProductId).First(&pImg).Error
@@ -97,7 +97,6 @@ func (or *orderRepo) ConfirmOrder(id string) error {
 }
 
 func (or *orderRepo) CancelOrder(co eo.CanceledOrder) error {
-
 	err := or.db.Model(&et.Transaction{}).Where("transaction_id = ?", co.TransactionId).Updates(et.Transaction{StatusTransaction: "Dibatalkan", CanceledReason: co.CanceledReason}).Error
 
 	if err != nil {
