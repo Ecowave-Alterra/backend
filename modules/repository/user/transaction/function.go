@@ -60,7 +60,7 @@ func (tr *transactionRepo) UpdateTransaction(updateData et.Transaction) error {
 func (tr *transactionRepo) GetPoint(id uint) (uint, error) {
 	var userDetail eu.UserDetail
 
-	if err := tr.db.Where("id = ?", id).First(&userDetail).Error; err != nil {
+	if err := tr.db.Where("user_id = ?", id).First(&userDetail).Error; err != nil {
 		return 0, err
 	}
 	point := userDetail.Point
@@ -131,4 +131,13 @@ func (tr *transactionRepo) CountVoucherUser(idUser uint, idVoucher uint) (uint, 
 
 	return uint(count), nil
 
+}
+func (tr *transactionRepo) UpdatePoint(id uint, point uint) error {
+
+	err := tr.db.Model(&eu.UserDetail{}).Where("user_id = ?", id).Update("point", point).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
