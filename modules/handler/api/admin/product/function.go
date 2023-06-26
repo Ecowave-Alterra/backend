@@ -223,11 +223,6 @@ func (h *ProductHandler) CreateProduct(c echo.Context) error {
 			"Message": "Field/gambar tidak boleh kosong",
 			"Status":  http.StatusBadRequest,
 		})
-	} else if len(name) > 10 {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Mohon maaf, entri Anda melebihi batas maksimum 10 karakter",
-			"Status":  http.StatusBadRequest,
-		})
 	} else {
 		product.Name = name
 	}
