@@ -59,6 +59,22 @@ func (tu *transactionUsecase) CreateTransaction(transaction *et.Transaction) (st
 	if err != nil {
 		return "", "", err
 	}
+
+	if transaction.Point > 0 {
+		res, err := tu.transactionRepo.GetPoint(transaction.UserId)
+		if err != nil {
+			return "", "", err
+		}
+		if transaction.Point > float64(res) {
+			return "", "", errors.New("Tidak boleh melebihi point yang dimiliki")
+		}
+		point := res - uint(transaction.Point)
+		err = tu.transactionRepo.UpdatePoint(transaction.UserId, point)
+		if err != nil {
+			return "", "", err
+		}
+	}
+
 	return redirectUrl, transId, nil
 }
 func (tu *transactionUsecase) MidtransNotifications(midtransRequest *em.MidtransRequest) error {

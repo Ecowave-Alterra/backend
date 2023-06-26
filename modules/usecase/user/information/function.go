@@ -20,7 +20,6 @@ func (ic *informationUsecase) UpdatePoint(id uint) error {
 	}
 
 	point += 5
-
 	err = ic.informationRepo.UpdatePoint(id, point)
 	if err != nil {
 		return err
