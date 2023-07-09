@@ -15,7 +15,10 @@ import (
 
 func ShippingOptions(ship *er.RajaongkirRequest) (interface{}, error) {
 	// malang kota
-	alamatPengirim := "256"
+	// alamatPengirim := "256"
+
+	// Kudus
+	alamatPengirim := "209"
 	destination := ship.CityId
 	weight := strconv.FormatUint(uint64(ship.Weight), 10)
 	courier := []string{"jne", "pos", "tiki"}
