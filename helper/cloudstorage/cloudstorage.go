@@ -17,7 +17,7 @@ var Folder string
 var FolderVideo string
 
 func UploadToBucket(ctx context.Context, fileHeader *multipart.FileHeader) (string, error) {
-	bucket := "ecowave"
+	bucket := "ecowave_storage"
 
 	storageClient, err := storage.NewClient(ctx, option.WithCredentialsFile("storage.json"))
 	if err != nil {
@@ -51,7 +51,7 @@ func UploadToBucket(ctx context.Context, fileHeader *multipart.FileHeader) (stri
 }
 
 func UploadVideoToBucket(ctx context.Context, videoHeader *multipart.FileHeader) (string, error) {
-	bucket := "ecowave"
+	bucket := "ecowave_storage"
 
 	storageClient, err := storage.NewClient(ctx, option.WithCredentialsFile("storage.json"))
 	if err != nil {
@@ -101,7 +101,7 @@ func DeleteImage(fileName string) error {
 		return echo.NewHTTPError(500, err)
 	}
 
-	bucketName := "ecowave"
+	bucketName := "ecowave_storage"
 	objectPath := Folder + fileName
 
 	obj := client.Bucket(bucketName).Object(objectPath)
