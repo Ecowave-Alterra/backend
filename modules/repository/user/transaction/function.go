@@ -132,3 +132,12 @@ func (tr *transactionRepo) CountVoucherUser(idUser uint, idVoucher uint) (uint, 
 	return uint(count), nil
 
 }
+func (tr *transactionRepo) UpdatePoint(id uint, point uint) error {
+
+	err := tr.db.Model(&eu.UserDetail{}).Where("user_id = ?", id).Update("point", point).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

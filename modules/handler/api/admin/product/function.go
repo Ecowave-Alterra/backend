@@ -409,11 +409,6 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 	name := c.FormValue("Name")
 	if name == "" {
 		req.Name = productBefore.Name
-	} else if len(name) > 10 {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"Message": "Mohon maaf, entri Anda melebihi batas maksimum 10 karakter",
-			"Status":  http.StatusBadRequest,
-		})
 	} else {
 		req.Name = name
 	}

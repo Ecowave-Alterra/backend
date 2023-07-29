@@ -10,12 +10,11 @@ func (ir *informationRepo) GetAllInformations(offset int, pageSize int) (*[]ie.U
 	var informationsRes []ie.UserInformationResponse
 	var count int64
 
-	err := ir.db.Where("status = ?", "Terbit").Find(&informations).Count(&count).Error
-	if err != nil {
+	if err := ir.db.Model(&ie.Information{}).Where("status = ?", "Terbit").Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
-	err = ir.db.Where("status = ?", "Terbit").Find(&informations).Offset(offset).Limit(pageSize).Error
-	if err != nil {
+
+	if err := ir.db.Where("status = ?", "Terbit").Find(&informations).Offset(offset).Limit(pageSize).Find(&informations).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -35,11 +34,7 @@ func (ir *informationRepo) GetAllInformations(offset int, pageSize int) (*[]ie.U
 
 func (ir *informationRepo) UpdatePoint(id uint, point uint) error {
 
-	updatePoint := eu.UserDetail{
-		Point: point,
-	}
-
-	err := ir.db.Model(&eu.UserDetail{}).Where("id = ?", id).Updates(&updatePoint).Error
+	err := ir.db.Model(&eu.UserDetail{}).Where("user_id = ?", id).Update("point", point).Error
 	if err != nil {
 		return err
 	}
@@ -49,12 +44,10 @@ func (ir *informationRepo) UpdatePoint(id uint, point uint) error {
 
 func (ir *informationRepo) GetPoint(id uint) (uint, error) {
 	var userDetail eu.UserDetail
-
-	if err := ir.db.Where("id = ?", id).First(&userDetail).Error; err != nil {
+	if err := ir.db.Where("user_id = ?", id).First(&userDetail).Error; err != nil {
 		return 0, err
 	}
 	point := userDetail.Point
 
 	return point, nil
-
 }

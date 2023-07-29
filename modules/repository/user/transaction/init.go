@@ -17,6 +17,7 @@ type TransactionRepo interface {
 	UpdateTransaction(transaction et.Transaction) error
 	GetPaymentStatus(id string) (string, error)
 	GetUserById(id uint) (*ue.User, error)
+	UpdatePoint(id uint, point uint) error
 }
 
 type transactionRepo struct {
