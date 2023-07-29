@@ -17,7 +17,7 @@ func (ar *authRepo) GetUserByEmail(email string) (*ue.User, error) {
 }
 func (ar *authRepo) Login(email string) (*ue.AuthResponse, string, uint, error) {
 	user := &ue.User{}
-	err := ar.db.Preload("UserAddresses").Preload("UserDetail").Where("email = ?", email).First(&user).Error
+	err := ar.db.Preload("UserDetail").Preload("UserAddresses").Where("email = ?", email).First(&user).Error
 	if err != nil {
 		return nil, "", 0, errors.New("Record Not Found")
 	}
@@ -28,7 +28,6 @@ func (ar *authRepo) Login(email string) (*ue.AuthResponse, string, uint, error) 
 			address = val
 		}
 	}
-
 	response := &ue.AuthResponse{
 		ID:            user.ID,
 		GoogleId:      user.GoogleId,

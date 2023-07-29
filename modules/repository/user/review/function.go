@@ -68,7 +68,7 @@ func (rr *reviewRepo) UpdateExpeditionRating(ratingExpedition float32, transacti
 func (rr *reviewRepo) GetPoint(id int) (int, error) {
 	var userDetail *eu.UserDetail
 
-	if err := rr.db.Where("id = ?", id).First(&userDetail).Error; err != nil {
+	if err := rr.db.Where("user_id = ?", id).First(&userDetail).Error; err != nil {
 		return 0, err
 	}
 
@@ -78,7 +78,7 @@ func (rr *reviewRepo) GetPoint(id int) (int, error) {
 func (rr *reviewRepo) UpdatePoint(idUser int, point int) error {
 	var userDetail *eu.UserDetail
 
-	err := rr.db.Model(userDetail).Where("id = ?", idUser).Update("point", point).Error
+	err := rr.db.Model(userDetail).Where("user_id = ?", idUser).Update("point", point).Error
 	if err != nil {
 		return err
 	}
